@@ -12,5 +12,5 @@
 - `SDWebImage` Carregamento de imagens.
 
 ---
-### Arquitatura:
+### Arquitetura:
 - MVC
