@@ -19,7 +19,7 @@ public enum RequestError {
     case emptyList
 }
 
-public protocol RequestManagerDelegate: class {
+public protocol RequestManagerDelegate: AnyObject {
     func handleSuccess(type: RequestSuccess)
     func handleError(type: RequestError)
 }

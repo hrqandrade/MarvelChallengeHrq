@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -538,9 +538,7 @@
                                         <constraints>
                                             <constraint firstAttribute="height" constant="25" id="zei-i4-Sa9"/>
                                         </constraints>
-                                        <state key="normal" title="Back" image="chevron.backward" catalog="system">
-                                            <color key="titleColor" systemColor="linkColor"/>
-                                        </state>
+                                        <state key="normal" title="Back" image="chevron.backward" catalog="system"/>
                                         <connections>
                                             <action selector="didTapBack:" destination="JNh-xB-7qn" eventType="touchUpInside" id="Jiu-BR-m9b"/>
                                         </connections>
@@ -558,6 +556,7 @@
                                     </button>
                                 </subviews>
                                 <color key="backgroundColor" red="0.8016632199" green="0.205217123" blue="0.1803541183" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <color key="tintColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="6Mq-t9-STb" secondAttribute="trailing" constant="20" id="4Lh-sP-Jbo"/>
                                     <constraint firstItem="lFs-Qw-6Zl" firstAttribute="leading" secondItem="h5t-5V-s8x" secondAttribute="leading" constant="20" id="4o0-Ih-Onk"/>
@@ -605,14 +604,14 @@
     </scenes>
     <resources>
         <image name="MarvelLogo" width="266.66665649414062" height="107.33333587646484"/>
-        <image name="chevron.backward" catalog="system" width="96" height="128"/>
+        <image name="chevron.backward" catalog="system" width="97" height="128"/>
         <image name="dislikedStar" width="170.66667175292969" height="170.66667175292969"/>
         <image name="list" width="512" height="512"/>
-        <systemColor name="linkColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="secondarySystemBackgroundColor">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

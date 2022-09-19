@@ -1,13 +1,13 @@
 PODS:
   - ReachabilitySwift (5.0.0)
-  - Realm (10.5.0):
-    - Realm/Headers (= 10.5.0)
-  - Realm/Headers (10.5.0)
-  - RealmSwift (10.5.0):
-    - Realm (= 10.5.0)
-  - SDWebImage (5.10.2):
-    - SDWebImage/Core (= 5.10.2)
-  - SDWebImage/Core (5.10.2)
+  - Realm (10.29.0):
+    - Realm/Headers (= 10.29.0)
+  - Realm/Headers (10.29.0)
+  - RealmSwift (10.29.0):
+    - Realm (= 10.29.0)
+  - SDWebImage (5.13.2):
+    - SDWebImage/Core (= 5.13.2)
+  - SDWebImage/Core (5.13.2)
 
 DEPENDENCIES:
   - ReachabilitySwift
@@ -23,10 +23,10 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
-  Realm: e1c22c3d83b229afb70ebc10e1771c91e9542d12
-  RealmSwift: 6fc078d9d3fd7e58c71bfdbb694e252462f112a5
-  SDWebImage: b969dcfc02c40a5da71eac0b03b8f1a0c794a86f
+  Realm: 5596770daeff1ad76c8eb10d5947dc10472da779
+  RealmSwift: 35d8d318b7e5a8dbc7096c2a243184e4d19abcc0
+  SDWebImage: 72f86271a6f3139cc7e4a89220946489d4b9a866
 
-PODFILE CHECKSUM: 3f77583c578ae0351b9c9b7e152e08c30f54b4d4
+PODFILE CHECKSUM: f34bc9b1b3ab1d07d2690657baff950855f36fc9
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.11.3

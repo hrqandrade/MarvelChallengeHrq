@@ -20,7 +20,7 @@ public enum RealmError {
     case errorToDelete
 }
 
-public protocol RealmManagerDelegate: class {
+public protocol RealmManagerDelegate: AnyObject {
     func handleSuccess(type: RealmSuccess)
     func handleError(type: RealmError)
 }
