@@ -80,6 +80,7 @@ public class RequestManager: NSObject {
         components?.queryItems = commonQueryItems + customQueryItems
         
         guard let url = components?.url else {
+            self.delegate?.handleError(type: .errorGetHeroes)
             return
         }
         
