@@ -106,8 +106,8 @@ final class HeroesCatalogViewModel {
                     self.page = requestedPage
                     self.characters += newCharacters
                     self.publishCurrentState()
-                case .failure:
-                    self.onStateChange?(.failed("Não foi possível carregar os personagens."))
+                case .failure(let error):
+                    self.onStateChange?(.failed(error.message))
                 }
             }
         }

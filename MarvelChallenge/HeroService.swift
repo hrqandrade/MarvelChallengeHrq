@@ -13,6 +13,23 @@ enum HeroServiceError: Error, Equatable {
     case decoding
 }
 
+extension HeroServiceError {
+    var message: String {
+        switch self {
+        case .missingCredentials:
+            return "Configure MARVEL_PUBLIC_KEY e MARVEL_PRIVATE_KEY no scheme para executar a integração."
+        case .invalidURL:
+            return "Não foi possível montar a URL da API."
+        case .transport:
+            return "Não foi possível conectar à API da Marvel."
+        case .invalidResponse:
+            return "A API da Marvel retornou uma resposta inválida."
+        case .decoding:
+            return "Não foi possível interpretar a resposta da API."
+        }
+    }
+}
+
 final class HeroService: HeroServicing {
     private let session: URLSession
     private let baseURL: URL

@@ -168,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				509EEB7925AC094D0057441B /* LoadingScreenManager */,
+				509EEC7F25AC924E0057441B /* RequestManager */,
 				509EEC6C25AC91A70057441B /* UnitTestFilesManager */,
 			);
 			path = Managers;

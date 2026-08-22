@@ -19,12 +19,16 @@ O projeto não utiliza CocoaPods nem bibliotecas de terceiros.
 
 ## Configuração
 
-As credenciais da API não são versionadas. No scheme `MarvelChallenge`, em **Run > Arguments > Environment Variables**, adicione:
+As credenciais da API não são versionadas. O repositório contém apenas o contrato em `Config/Secrets.xcconfig.example`; `Config/Secrets.xcconfig` está no `.gitignore`.
+
+Para executar pelo Xcode, no scheme `MarvelChallenge`, em **Run > Arguments > Environment Variables**, adicione:
 
 - `MARVEL_PUBLIC_KEY`
 - `MARVEL_PRIVATE_KEY`
 
-Chaves que já tenham sido publicadas no histórico do repositório devem ser revogadas e substituídas.
+Quem clonar o projeto deve usar suas próprias credenciais. Chaves que já tenham sido publicadas no histórico do repositório devem ser revogadas e substituídas.
+
+Esta configuração é adequada para demonstração e desenvolvimento local. Um aplicativo distribuído não deve carregar a chave privada da Marvel no binário; em produção, a autenticação deve ficar em um serviço intermediário.
 
 Abra `MarvelChallenge.xcodeproj`, selecione um simulador e execute o app.
 
