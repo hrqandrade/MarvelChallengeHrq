@@ -1,153 +1,77 @@
-//
-//  ViewController.swift
-//  MarvelChallenge
-//
-//  Created by Henrique Silva on 07/01/21.
-//  Copyright © 2021 Henrique Silva. All rights reserved.
-//
-
 import UIKit
 
-enum State {
-    case realm
-    case request
-    case loading
-}
-
-class HeroesCatalogViewController: UIViewController {
-    
+final class HeroesCatalogViewController: UIViewController {
     @IBOutlet weak var heroesCollectionView: UICollectionView!
     @IBOutlet weak var layoutButton: UIButton!
     @IBOutlet weak var headerLabel: UILabel!
     @IBOutlet weak var segmentedControl: UISegmentedControl!
-    
-    let loading: SimpleLoadingViewController = LoadingScreenManager.simpleLoading.viewController()
-    lazy var managerRequest = RequestManager(delegate: self)
-    lazy var managerRealm = RealmManager(delegate: self)
-    var charactesResult: [Character] = []
-    var charactersRealm: [CharacterRealm] = []
-    var stateHeroes: State!
-    var page = 0
-    var lastItem = 0
-    var refresher: UIRefreshControl!
-    var isGridFlowLayoutUsed: Bool = true {
-        didSet {
-            self.updateButtonAppearance()
-        }
-    }
-    
+
+    var viewModel: HeroesCatalogViewModel!
+    var onSelectCharacter: ((Character) -> Void)?
+    var isGridLayout = true
+    private let refreshControl = UIRefreshControl()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.setupCollectionView()
+        precondition(viewModel != nil, "HeroesCatalogViewModel must be injected by the coordinator")
+        configureCollectionView()
+        bindViewModel()
+        viewModel.loadInitial()
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        requestHeroes()
-    }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        didChangeRequestHeroes()
+        viewModel.reloadFavorites()
+        heroesCollectionView.reloadData()
     }
-    
-    @objc func loadData() {
-        if charactesResult.count == 0 {
-            self.heroesCollectionView.refreshControl?.beginRefreshing()
-            self.managerRequest.getHeroes(page: 0)
+
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] state in
+            guard let self = self else { return }
+            self.refreshControl.endRefreshing()
+            self.heroesCollectionView.reloadData()
+            switch state {
+            case .empty: self.setEmptyBackground()
+            case .failed(let message): self.presentAlert(withTitle: "Erro", message: message)
+            case .loaded: self.heroesCollectionView.backgroundView = nil
+            default: break
+            }
         }
     }
-    
-    func stopRefresher() {
-        DispatchQueue.main.async { self.heroesCollectionView.refreshControl?.endRefreshing()
-            self.refresher?.endRefreshing()
-            self.heroesCollectionView.backgroundView = nil
-        }
-    }
-    
-    func setupCollectionView() {
-        self.stateHeroes = .loading
+
+    private func configureCollectionView() {
         heroesCollectionView.dataSource = self
         heroesCollectionView.delegate = self
-        updateButtonAppearance()
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        heroesCollectionView.refreshControl = refreshControl
+        updateLayout()
     }
-    
-    func requestHeroes() {
-        if charactesResult.isEmpty {
-            self.present(self.loading, animated: true, completion: {
-                self.managerRequest.getHeroes(page: self.page)
-            })
-        }
+
+    @objc private func refresh() {
+        viewModel.reload()
     }
-    
-    func didChangeRequestHeroes() {
-        if MarvelSharedInstance.sharedInstance.needsReload && !charactesResult.isEmpty {
-            MarvelSharedInstance.sharedInstance.needsReload = false
-            self.reloadDataFromCollection()
-        }
+
+    private func updateLayout() {
+        layoutButton.setImage(UIImage(named: isGridLayout ? "list" : "grid"), for: .normal)
+        heroesCollectionView.setCollectionViewLayout(isGridLayout ? GridFlowLayout() : ListFlowLayout(), animated: true)
+        heroesCollectionView.reloadData()
     }
-    
-    func inputPullRefresh() {
-        self.refresher = UIRefreshControl()
-        self.heroesCollectionView.alwaysBounceVertical = true
-        self.refresher.tintColor = UIColor.white
-        self.refresher.addTarget(self, action: #selector(loadData), for: .valueChanged)
-        self.heroesCollectionView.addSubview(refresher)
+
+    private func setEmptyBackground() {
+        let imageName = segmentedControl.selectedSegmentIndex == 0 ? "emptyList" : "emptyFavorite"
+        let imageView = UIImageView(image: UIImage(named: imageName))
+        imageView.contentMode = .scaleAspectFit
+        heroesCollectionView.backgroundView = imageView
     }
-    
-    private func updateButtonAppearance() {
-        layoutButton.setImage(UIImage(named: isGridFlowLayoutUsed ? "list" : "grid" ), for: .normal)
-        let layout = isGridFlowLayoutUsed ? GridFlowLayout() : ListFlowLayout()
-        UIView.animate(withDuration: 0.4) { () -> Void in
-            self.heroesCollectionView.collectionViewLayout.invalidateLayout()
-            self.heroesCollectionView.setCollectionViewLayout(layout, animated: true)
-            self.reloadDataFromCollection()
-        }
+
+    @IBAction private func didTapLayout(_ sender: Any) {
+        isGridLayout.toggle()
+        updateLayout()
     }
-    
-    @IBAction func didTapLayout(_ sender: Any) {
-        isGridFlowLayoutUsed = !isGridFlowLayoutUsed
-    }
-    
-    func reloadDataFromCollection() {
-        let indexSet = IndexSet(integer: 0)
-        self.heroesCollectionView.reloadSections(indexSet)
-    }
-    
-    func getHeroes() {
-        self.charactersRealm = []
-        self.managerRealm.getHeroes()
-    }
-    
-    func setState(emptyList: Bool, needRemoveBg: Bool) {
-        if needRemoveBg {
-            self.heroesCollectionView.backgroundView = nil
-            return
-        }
-        let bgImage = UIImageView()
-        switch emptyList {
-        case true: bgImage.image = UIImage(named: "emptyList")
-        case false: bgImage.image = UIImage(named: "emptyFavorite")
-        }
-        bgImage.contentMode = .scaleToFill
-        self.heroesCollectionView.backgroundView = bgImage
-    }
-    
-    @IBAction func didChangeCategory(_ sender: Any) {
-        self.setState(emptyList: true, needRemoveBg: true)
-        switch segmentedControl.selectedSegmentIndex {
-        case 0:
-            if charactesResult.isEmpty {
-                self.setState(emptyList: true, needRemoveBg: false)
-            }
-            self.headerLabel.text = "Characters"
-            self.stateHeroes = .request
-        case 1:
-            self.getHeroes()
-            self.headerLabel.text = "Favorites"
-        default:
-            break
-        }
-        self.reloadDataFromCollection()
+
+    @IBAction private func didChangeCategory(_ sender: Any) {
+        let section: HeroesCatalogSection = segmentedControl.selectedSegmentIndex == 0 ? .characters : .favorites
+        headerLabel.text = section == .characters ? "Characters" : "Favorites"
+        viewModel.selectSection(section)
     }
 }

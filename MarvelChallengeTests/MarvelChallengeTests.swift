@@ -1,64 +1,47 @@
-//
-//  MarvelChallengeTests.swift
-//  MarvelChallengeTests
-//
-//  Created by Henrique Silva on 07/01/21.
-//  Copyright © 2021 Henrique Silva. All rights reserved.
-//
-
 import XCTest
 @testable import MarvelChallenge
 
-class MarvelChallengeTests: XCTestCase {
-    let delegate = RequestDelegateCopy()
-    var manager: RequestManager?
+final class MarvelChallengeTests: XCTestCase {
+    func testCatalogPublishesEmptyStateWhenServiceReturnsNoCharacters() {
+        let service = HeroServiceStub(result: .success([]))
+        let store = FavoritesStore(fileURL: temporaryFileURL())
+        let viewModel = HeroesCatalogViewModel(service: service, favorites: store)
+        let expectation = expectation(description: "empty state")
 
-    override func setUp() {
-    }
-
-    override func tearDown() {
-        manager = nil
-    }
-
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testeParseCharactersValue(){
-        let expectation = self.expectation(description: "RequestCharacter")
-        manager = RequestManager(delegate: delegate)
-        manager?.getHeroes(page: 0)
-        
-        var isEqual = false
-        if case .success(results: _) = delegate.handledSuccess {
-            isEqual = true
-            expectation.fulfill()
+        viewModel.onStateChange = { state in
+            if state == .empty { expectation.fulfill() }
         }
-        
-        waitForExpectations(timeout: 5, handler: nil)
-        XCTAssertEqual(isEqual, true)
-    }
-    
-    func testeErrorDelegateValue() {
-        let expectation = self.expectation(description: "RequestCharacter")
-        let manager = RequestManager(delegate: delegate)
-        manager.fileName = ""
-        manager.getHeroes(page: 0)
-        
-        var isEqual = false
-        if case .success(results: _) = delegate.handledSuccess {
-            isEqual = false
-            expectation.fulfill()
-        }
-        
-        if case .errorGetHeroes = delegate.handledError {
-            isEqual = true
-            expectation.fulfill()
-        }
-        
-        waitForExpectations(timeout: 5, handler: nil)
-        XCTAssertEqual(isEqual, true)
+        viewModel.loadInitial()
+
+        wait(for: [expectation], timeout: 1)
+        XCTAssertEqual(viewModel.itemCount, 0)
     }
 
+    func testFavoritesStoreSavesAndRemovesCharacter() throws {
+        let store = FavoritesStore(fileURL: temporaryFileURL())
+        let favorite = FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)
+
+        try store.save(favorite)
+        XCTAssertTrue(store.contains(id: 1))
+        XCTAssertEqual(store.all(), [favorite])
+
+        try store.remove(id: 1)
+        XCTAssertFalse(store.contains(id: 1))
+    }
+
+    private func temporaryFileURL() -> URL {
+        FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
+    }
+}
+
+private final class HeroServiceStub: HeroServicing {
+    let result: Result<[Character], HeroServiceError>
+
+    init(result: Result<[Character], HeroServiceError>) {
+        self.result = result
+    }
+
+    func fetchHeroes(page: Int, completion: @escaping (Result<[Character], HeroServiceError>) -> Void) {
+        completion(result)
+    }
 }

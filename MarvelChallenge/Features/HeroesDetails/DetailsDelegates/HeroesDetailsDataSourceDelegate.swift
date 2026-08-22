@@ -11,9 +11,9 @@ import UIKit
 extension HeroesDetailsViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == comicCollectionView {
-            return characterObject?.comics?.items?.count ?? 0
+            return viewModel.comics.count
         } else {
-            return characterObject?.series?.items?.count ?? 0
+            return viewModel.series.count
         }
     }
     
@@ -22,12 +22,12 @@ extension HeroesDetailsViewController: UICollectionViewDataSource, UICollectionV
         if collectionView == comicCollectionView {
             let cell = comicCollectionView.dequeueReusableCell(withReuseIdentifier: cellComics, for: indexPath) as! DetailsCollectionViewCell
             
-            cell.setupCell(description: characterObject?.comics?.items?[indexPath.row].name ?? "")
+            cell.setupCell(description: viewModel.comics[indexPath.row].name ?? "")
             return cell
         } else {
             let cell = seriesCollectionView.dequeueReusableCell(withReuseIdentifier: cellSeries, for: indexPath) as! DetailsCollectionViewCell
             
-            cell.setupCell(description: characterObject?.comics?.items?[indexPath.row].name ?? "")
+            cell.setupCell(description: viewModel.series[indexPath.row].name ?? "")
             return cell
         }
     }
@@ -40,4 +40,3 @@ extension HeroesDetailsViewController: UICollectionViewDataSource, UICollectionV
         return CGSize(width: 120, height: 120)
     }
 }
-
