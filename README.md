@@ -2,6 +2,8 @@
 
 Aplicativo iOS para consultar personagens da Marvel, ver detalhes e manter uma lista local de favoritos.
 
+Versão atual: **2.0.0**
+
 ## Contexto
 
 Este projeto foi criado originalmente em 2017 como um desafio técnico. A implementação refletia as práticas e ferramentas disponíveis naquele período e, posteriormente, recebeu pequenos ajustes de compatibilidade.
