@@ -1,59 +1,26 @@
-//
-//  HeroesCatalogViewControllerDataSource.swift
-//  MarvelChallenge
-//
-//  Created by Henrique Silva on 09/01/21.
-//  Copyright © 2021 Henrique Silva. All rights reserved.
-//
-
 import UIKit
 
 extension HeroesCatalogViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch stateHeroes  {
-        case .loading: return 0
-        case .request: lastItem = charactesResult.count
-            return charactesResult.count
-        case .realm: return charactersRealm.count
-        case .none: return 0
-        }
+        viewModel.itemCount
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        switch (isGridFlowLayoutUsed, stateHeroes) {
-        case (true,.request):
-            return setGridCell(isRealm: false, collectionView: collectionView, indexPath: indexPath)
-        case (false,.request):
-            return setListCell(isRealm: false, collectionView: collectionView, indexPath: indexPath)
-        case (true,.realm):
-            return setGridCell(isRealm: true, collectionView: collectionView, indexPath: indexPath)
-        case (false,.realm):
-            return setListCell(isRealm: true, collectionView: collectionView, indexPath: indexPath)
-        case (_, .none):
-            return UICollectionViewCell()
-        case (_, .some(.loading)):
-            return UICollectionViewCell()
-        }
-    }
-    
-    func setListCell(isRealm: Bool, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell{
-        let cell: HeroesCollectionListCell = collectionView.dequeueReusableCell(withReuseIdentifier: "HeroesCollectionListCell", for: indexPath as IndexPath) as! HeroesCollectionListCell
-        switch isRealm {
-        case true: cell.setupWithRealm(object: charactersRealm[indexPath.row]) {
-            self.managerRealm.delete(id: self.charactersRealm[indexPath.row].id)
-        }
-        case false: cell.setupWithRequest(object: charactesResult[indexPath.row])
-        }
-        return cell
-    }
-    
-    func setGridCell(isRealm: Bool, collectionView: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell{
-        let cell: HeroesCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: "HeroesCollectionViewCell", for: indexPath as IndexPath) as! HeroesCollectionViewCell
-        switch isRealm {
-        case true: cell.setupWithRealm(object: charactersRealm[indexPath.row]) {
-            self.managerRealm.delete(id: self.charactersRealm[indexPath.row].id)
-        }
-        case false: cell.setupWithRequest(object: charactesResult[indexPath.row])
+        let identifier = isGridLayout ? "HeroesCollectionViewCell" : "HeroesCollectionListCell"
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
+        if let character = viewModel.character(at: indexPath.item) {
+            let action: () -> Void = { [weak self] in
+                self?.viewModel.toggleFavorite(character)
+            }
+            (cell as? HeroesCollectionViewCell)?.configure(character: character, isFavorite: viewModel.isFavorite(character), onFavorite: action)
+            (cell as? HeroesCollectionListCell)?.configure(character: character, isFavorite: viewModel.isFavorite(character), onFavorite: action)
+        } else if let favorite = viewModel.favorite(at: indexPath.item) {
+            let action = { [weak self] in
+                guard let self = self, let index = self.viewModel.favoriteCharacters.firstIndex(of: favorite) else { return }
+                self.viewModel.removeFavorite(at: index)
+            }
+            (cell as? HeroesCollectionViewCell)?.configure(favorite: favorite, onFavorite: action)
+            (cell as? HeroesCollectionListCell)?.configure(favorite: favorite, onFavorite: action)
         }
         return cell
     }
@@ -61,27 +28,11 @@ extension HeroesCatalogViewController: UICollectionViewDataSource {
 
 extension HeroesCatalogViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        switch stateHeroes {
-        case .request:
-            MarvelSharedInstance.sharedInstance.characterSelect = charactesResult[indexPath.row]
-            self.performSegue(withIdentifier: "callDetails", sender: nil)
-            break
-        default:
-            break
-        }
-        
+        guard let character = viewModel.character(at: indexPath.item) else { return }
+        onSelectCharacter?(character)
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        switch stateHeroes {
-        case .request:
-            if indexPath.row == lastItem-1 {
-                page += 1
-                self.managerRequest.getHeroes(page: page)
-                
-            }
-        default:
-            break
-        }
+        viewModel.loadNextPageIfNeeded(index: indexPath.item)
     }
 }

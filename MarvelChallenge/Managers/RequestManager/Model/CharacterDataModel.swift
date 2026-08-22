@@ -6,7 +6,7 @@
 //  Copyright © 2021 Henrique Silva. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 // MARK: - CharacterData
 public struct CharacterData: Codable {

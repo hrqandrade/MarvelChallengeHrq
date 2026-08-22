@@ -67,5 +67,7 @@ fastlane/test_output
 # Plist created by CI for xcodebuild export options
 ExportOptions.plist
 
+# Local API credentials
+Config/Secrets.xcconfig
 
 
