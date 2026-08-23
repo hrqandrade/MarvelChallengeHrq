@@ -151,8 +151,8 @@ xcodebuild test \
   -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
-## Próximas evoluções
+## Roadmap
 
-- Ampliar testes de paginação, falhas de rede e navegação.
-- Adicionar CI para build e testes em Pull Requests.
-- Evoluir o Design System com componentes reutilizáveis de interface.
+A evolução técnica até a release 2.0.0 está organizada no [`ROADMAP.md`](ROADMAP.md). O planejamento inclui segurança de runtime, ciclo de vida e memória, cancelamento, paginação, persistência, limites arquiteturais, testes, componentes do Design System e integração contínua.
+
+O roadmap é tratado como um documento vivo: descobertas técnicas são priorizadas pelo risco e incorporadas às próximas entregas com critérios claros de conclusão.
