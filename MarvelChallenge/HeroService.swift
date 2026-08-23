@@ -17,15 +17,15 @@ extension HeroServiceError {
     var message: String {
         switch self {
         case .missingCredentials:
-            return "Configure MARVEL_PUBLIC_KEY e MARVEL_PRIVATE_KEY no scheme para executar a integração."
+            return Localizable.Error.missingCredentials
         case .invalidURL:
-            return "Não foi possível montar a URL da API."
+            return Localizable.Error.invalidURL
         case .transport:
-            return "Não foi possível conectar à API da Marvel."
+            return Localizable.Error.transport
         case .invalidResponse:
-            return "A API da Marvel retornou uma resposta inválida."
+            return Localizable.Error.invalidResponse
         case .decoding:
-            return "Não foi possível interpretar a resposta da API."
+            return Localizable.Error.decoding
         }
     }
 }

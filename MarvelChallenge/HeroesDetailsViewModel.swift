@@ -11,7 +11,7 @@ final class HeroesDetailsViewModel {
 
     var name: String { character.name ?? "" }
     var description: String {
-        guard let description = character.resultDescription, !description.isEmpty else { return "Description not found" }
+        guard let description = character.resultDescription, !description.isEmpty else { return Localizable.Details.descriptionUnavailable }
         return description
     }
     var imageURL: URL? { character.imageURL }

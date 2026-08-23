@@ -1,0 +1,20 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "catalog.characters" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Characters" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Personagens" } } } },
+    "catalog.favorites" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Favorites" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Favoritos" } } } },
+    "common.error" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Error" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Erro" } } } },
+    "common.ok" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "OK" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "OK" } } } },
+    "details.comics" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Comics" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Quadrinhos" } } } },
+    "details.descriptionUnavailable" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Description not found" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Descrição não encontrada" } } } },
+    "details.series" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Series" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Séries" } } } },
+    "error.decoding" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "The API response could not be decoded." } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Não foi possível interpretar a resposta da API." } } } },
+    "error.invalidResponse" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "The Marvel API returned an invalid response." } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "A API da Marvel retornou uma resposta inválida." } } } },
+    "error.invalidURL" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "The API URL could not be created." } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Não foi possível montar a URL da API." } } } },
+    "error.missingCredentials" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Configure MARVEL_PUBLIC_KEY and MARVEL_PRIVATE_KEY in the scheme to run the integration." } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Configure MARVEL_PUBLIC_KEY e MARVEL_PRIVATE_KEY no scheme para executar a integração." } } } },
+    "error.transport" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "The Marvel API could not be reached." } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Não foi possível conectar à API da Marvel." } } } },
+    "loading.description" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Everything will be ready soon." } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Em breve tudo estará pronto." } } } },
+    "loading.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Please wait…" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Aguarde…" } } } }
+  },
+  "version" : "1.0"
+}

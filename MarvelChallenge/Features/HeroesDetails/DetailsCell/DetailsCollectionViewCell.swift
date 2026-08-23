@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MarvelDesignSystem
 
 class DetailsCollectionViewCell: UICollectionViewCell {
     
@@ -18,10 +19,13 @@ class DetailsCollectionViewCell: UICollectionViewCell {
     
     func setupCell(description: String){
         self.labelDescription.text = description
+        self.labelDescription.font = DesignSystem.Typography.caption
+        self.labelDescription.textColor = DesignSystem.Color.textPrimary
+        self.borderedView.backgroundColor = DesignSystem.Color.surface
         self.borderedView.layer.borderWidth = 1
-        self.borderedView.layer.borderColor = UIColor.white.cgColor
+        self.borderedView.layer.borderColor = DesignSystem.Color.border.cgColor
         self.borderedView.layer.masksToBounds = true
-        self.borderedView.layer.cornerRadius = 10
+        self.borderedView.layer.cornerRadius = DesignSystem.Radius.medium
     }
     
 }

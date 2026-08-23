@@ -60,6 +60,12 @@ ViewModels
 
 O carregamento de imagens é fornecido pelo pacote próprio [`MarvelImageLoader`](https://github.com/hrqandrade/MarvelImageLoader), integrado por Swift Package Manager e construído com `URLSession` e `NSCache`.
 
+## Design System e localização
+
+Os estilos visuais são fornecidos pelo pacote próprio [`MarvelDesignSystem`](https://github.com/hrqandrade/MarvelDesignSystem), integrado por Swift Package Manager. Cores semânticas, tipografia, espaçamentos, raios e sombras ficam centralizados no pacote para reduzir valores visuais dispersos pelas telas.
+
+Os textos de interface ficam no String Catalog `Localizable.xcstrings`, com traduções em inglês e português do Brasil. O arquivo `Localizable.swift` oferece uma interface organizada por contexto para evitar chaves e textos literais nas classes de apresentação.
+
 ## Estratégia de branches
 
 - `master`: versão estável.
@@ -92,3 +98,4 @@ xcodebuild test \
 - Separar as pastas por feature e camada no projeto Xcode.
 - Ampliar testes de paginação, falhas de rede e navegação.
 - Adicionar CI para build e testes em Pull Requests.
+- Evoluir o Design System com componentes reutilizáveis de interface.

@@ -1,5 +1,6 @@
 import UIKit
 import MarvelImageLoader
+import MarvelDesignSystem
 
 final class HeroesDetailsViewController: UIViewController {
     @IBOutlet private weak var labelHeader: UILabel!
@@ -18,6 +19,15 @@ final class HeroesDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         precondition(viewModel != nil, "HeroesDetailsViewModel must be injected by the coordinator")
+        view.backgroundColor = DesignSystem.Color.backgroundPrimary
+        labelHeader.font = DesignSystem.Typography.title
+        labelHeader.textColor = DesignSystem.Color.textPrimary
+        descriptionLabel.font = DesignSystem.Typography.body
+        descriptionLabel.textColor = DesignSystem.Color.textSecondary
+        comicLabel.font = DesignSystem.Typography.titleSecondary
+        seriesLabel.font = DesignSystem.Typography.titleSecondary
+        comicLabel.text = Localizable.Details.comics
+        seriesLabel.text = Localizable.Details.series
         configureCollections()
         render()
     }
