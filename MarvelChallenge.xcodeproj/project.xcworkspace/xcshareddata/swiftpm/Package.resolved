@@ -1,0 +1,15 @@
+{
+  "originHash" : "4463705aa18debbb26d1e6236a950224e7a4398e058d860f710e3aa492e1b7ee",
+  "pins" : [
+    {
+      "identity" : "marvelimageloader",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hrqandrade/MarvelImageLoader.git",
+      "state" : {
+        "revision" : "38cdadf6ad3c52b6521fe2b2950214636b4571b3",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}

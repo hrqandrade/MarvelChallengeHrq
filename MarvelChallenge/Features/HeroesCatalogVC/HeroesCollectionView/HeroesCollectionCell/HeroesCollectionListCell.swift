@@ -1,4 +1,5 @@
 import UIKit
+import MarvelImageLoader
 
 final class HeroesCollectionListCell: UICollectionViewCell {
     @IBOutlet private var imageView: UIImageView!

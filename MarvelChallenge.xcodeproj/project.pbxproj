@@ -10,7 +10,7 @@
 		AA0000000000000000000001 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000011 /* AppCoordinator.swift */; };
 		AA0000000000000000000002 /* HeroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000012 /* HeroService.swift */; };
 		AA0000000000000000000003 /* FavoritesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000013 /* FavoritesStore.swift */; };
-		AA0000000000000000000004 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000014 /* ImageLoader.swift */; };
+		BB0000000000000000000001 /* MarvelImageLoader in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000000000000000000003 /* MarvelImageLoader */; };
 		AA0000000000000000000005 /* HeroesCatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000015 /* HeroesCatalogViewModel.swift */; };
 		AA0000000000000000000006 /* HeroesDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000016 /* HeroesDetailsViewModel.swift */; };
 		5025353325A7C60A00B03C4D /* ListFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5025353225A7C60A00B03C4D /* ListFlowLayout.swift */; };
@@ -67,7 +67,6 @@
 		AA0000000000000000000011 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		AA0000000000000000000012 /* HeroService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroService.swift; sourceTree = "<group>"; };
 		AA0000000000000000000013 /* FavoritesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStore.swift; sourceTree = "<group>"; };
-		AA0000000000000000000014 /* ImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
 		AA0000000000000000000015 /* HeroesCatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCatalogViewModel.swift; sourceTree = "<group>"; };
 		AA0000000000000000000016 /* HeroesDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesDetailsViewModel.swift; sourceTree = "<group>"; };
 		5025353425A7EA7300B03C4D /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -105,6 +104,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB0000000000000000000001 /* MarvelImageLoader in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,7 +268,6 @@
 				AA0000000000000000000011 /* AppCoordinator.swift */,
 				AA0000000000000000000012 /* HeroService.swift */,
 				AA0000000000000000000013 /* FavoritesStore.swift */,
-				AA0000000000000000000014 /* ImageLoader.swift */,
 				AA0000000000000000000015 /* HeroesCatalogViewModel.swift */,
 				AA0000000000000000000016 /* HeroesDetailsViewModel.swift */,
 				50C7BD0225A785B4006A235D /* Main.storyboard */,
@@ -328,6 +327,9 @@
 			dependencies = (
 			);
 			name = MarvelChallenge;
+			packageProductDependencies = (
+				BB0000000000000000000003 /* MarvelImageLoader */,
+			);
 			productName = MarvelChallenge;
 			productReference = 50C7BCF925A785B4006A235D /* MarvelChallenge.app */;
 			productType = "com.apple.product-type.application";
@@ -378,6 +380,9 @@
 				Base,
 			);
 			mainGroup = 50C7BCF025A785B4006A235D;
+			packageReferences = (
+				BB0000000000000000000002 /* XCRemoteSwiftPackageReference "MarvelImageLoader" */,
+			);
 			productRefGroup = 50C7BCFA25A785B4006A235D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -501,7 +506,6 @@
 				AA0000000000000000000001 /* AppCoordinator.swift in Sources */,
 				AA0000000000000000000002 /* HeroService.swift in Sources */,
 				AA0000000000000000000003 /* FavoritesStore.swift in Sources */,
-				AA0000000000000000000004 /* ImageLoader.swift in Sources */,
 				AA0000000000000000000005 /* HeroesCatalogViewModel.swift in Sources */,
 				AA0000000000000000000006 /* HeroesDetailsViewModel.swift in Sources */,
 				50BFB02825ACC5D2009F34FA /* HeroesDetailsDataSourceDelegate.swift in Sources */,
@@ -797,6 +801,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BB0000000000000000000002 /* XCRemoteSwiftPackageReference "MarvelImageLoader" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hrqandrade/MarvelImageLoader.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BB0000000000000000000003 /* MarvelImageLoader */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB0000000000000000000002 /* XCRemoteSwiftPackageReference "MarvelImageLoader" */;
+			productName = MarvelImageLoader;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 50C7BCF125A785B4006A235D /* Project object */;
 }
