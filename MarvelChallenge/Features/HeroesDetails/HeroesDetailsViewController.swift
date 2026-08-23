@@ -1,4 +1,5 @@
 import UIKit
+import MarvelImageLoader
 
 final class HeroesDetailsViewController: UIViewController {
     @IBOutlet private weak var labelHeader: UILabel!

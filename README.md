@@ -17,7 +17,7 @@ Em 2026, o projeto começou a ser modernizado para servir como exemplo de uma ap
 - Swift 5
 - Conta de desenvolvedor no [Marvel Developer Portal](https://developer.marvel.com/)
 
-O projeto não utiliza CocoaPods nem bibliotecas de terceiros.
+O projeto não utiliza CocoaPods. Dependências próprias são distribuídas por Swift Package Manager.
 
 ## Configuração
 
@@ -58,7 +58,7 @@ ViewModels
 - **ViewModel:** concentra estado e regras de apresentação sem depender de UIKit.
 - **Services/Stores:** implementam infraestrutura atrás de protocolos, permitindo mocks nos testes.
 
-O carregamento de imagens usa `URLSession` e `NSCache` atrás do protocolo `ImageLoading`. Essa fronteira permite migrar a implementação para um pacote Swift Package Manager independente sem acoplar as telas.
+O carregamento de imagens é fornecido pelo pacote próprio [`MarvelImageLoader`](https://github.com/hrqandrade/MarvelImageLoader), integrado por Swift Package Manager e construído com `URLSession` e `NSCache`.
 
 ## Estratégia de branches
 
@@ -89,7 +89,6 @@ xcodebuild test \
 
 ## Próximas evoluções
 
-- Extrair `ImageLoading` para um repositório próprio distribuído por SPM.
 - Separar as pastas por feature e camada no projeto Xcode.
 - Ampliar testes de paginação, falhas de rede e navegação.
 - Adicionar CI para build e testes em Pull Requests.
