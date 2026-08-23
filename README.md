@@ -86,6 +86,36 @@ ViewModels
 - **ViewModel:** concentra estado e regras de apresentação sem depender de UIKit.
 - **Services/Stores:** implementam infraestrutura atrás de protocolos, permitindo mocks nos testes.
 
+### Organização do código
+
+```text
+MarvelChallenge
+├── Application
+│   ├── AppCoordinator
+│   ├── AppDelegate
+│   └── SceneDelegate
+├── Core
+│   ├── Extensions
+│   ├── Localization
+│   ├── Networking
+│   │   └── Models
+│   └── Persistence
+├── Features
+│   ├── HeroesCatalog
+│   │   ├── View
+│   │   │   ├── Cells
+│   │   │   └── Layouts
+│   │   └── ViewModel
+│   └── HeroesDetails
+│       ├── View
+│       │   └── Cells
+│       └── ViewModel
+└── Shared
+    └── Loading
+```
+
+Cada feature mantém sua View e seu ViewModel próximos. Infraestruturas compartilhadas ficam em `Core`, componentes de interface reutilizados ficam em `Shared` e o ciclo de vida do aplicativo fica em `Application`.
+
 O carregamento de imagens é fornecido pelo pacote próprio [`MarvelImageLoader`](https://github.com/hrqandrade/MarvelImageLoader), integrado por Swift Package Manager e construído com `URLSession` e `NSCache`.
 
 ## Design System e localização
@@ -121,9 +151,8 @@ xcodebuild test \
   -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
-## Próximas evoluções
+## Roadmap
 
-- Separar as pastas por feature e camada no projeto Xcode.
-- Ampliar testes de paginação, falhas de rede e navegação.
-- Adicionar CI para build e testes em Pull Requests.
-- Evoluir o Design System com componentes reutilizáveis de interface.
+A evolução técnica até a release 2.0.0 está organizada no [`ROADMAP.md`](ROADMAP.md). O planejamento inclui segurança de runtime, ciclo de vida e memória, cancelamento, paginação, persistência, limites arquiteturais, testes, componentes do Design System e integração contínua.
+
+O roadmap é tratado como um documento vivo: descobertas técnicas são priorizadas pelo risco e incorporadas às próximas entregas com critérios claros de conclusão.
