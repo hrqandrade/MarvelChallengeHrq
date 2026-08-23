@@ -7,7 +7,9 @@ enum HeroesCatalogSection {
 
 enum HeroesCatalogState: Equatable {
     case idle
-    case loading
+    case initialLoading
+    case refreshing
+    case loadingNextPage
     case loaded
     case empty
     case failed(String)
@@ -20,7 +22,9 @@ final class HeroesCatalogViewModel {
     private(set) var favoriteCharacters: [FavoriteCharacter] = []
     private(set) var section: HeroesCatalogSection = .characters
     private var page = 0
-    private var isLoading = false
+    private var hasMorePages = true
+    private var currentRequest: RequestCancellable?
+    private var currentRequestID: UUID?
 
     var onStateChange: ((HeroesCatalogState) -> Void)?
 
@@ -29,26 +33,38 @@ final class HeroesCatalogViewModel {
         self.favorites = favorites
     }
 
+    deinit {
+        currentRequest?.cancel()
+    }
+
     var itemCount: Int {
         section == .characters ? characters.count : favoriteCharacters.count
     }
 
     func loadInitial() {
-        guard characters.isEmpty else { return }
+        precondition(Thread.isMainThread)
+        guard characters.isEmpty, currentRequestID == nil else { return }
         page = 0
-        load(page: page)
+        hasMorePages = true
+        load(page: page, mode: .initial)
     }
 
     func reload() {
-        guard !isLoading else { return }
-        characters = []
+        precondition(Thread.isMainThread)
+        cancelCurrentRequest()
         page = 0
-        load(page: page)
+        hasMorePages = true
+        load(page: page, mode: .refresh)
     }
 
     func loadNextPageIfNeeded(index: Int) {
-        guard section == .characters, index == characters.count - 1 else { return }
-        load(page: page + 1)
+        precondition(Thread.isMainThread)
+        guard section == .characters,
+              currentRequestID == nil,
+              hasMorePages,
+              !characters.isEmpty,
+              index == characters.count - 1 else { return }
+        load(page: page + 1, mode: .nextPage)
     }
 
     func selectSection(_ section: HeroesCatalogSection) {
@@ -93,27 +109,80 @@ final class HeroesCatalogViewModel {
         publishCurrentState()
     }
 
-    private func load(page requestedPage: Int) {
-        guard !isLoading else { return }
-        isLoading = true
-        onStateChange?(.loading)
-        service.fetchHeroes(page: requestedPage) { [weak self] result in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                self.isLoading = false
-                switch result {
-                case .success(let newCharacters):
-                    self.page = requestedPage
-                    self.characters += newCharacters
-                    self.publishCurrentState()
-                case .failure(let error):
-                    self.onStateChange?(.failed(error.message))
-                }
+    private func load(page requestedPage: Int, mode: LoadMode) {
+        guard currentRequestID == nil else { return }
+        let requestID = UUID()
+        currentRequestID = requestID
+        onStateChange?(mode.state)
+        let request = service.fetchHeroes(page: requestedPage) { [weak self] result in
+            self?.performOnMain { [weak self] in
+                self?.handle(result, page: requestedPage, mode: mode, requestID: requestID)
             }
+        }
+        if currentRequestID == requestID {
+            currentRequest = request
+        } else {
+            request?.cancel()
+        }
+    }
+
+    private func handle(
+        _ result: Result<HeroesPage, HeroServiceError>,
+        page requestedPage: Int,
+        mode: LoadMode,
+        requestID: UUID
+    ) {
+        guard currentRequestID == requestID else { return }
+        currentRequest = nil
+        currentRequestID = nil
+
+        switch result {
+        case .success(let response):
+            page = requestedPage
+            hasMorePages = response.hasNextPage
+            switch mode {
+            case .initial, .refresh:
+                characters = response.characters
+            case .nextPage:
+                characters += response.characters
+            }
+            publishCurrentState()
+        case .failure(let error):
+            onStateChange?(.failed(error.message))
+        }
+    }
+
+    private func cancelCurrentRequest() {
+        currentRequest?.cancel()
+        currentRequest = nil
+        currentRequestID = nil
+    }
+
+    private func performOnMain(_ action: @escaping () -> Void) {
+        if Thread.isMainThread {
+            action()
+        } else {
+            DispatchQueue.main.async(execute: action)
         }
     }
 
     private func publishCurrentState() {
         onStateChange?(itemCount == 0 ? .empty : .loaded)
+    }
+}
+
+private extension HeroesCatalogViewModel {
+    enum LoadMode {
+        case initial
+        case refresh
+        case nextPage
+
+        var state: HeroesCatalogState {
+            switch self {
+            case .initial: return .initialLoading
+            case .refresh: return .refreshing
+            case .nextPage: return .loadingNextPage
+            }
+        }
     }
 }

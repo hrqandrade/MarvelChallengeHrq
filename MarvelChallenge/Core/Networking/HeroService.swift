@@ -2,7 +2,26 @@ import CommonCrypto
 import Foundation
 
 protocol HeroServicing {
-    func fetchHeroes(page: Int, completion: @escaping (Result<[Character], HeroServiceError>) -> Void)
+    @discardableResult
+    func fetchHeroes(page: Int, completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void) -> RequestCancellable?
+}
+
+protocol RequestCancellable: AnyObject {
+    func cancel()
+}
+
+extension URLSessionDataTask: RequestCancellable {}
+
+struct HeroesPage {
+    let characters: [Character]
+    let offset: Int
+    let total: Int?
+
+    var hasNextPage: Bool {
+        guard !characters.isEmpty else { return false }
+        guard let total else { return true }
+        return offset + characters.count < total
+    }
 }
 
 enum HeroServiceError: Error, Equatable {
@@ -48,17 +67,18 @@ final class HeroService: HeroServicing {
         self.privateKey = privateKey
     }
 
-    func fetchHeroes(page: Int, completion: @escaping (Result<[Character], HeroServiceError>) -> Void) {
+    @discardableResult
+    func fetchHeroes(page: Int, completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void) -> RequestCancellable? {
         guard !publicKey.isEmpty, !privateKey.isEmpty else {
             completion(.failure(.missingCredentials))
-            return
+            return nil
         }
         guard let url = makeURL(page: page) else {
             completion(.failure(.invalidURL))
-            return
+            return nil
         }
 
-        session.dataTask(with: url) { data, response, error in
+        let task = session.dataTask(with: url) { data, response, error in
             if error != nil {
                 completion(.failure(.transport))
                 return
@@ -68,12 +88,22 @@ final class HeroService: HeroServicing {
                 return
             }
             do {
-                let result = try JSONDecoder().decode(CharacterData.self, from: data)
-                completion(.success(result.data?.results ?? []))
+                let response = try JSONDecoder().decode(CharacterData.self, from: data)
+                guard let result = response.data else {
+                    completion(.failure(.invalidResponse))
+                    return
+                }
+                completion(.success(HeroesPage(
+                    characters: result.results ?? [],
+                    offset: result.offset ?? page * 20,
+                    total: result.total
+                )))
             } catch {
                 completion(.failure(.decoding))
             }
-        }.resume()
+        }
+        task.resume()
+        return task
     }
 
     private func makeURL(page: Int) -> URL? {

@@ -41,7 +41,7 @@ Critério de conclusão: projeto compilando, testes atuais aprovados e nenhuma r
 
 Critério de conclusão: ausência de caminhos conhecidos de crash por cast/unwrap e testes básicos de desalocação. A análise manual no Memory Graph faz parte da regressão da release.
 
-### 3. Concorrência, cancelamento e paginação — planejada
+### 3. Concorrência, cancelamento e paginação — concluída
 
 - Fazer o serviço de rede devolver uma operação cancelável.
 - Cancelar requisições substituídas, recarregadas ou sem consumidor.
