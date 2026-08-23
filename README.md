@@ -1,14 +1,42 @@
 # Marvel Challenge
 
-Aplicativo iOS para consultar personagens da Marvel, ver detalhes e manter uma lista local de favoritos.
+Aplicativo iOS para consultar personagens da Marvel, ver detalhes e manter uma lista local de favoritos. Mais do que uma demonstração de interface, este repositório registra a evolução de um projeto legado para uma base moderna, modular e testável.
 
 Versão atual: **2.0.0**
 
-## Contexto
+## A história do projeto
 
-Este projeto foi criado originalmente em 2017 como um desafio técnico. A implementação refletia as práticas e ferramentas disponíveis naquele período e, posteriormente, recebeu pequenos ajustes de compatibilidade.
+Este projeto nasceu em 2017 como um desafio técnico. Naquele momento, o objetivo era entregar as funcionalidades principais: consumir a API da Marvel, listar personagens, apresentar detalhes e persistir favoritos. A solução cumpria esse papel usando MVC, delegates e bibliotecas populares do ecossistema iOS da época.
 
-Em 2026, o projeto começou a ser modernizado para servir como exemplo de uma aplicação UIKit com arquitetura MVVM-C, dependências explícitas e código testável. A atualização é incremental para preservar o histórico e tornar cada decisão arquitetural revisável.
+Com o passar dos anos, o código passou a representar também uma fotografia daquele período: responsabilidades concentradas nas telas, navegação acoplada às ViewControllers, credenciais no código e dependências externas para persistência, conectividade e imagens.
+
+Em 2026, decidi revisitar o desafio com uma proposta diferente: não apagar o passado, mas usá-lo para demonstrar evolução técnica. A versão 2.0.0 moderniza o projeto em etapas pequenas e revisáveis, preservando o histórico do Git para que cada decisão possa ser acompanhada.
+
+O resultado é um estudo prático sobre manutenção de software: partir de uma aplicação funcional, identificar os acoplamentos que limitam sua evolução e construir uma arquitetura mais clara sem reescrever tudo de uma vez.
+
+## Da versão original à 2.0.0
+
+| Aspecto | Versão original | Versão 2.0.0 |
+| --- | --- | --- |
+| Arquitetura | MVC com lógica e navegação próximas das telas | MVVM-C com responsabilidades separadas |
+| Criação do fluxo | ViewControllers instanciavam e controlavam dependências | Coordinator monta o fluxo e injeta dependências |
+| Comunicação | Delegates concretos entre managers e telas | Estados observáveis e serviços definidos por protocolos |
+| Rede | Manager acoplado e validação por `ReachabilitySwift` | `URLSession`, erros tipados e tratamento de resposta HTTP |
+| Favoritos | `RealmSwift` e imagem persistida em Base64 | `Codable` e armazenamento local atrás de protocolo |
+| Imagens | `SDWebImage` | [`MarvelImageLoader`](https://github.com/hrqandrade/MarvelImageLoader) próprio, via SPM |
+| Estilos | Cores, fontes e medidas distribuídas pelas telas | [`MarvelDesignSystem`](https://github.com/hrqandrade/MarvelDesignSystem) com tokens semânticos |
+| Textos | Strings literais nas classes e interfaces | String Catalog com inglês e português do Brasil |
+| Credenciais | Chaves armazenadas no código-fonte | Configuração local fora do versionamento |
+| Dependências | CocoaPods | Swift Package Manager apenas para módulos próprios |
+| Testabilidade | Dependência de managers concretos e do ambiente | Protocolos, injeção de dependência e testes com doubles |
+
+### Princípios da modernização
+
+- **Evolução incremental:** cada etapa parte da `develop` e retorna por Pull Request.
+- **Dependências justificadas:** recursos simples usam APIs nativas; módulos reutilizáveis viram pacotes próprios.
+- **Código orientado a contratos:** serviços e persistência ficam atrás de protocolos.
+- **UI consistente:** estilos e textos deixam de ser decisões isoladas de cada tela.
+- **Histórico preservado:** a implementação original continua acessível nos commits antigos para permitir a comparação.
 
 ## Requisitos
 
@@ -60,6 +88,12 @@ ViewModels
 
 O carregamento de imagens é fornecido pelo pacote próprio [`MarvelImageLoader`](https://github.com/hrqandrade/MarvelImageLoader), integrado por Swift Package Manager e construído com `URLSession` e `NSCache`.
 
+## Design System e localização
+
+Os estilos visuais são fornecidos pelo pacote próprio [`MarvelDesignSystem`](https://github.com/hrqandrade/MarvelDesignSystem), integrado por Swift Package Manager. Cores semânticas, tipografia, espaçamentos, raios e sombras ficam centralizados no pacote para reduzir valores visuais dispersos pelas telas.
+
+Os textos de interface ficam no String Catalog `Localizable.xcstrings`, com traduções em inglês e português do Brasil. O arquivo `Localizable.swift` oferece uma interface organizada por contexto para evitar chaves e textos literais nas classes de apresentação.
+
 ## Estratégia de branches
 
 - `master`: versão estável.
@@ -92,3 +126,4 @@ xcodebuild test \
 - Separar as pastas por feature e camada no projeto Xcode.
 - Ampliar testes de paginação, falhas de rede e navegação.
 - Adicionar CI para build e testes em Pull Requests.
+- Evoluir o Design System com componentes reutilizáveis de interface.

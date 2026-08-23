@@ -1,5 +1,6 @@
 import UIKit
 import MarvelImageLoader
+import MarvelDesignSystem
 
 final class HeroesCollectionViewCell: UICollectionViewCell {
     @IBOutlet private var imageView: UIImageView!
@@ -10,7 +11,13 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        [imageView, label, cardView].forEach { $0?.layer.cornerRadius = 3; $0?.layer.masksToBounds = true }
+        imageView.layer.cornerRadius = DesignSystem.Radius.small
+        imageView.layer.masksToBounds = true
+        label.font = DesignSystem.Typography.headline
+        label.textColor = DesignSystem.Color.textPrimary
+        cardView.backgroundColor = DesignSystem.Color.surface
+        cardView.layer.cornerRadius = DesignSystem.Radius.medium
+        cardView.layer.apply(.card)
     }
 
     func configure(character: Character, isFavorite: Bool, onFavorite: @escaping () -> Void) {

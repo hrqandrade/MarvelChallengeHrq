@@ -11,6 +11,9 @@
 		AA0000000000000000000002 /* HeroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000012 /* HeroService.swift */; };
 		AA0000000000000000000003 /* FavoritesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000013 /* FavoritesStore.swift */; };
 		BB0000000000000000000001 /* MarvelImageLoader in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000000000000000000003 /* MarvelImageLoader */; };
+		CC0000000000000000000001 /* MarvelDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = CC0000000000000000000007 /* MarvelDesignSystem */; };
+		CC0000000000000000000002 /* Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000003 /* Localizable.swift */; };
+		CC0000000000000000000004 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000005 /* Localizable.xcstrings */; };
 		AA0000000000000000000005 /* HeroesCatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000015 /* HeroesCatalogViewModel.swift */; };
 		AA0000000000000000000006 /* HeroesDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000016 /* HeroesDetailsViewModel.swift */; };
 		5025353325A7C60A00B03C4D /* ListFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5025353225A7C60A00B03C4D /* ListFlowLayout.swift */; };
@@ -97,6 +100,8 @@
 		50C7BD1525A785B7006A235D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50C7BD2225A79BD8006A235D /* HeroesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCollectionViewCell.swift; sourceTree = "<group>"; };
 		50C7BD2925A7AECF006A235D /* GridFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridFlowLayout.swift; sourceTree = "<group>"; };
+		CC0000000000000000000003 /* Localizable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localizable.swift; sourceTree = "<group>"; };
+		CC0000000000000000000005 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +110,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB0000000000000000000001 /* MarvelImageLoader in Frameworks */,
+				CC0000000000000000000001 /* MarvelDesignSystem in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,6 +271,8 @@
 		50C7BCFB25A785B4006A235D /* MarvelChallenge */ = {
 			isa = PBXGroup;
 			children = (
+				CC0000000000000000000003 /* Localizable.swift */,
+				CC0000000000000000000005 /* Localizable.xcstrings */,
 				AA0000000000000000000011 /* AppCoordinator.swift */,
 				AA0000000000000000000012 /* HeroService.swift */,
 				AA0000000000000000000013 /* FavoritesStore.swift */,
@@ -329,6 +337,7 @@
 			name = MarvelChallenge;
 			packageProductDependencies = (
 				BB0000000000000000000003 /* MarvelImageLoader */,
+				CC0000000000000000000007 /* MarvelDesignSystem */,
 			);
 			productName = MarvelChallenge;
 			productReference = 50C7BCF925A785B4006A235D /* MarvelChallenge.app */;
@@ -377,11 +386,13 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"pt-BR",
 				Base,
 			);
 			mainGroup = 50C7BCF025A785B4006A235D;
 			packageReferences = (
 				BB0000000000000000000002 /* XCRemoteSwiftPackageReference "MarvelImageLoader" */,
+				CC0000000000000000000006 /* XCRemoteSwiftPackageReference "MarvelDesignSystem" */,
 			);
 			productRefGroup = 50C7BCFA25A785B4006A235D /* Products */;
 			projectDirPath = "";
@@ -398,6 +409,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC0000000000000000000004 /* Localizable.xcstrings in Resources */,
 				50C7BD0925A785B6006A235D /* LaunchScreen.storyboard in Resources */,
 				50C7BD0625A785B6006A235D /* Assets.xcassets in Resources */,
 				509EEC4225AC45CF0057441B /* character.json in Resources */,
@@ -503,6 +515,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC0000000000000000000002 /* Localizable.swift in Sources */,
 				AA0000000000000000000001 /* AppCoordinator.swift in Sources */,
 				AA0000000000000000000002 /* HeroService.swift in Sources */,
 				AA0000000000000000000003 /* FavoritesStore.swift in Sources */,
@@ -803,6 +816,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		CC0000000000000000000006 /* XCRemoteSwiftPackageReference "MarvelDesignSystem" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hrqandrade/MarvelDesignSystem.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		BB0000000000000000000002 /* XCRemoteSwiftPackageReference "MarvelImageLoader" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/hrqandrade/MarvelImageLoader.git";
@@ -814,6 +835,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		CC0000000000000000000007 /* MarvelDesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CC0000000000000000000006 /* XCRemoteSwiftPackageReference "MarvelDesignSystem" */;
+			productName = MarvelDesignSystem;
+		};
 		BB0000000000000000000003 /* MarvelImageLoader */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = BB0000000000000000000002 /* XCRemoteSwiftPackageReference "MarvelImageLoader" */;

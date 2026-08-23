@@ -1,4 +1,5 @@
 import UIKit
+import MarvelDesignSystem
 
 final class HeroesCatalogViewController: UIViewController {
     @IBOutlet weak var heroesCollectionView: UICollectionView!
@@ -14,6 +15,10 @@ final class HeroesCatalogViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         precondition(viewModel != nil, "HeroesCatalogViewModel must be injected by the coordinator")
+        view.backgroundColor = DesignSystem.Color.backgroundPrimary
+        headerLabel.font = DesignSystem.Typography.title
+        headerLabel.textColor = DesignSystem.Color.textPrimary
+        heroesCollectionView.backgroundColor = DesignSystem.Color.backgroundPrimary
         configureCollectionView()
         bindViewModel()
         viewModel.loadInitial()
@@ -32,7 +37,7 @@ final class HeroesCatalogViewController: UIViewController {
             self.heroesCollectionView.reloadData()
             switch state {
             case .empty: self.setEmptyBackground()
-            case .failed(let message): self.presentAlert(withTitle: "Erro", message: message)
+            case .failed(let message): self.presentAlert(withTitle: Localizable.Common.error, message: message)
             case .loaded: self.heroesCollectionView.backgroundView = nil
             default: break
             }
@@ -71,7 +76,7 @@ final class HeroesCatalogViewController: UIViewController {
 
     @IBAction private func didChangeCategory(_ sender: Any) {
         let section: HeroesCatalogSection = segmentedControl.selectedSegmentIndex == 0 ? .characters : .favorites
-        headerLabel.text = section == .characters ? "Characters" : "Favorites"
+        headerLabel.text = section == .characters ? Localizable.Catalog.characters : Localizable.Catalog.favorites
         viewModel.selectSection(section)
     }
 }
