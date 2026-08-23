@@ -41,13 +41,22 @@ final class HeroesCatalogViewController: UIViewController {
     private func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
             guard let self = self else { return }
-            self.refreshControl.endRefreshing()
-            self.heroesCollectionView.reloadData()
             switch state {
-            case .empty: self.setEmptyBackground()
-            case .failed(let message): self.presentAlert(withTitle: Localizable.Common.error, message: message)
-            case .loaded: self.heroesCollectionView.backgroundView = nil
-            default: break
+            case .initialLoading:
+                self.heroesCollectionView.backgroundView = nil
+            case .refreshing, .loadingNextPage, .idle:
+                break
+            case .loaded:
+                self.refreshControl.endRefreshing()
+                self.heroesCollectionView.backgroundView = nil
+                self.heroesCollectionView.reloadData()
+            case .empty:
+                self.refreshControl.endRefreshing()
+                self.heroesCollectionView.reloadData()
+                self.setEmptyBackground()
+            case .failed(let message):
+                self.refreshControl.endRefreshing()
+                self.presentAlert(withTitle: Localizable.Common.error, message: message)
             }
         }
     }

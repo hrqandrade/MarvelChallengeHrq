@@ -140,7 +140,7 @@ git switch -c feat/image-loader-spm
 
 ## Testes
 
-Os testes cobrem estado do ViewModel, persistência de favoritos, cálculo dos layouts e desalocação dos principais fluxos de tela. Para executá-los:
+Os testes cobrem estados e concorrência do ViewModel, cancelamento e paginação, persistência de favoritos, cálculo dos layouts e desalocação dos principais fluxos de tela. Para executá-los:
 
 ```bash
 xcodebuild test \
