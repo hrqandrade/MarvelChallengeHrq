@@ -7,14 +7,22 @@ final class HeroesCatalogViewController: UIViewController {
     @IBOutlet weak var headerLabel: UILabel!
     @IBOutlet weak var segmentedControl: UISegmentedControl!
 
-    var viewModel: HeroesCatalogViewModel!
+    private var configuredViewModel: HeroesCatalogViewModel?
+    var viewModel: HeroesCatalogViewModel {
+        get {
+            guard let configuredViewModel else {
+                preconditionFailure("HeroesCatalogViewModel must be injected by the coordinator")
+            }
+            return configuredViewModel
+        }
+        set { configuredViewModel = newValue }
+    }
     var onSelectCharacter: ((Character) -> Void)?
     var isGridLayout = true
     private let refreshControl = UIRefreshControl()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        precondition(viewModel != nil, "HeroesCatalogViewModel must be injected by the coordinator")
         view.backgroundColor = DesignSystem.Color.backgroundPrimary
         headerLabel.font = DesignSystem.Typography.title
         headerLabel.textColor = DesignSystem.Color.textPrimary

@@ -20,6 +20,15 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
         cardView.layer.apply(.card)
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imageView.cancelImageLoad()
+        imageView.image = nil
+        label.text = nil
+        favButton.setImage(nil, for: .normal)
+        onFavorite = nil
+    }
+
     func configure(character: Character, isFavorite: Bool, onFavorite: @escaping () -> Void) {
         configure(name: character.name ?? "", imageURL: character.imageURL, isFavorite: isFavorite, onFavorite: onFavorite)
     }

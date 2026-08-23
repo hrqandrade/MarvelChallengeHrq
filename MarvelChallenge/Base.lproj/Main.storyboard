@@ -107,9 +107,7 @@
                                             <outlet property="cardView" destination="OKg-2o-9hS" id="ZwM-mC-xDf"/>
                                             <outlet property="favButton" destination="khi-z8-nWe" id="TBB-ii-VaS"/>
                                             <outlet property="imageView" destination="eY3-hz-Lhp" id="P9f-qF-Byx"/>
-                                            <outlet property="imageViewHeightConstraint" destination="0vj-oP-iFq" id="hYX-Bu-UUM"/>
                                             <outlet property="label" destination="YvP-b6-RfH" id="zDZ-wQ-IJz"/>
-                                            <outlet property="stackCardView" destination="ShA-Lw-ffs" id="oNY-RY-Y2F"/>
                                         </connections>
                                     </collectionViewCell>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="HeroesCollectionListCell" id="rfF-uW-jbU" customClass="HeroesCollectionListCell" customModule="MarvelChallenge" customModuleProvider="target">
@@ -189,10 +187,7 @@
                                             <outlet property="cardView" destination="qbs-5K-DpF" id="Jz2-s9-c0E"/>
                                             <outlet property="favButton" destination="dHD-tf-u7n" id="DO4-Bn-U4R"/>
                                             <outlet property="imageView" destination="3Kv-5y-HSM" id="8Tg-7y-ufr"/>
-                                            <outlet property="imageViewConstraint" destination="E3L-LB-PNT" id="B6y-Pm-Oi7"/>
-                                            <outlet property="imageViewHeightConstraint" destination="kwZ-Rz-6HN" id="Fez-DH-Cy3"/>
                                             <outlet property="label" destination="c0S-ec-mcq" id="Jbq-JB-ygG"/>
-                                            <outlet property="stackCardView" destination="FuR-JA-Jvt" id="HOa-Mc-sS5"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -594,7 +589,6 @@
                         <outlet property="labelHeader" destination="CEd-E4-sdZ" id="kzY-Xf-Mzb"/>
                         <outlet property="seriesCollectionView" destination="Oxu-RK-ekv" id="Cib-Ws-sh1"/>
                         <outlet property="seriesLabel" destination="X91-dl-RWb" id="OgY-UF-ndc"/>
-                        <outlet property="stackView" destination="aqL-Dz-yY0" id="pt0-dd-E2p"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Kbg-6d-7Yg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

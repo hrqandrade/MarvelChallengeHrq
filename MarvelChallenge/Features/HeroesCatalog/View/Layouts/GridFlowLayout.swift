@@ -8,9 +8,12 @@
 
 import UIKit
 
-class GridFlowLayout: UICollectionViewFlowLayout {
-
-    let itemHeight: CGFloat = 190
+final class GridFlowLayout: UICollectionViewFlowLayout {
+    private enum Metrics {
+        static let itemHeight: CGFloat = 190
+        static let spacing: CGFloat = 1
+        static let columns: CGFloat = 2
+    }
 
     override init() {
         super.init()
@@ -22,27 +25,18 @@ class GridFlowLayout: UICollectionViewFlowLayout {
         setupLayout()
     }
 
-    func setupLayout() {
-        minimumInteritemSpacing = 1
-        minimumLineSpacing = 1
+    override func prepare() {
+        super.prepare()
+        guard let collectionView else { return }
+        let availableWidth = collectionView.bounds.width - sectionInset.left - sectionInset.right
+        let totalSpacing = Metrics.spacing * (Metrics.columns - 1)
+        let itemWidth = (availableWidth - totalSpacing) / Metrics.columns
+        itemSize = CGSize(width: itemWidth, height: Metrics.itemHeight)
+    }
+
+    private func setupLayout() {
+        minimumInteritemSpacing = Metrics.spacing
+        minimumLineSpacing = Metrics.spacing
         scrollDirection = .vertical
-    }
-
-    var itemWidth: CGFloat {
-        return collectionView!.frame.width / 2 - 1
-    }
-
-    override var itemSize: CGSize {
-        set {
-            self.itemSize = CGSize(width: itemWidth, height: itemHeight)
-
-        }
-        get {
-            return CGSize(width: itemWidth, height: itemHeight)
-        }
-    }
-
-    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
-        return collectionView!.contentOffset
     }
 }

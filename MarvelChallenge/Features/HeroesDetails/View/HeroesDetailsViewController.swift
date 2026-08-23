@@ -12,13 +12,21 @@ final class HeroesDetailsViewController: UIViewController {
     @IBOutlet weak var comicCollectionView: UICollectionView!
     @IBOutlet weak var seriesCollectionView: UICollectionView!
 
-    var viewModel: HeroesDetailsViewModel!
+    private var configuredViewModel: HeroesDetailsViewModel?
+    var viewModel: HeroesDetailsViewModel {
+        get {
+            guard let configuredViewModel else {
+                preconditionFailure("HeroesDetailsViewModel must be injected by the coordinator")
+            }
+            return configuredViewModel
+        }
+        set { configuredViewModel = newValue }
+    }
     let cellComics = "DetailsComicCell"
     let cellSeries = "DetailsSeriesCell"
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        precondition(viewModel != nil, "HeroesDetailsViewModel must be injected by the coordinator")
         view.backgroundColor = DesignSystem.Color.backgroundPrimary
         labelHeader.font = DesignSystem.Typography.title
         labelHeader.textColor = DesignSystem.Color.textPrimary

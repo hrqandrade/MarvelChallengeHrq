@@ -22,7 +22,7 @@ Este roadmap organiza a evolução do Marvel Challenge até a versão 2.0.0. O p
 - Retirar credenciais do código versionado.
 - Definir a versão 2.0.0 e o fluxo de branches.
 
-### 1. Organização por feature e camada — em andamento
+### 1. Organização por feature e camada — concluída
 
 - Alinhar pastas físicas e grupos do Xcode.
 - Aproximar View e ViewModel dentro de cada feature.
@@ -31,7 +31,7 @@ Este roadmap organiza a evolução do Marvel Challenge até a versão 2.0.0. O p
 
 Critério de conclusão: projeto compilando, testes atuais aprovados e nenhuma referência quebrada após as movimentações.
 
-### 2. Segurança de runtime e ciclo de vida — planejada
+### 2. Segurança de runtime e ciclo de vida — concluída
 
 - Corrigir o cálculo recursivo de `itemSize` nos layouts.
 - Remover force casts, force unwraps e dependências implicitamente desembrulhadas evitáveis.
@@ -39,7 +39,7 @@ Critério de conclusão: projeto compilando, testes atuais aprovados e nenhuma r
 - Integrar o loading ao fluxo de estado ou remover o componente enquanto não tiver uso.
 - Validar desalocação de Coordinator, ViewControllers, ViewModels e células.
 
-Critério de conclusão: ausência de caminhos conhecidos de crash por cast/unwrap, validação no Memory Graph e testes básicos de desalocação.
+Critério de conclusão: ausência de caminhos conhecidos de crash por cast/unwrap e testes básicos de desalocação. A análise manual no Memory Graph faz parte da regressão da release.
 
 ### 3. Concorrência, cancelamento e paginação — planejada
 

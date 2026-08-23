@@ -8,9 +8,11 @@
 
 import UIKit
 
-class ListFlowLayout: UICollectionViewFlowLayout {
-
-    let itemHeight: CGFloat = 95
+final class ListFlowLayout: UICollectionViewFlowLayout {
+    private enum Metrics {
+        static let itemHeight: CGFloat = 95
+        static let lineSpacing: CGFloat = 1
+    }
 
     override init() {
         super.init()
@@ -22,27 +24,16 @@ class ListFlowLayout: UICollectionViewFlowLayout {
         setupLayout()
     }
 
-    func setupLayout() {
+    override func prepare() {
+        super.prepare()
+        guard let collectionView else { return }
+        let itemWidth = collectionView.bounds.width - sectionInset.left - sectionInset.right
+        itemSize = CGSize(width: itemWidth, height: Metrics.itemHeight)
+    }
+
+    private func setupLayout() {
         minimumInteritemSpacing = 0
-        minimumLineSpacing = 1
+        minimumLineSpacing = Metrics.lineSpacing
         scrollDirection = .vertical
-
-    }
-
-    var itemWidth: CGFloat {
-        return collectionView!.frame.width
-    }
-
-    override var itemSize: CGSize {
-        set {
-            self.itemSize = CGSize(width: itemWidth, height: itemHeight)
-        }
-        get {
-            return CGSize(width: itemWidth, height: itemHeight)
-        }
-    }
-
-    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
-        return collectionView!.contentOffset
     }
 }
