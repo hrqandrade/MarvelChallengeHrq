@@ -1,11 +1,3 @@
-//
-//  Extensions.swift
-//  MarvelChallenge
-//
-//  Created by Henrique Silva on 07/01/21.
-//  Copyright © 2021 Henrique Silva. All rights reserved.
-//
-
 import UIKit
 extension UIViewController {
 

@@ -61,7 +61,16 @@ final class HeroesDetailsViewController: UIViewController {
     @IBAction private func didTapBack(_ sender: Any) { dismiss(animated: true) }
 
     @IBAction private func didTapFavorite(_ sender: Any) {
-        viewModel.toggleFavorite()
-        favoriteButton.setImage(UIImage(named: viewModel.isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
+        favoriteButton.isEnabled = false
+        viewModel.toggleFavorite { [weak self] result in
+            guard let self else { return }
+            self.favoriteButton.isEnabled = true
+            switch result {
+            case .success(let isFavorite):
+                self.favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
+            case .failure(let message):
+                self.presentAlert(withTitle: Localizable.Common.error, message: message)
+            }
+        }
     }
 }

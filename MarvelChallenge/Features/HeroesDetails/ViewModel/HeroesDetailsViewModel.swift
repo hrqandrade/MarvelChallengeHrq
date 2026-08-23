@@ -1,5 +1,10 @@
 import Foundation
 
+enum HeroesDetailsFavoriteResult {
+    case success(Bool)
+    case failure(String)
+}
+
 final class HeroesDetailsViewModel {
     let character: Character
     private let favorites: FavoritesStoring
@@ -19,12 +24,21 @@ final class HeroesDetailsViewModel {
     var series: [ComicsItem] { character.series?.items ?? [] }
     var isFavorite: Bool { character.id.map(favorites.contains(id:)) ?? false }
 
-    func toggleFavorite() {
+    func toggleFavorite(completion: @escaping (HeroesDetailsFavoriteResult) -> Void) {
         guard let id = character.id else { return }
+        let mutationCompletion: (Result<Void, FavoritesStoreError>) -> Void = { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success: completion(.success(self.isFavorite))
+                case .failure: completion(.failure(Localizable.Error.favoritesWriting))
+                }
+            }
+        }
         if favorites.contains(id: id) {
-            try? favorites.remove(id: id)
+            favorites.remove(id: id, completion: mutationCompletion)
         } else {
-            try? favorites.save(FavoriteCharacter(id: id, name: name, imageURL: imageURL))
+            favorites.save(FavoriteCharacter(id: id, name: name, imageURL: imageURL), completion: mutationCompletion)
         }
     }
 }

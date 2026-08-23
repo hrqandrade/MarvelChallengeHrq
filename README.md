@@ -6,7 +6,7 @@ Versão atual: **2.0.0**
 
 ## A história do projeto
 
-Este projeto nasceu em 2017 como um desafio técnico. Naquele momento, o objetivo era entregar as funcionalidades principais: consumir a API da Marvel, listar personagens, apresentar detalhes e persistir favoritos. A solução cumpria esse papel usando MVC, delegates e bibliotecas populares do ecossistema iOS da época.
+Este projeto nasceu em 2019 como um desafio técnico. Naquele momento, o objetivo era entregar as funcionalidades principais: consumir a API da Marvel, listar personagens, apresentar detalhes e persistir favoritos. A solução cumpria esse papel usando MVC, delegates e bibliotecas populares do ecossistema iOS da época.
 
 Com o passar dos anos, o código passou a representar também uma fotografia daquele período: responsabilidades concentradas nas telas, navegação acoplada às ViewControllers, credenciais no código e dependências externas para persistência, conectividade e imagens.
 
@@ -140,7 +140,7 @@ git switch -c feat/image-loader-spm
 
 ## Testes
 
-Os testes cobrem estados e concorrência do ViewModel, cancelamento e paginação, persistência de favoritos, cálculo dos layouts e desalocação dos principais fluxos de tela. Para executá-los:
+Os testes cobrem estados e concorrência do ViewModel, cancelamento e paginação, cache e persistência atômica de favoritos, cálculo dos layouts e desalocação dos principais fluxos de tela. Para executá-los:
 
 ```bash
 xcodebuild test \

@@ -1,11 +1,3 @@
-//
-//  HeroesDetailsDataSourceDelegate.swift
-//  MarvelChallenge
-//
-//  Created by c80256a on 11/01/21.
-//  Copyright © 2021 Henrique Silva. All rights reserved.
-//
-
 import UIKit
 
 extension HeroesDetailsViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout{

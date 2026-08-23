@@ -28,6 +28,8 @@ enum Localizable {
         static let transport = text("error.transport")
         static let invalidResponse = text("error.invalidResponse")
         static let decoding = text("error.decoding")
+        static let favoritesReading = text("error.favoritesReading")
+        static let favoritesWriting = text("error.favoritesWriting")
     }
 
     private static func text(_ key: String) -> String {
