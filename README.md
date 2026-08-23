@@ -110,11 +110,9 @@ MarvelChallenge
 │       ├── View
 │       │   └── Cells
 │       └── ViewModel
-└── Shared
-    └── Loading
 ```
 
-Cada feature mantém sua View e seu ViewModel próximos. Infraestruturas compartilhadas ficam em `Core`, componentes de interface reutilizados ficam em `Shared` e o ciclo de vida do aplicativo fica em `Application`.
+Cada feature mantém sua View e seu ViewModel próximos. Infraestruturas compartilhadas ficam em `Core` e o ciclo de vida do aplicativo fica em `Application`. Um diretório `Shared` será introduzido quando houver componentes de interface efetivamente reutilizados por mais de uma feature.
 
 O carregamento de imagens é fornecido pelo pacote próprio [`MarvelImageLoader`](https://github.com/hrqandrade/MarvelImageLoader), integrado por Swift Package Manager e construído com `URLSession` e `NSCache`.
 
@@ -142,7 +140,7 @@ git switch -c feat/image-loader-spm
 
 ## Testes
 
-Os testes cobrem o estado do ViewModel com serviço simulado e a persistência de favoritos. Para executá-los:
+Os testes cobrem estado do ViewModel, persistência de favoritos, cálculo dos layouts e desalocação dos principais fluxos de tela. Para executá-los:
 
 ```bash
 xcodebuild test \

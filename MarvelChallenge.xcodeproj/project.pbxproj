@@ -19,9 +19,6 @@
 		5025353325A7C60A00B03C4D /* ListFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5025353225A7C60A00B03C4D /* ListFlowLayout.swift */; };
 		5025353525A7EA7300B03C4D /* UIViewController+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5025353425A7EA7300B03C4D /* UIViewController+Alert.swift */; };
 		50733D2325AA7A2A00EAC4FF /* HeroesCollectionListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50733D2225AA7A2A00EAC4FF /* HeroesCollectionListCell.swift */; };
-		509EEB5425ABC2900057441B /* SimpleLoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509EEB5225ABC2900057441B /* SimpleLoadingViewController.swift */; };
-		509EEB5525ABC2900057441B /* SimpleLoadingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 509EEB5325ABC2900057441B /* SimpleLoadingViewController.xib */; };
-		509EEB5D25ABC4170057441B /* LoadingScreenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509EEB5C25ABC4170057441B /* LoadingScreenManager.swift */; };
 		509EEC5B25AC90470057441B /* HeroesCatalogViewControllerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509EEC5A25AC90470057441B /* HeroesCatalogViewControllerDataSource.swift */; };
 		509EEC7A25AC92460057441B /* CharacterDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509EEC7925AC92460057441B /* CharacterDataModel.swift */; };
 		50BFB00E25ACA7BB009F34FA /* HeroesDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BFB00D25ACA7BB009F34FA /* HeroesDetailsViewController.swift */; };
@@ -70,9 +67,6 @@
 		AA0000000000000000000016 /* HeroesDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesDetailsViewModel.swift; sourceTree = "<group>"; };
 		5025353425A7EA7300B03C4D /* UIViewController+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Alert.swift"; sourceTree = "<group>"; };
 		50733D2225AA7A2A00EAC4FF /* HeroesCollectionListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCollectionListCell.swift; sourceTree = "<group>"; };
-		509EEB5225ABC2900057441B /* SimpleLoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleLoadingViewController.swift; sourceTree = "<group>"; };
-		509EEB5325ABC2900057441B /* SimpleLoadingViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SimpleLoadingViewController.xib; sourceTree = "<group>"; };
-		509EEB5C25ABC4170057441B /* LoadingScreenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScreenManager.swift; sourceTree = "<group>"; };
 		509EEC5A25AC90470057441B /* HeroesCatalogViewControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeroesCatalogViewControllerDataSource.swift; sourceTree = "<group>"; };
 		509EEC7925AC92460057441B /* CharacterDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDataModel.swift; sourceTree = "<group>"; };
 		50BFB00D25ACA7BB009F34FA /* HeroesDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesDetailsViewController.swift; sourceTree = "<group>"; };
@@ -268,24 +262,6 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		DD0000000000000000000011 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				DD0000000000000000000012 /* Loading */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
-		DD0000000000000000000012 /* Loading */ = {
-			isa = PBXGroup;
-			children = (
-				509EEB5C25ABC4170057441B /* LoadingScreenManager.swift */,
-				509EEB5225ABC2900057441B /* SimpleLoadingViewController.swift */,
-				509EEB5325ABC2900057441B /* SimpleLoadingViewController.xib */,
-			);
-			path = Loading;
-			sourceTree = "<group>";
-		};
 		50C7BCF025A785B4006A235D = {
 			isa = PBXGroup;
 			children = (
@@ -310,7 +286,6 @@
 				DD0000000000000000000001 /* Application */,
 				DD0000000000000000000002 /* Core */,
 				DD0000000000000000000008 /* Features */,
-				DD0000000000000000000011 /* Shared */,
 				50C7BD0225A785B4006A235D /* Main.storyboard */,
 				50C7BD0525A785B6006A235D /* Assets.xcassets */,
 				50C7BD0725A785B6006A235D /* LaunchScreen.storyboard */,
@@ -423,7 +398,6 @@
 				50C7BD0925A785B6006A235D /* LaunchScreen.storyboard in Resources */,
 				50C7BD0625A785B6006A235D /* Assets.xcassets in Resources */,
 				50C7BD0425A785B4006A235D /* Main.storyboard in Resources */,
-				509EEB5525ABC2900057441B /* SimpleLoadingViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,8 +432,6 @@
 				50C7BD2425A79BD8006A235D /* HeroesCollectionViewCell.swift in Sources */,
 				50BFB00E25ACA7BB009F34FA /* HeroesDetailsViewController.swift in Sources */,
 				509EEC7A25AC92460057441B /* CharacterDataModel.swift in Sources */,
-				509EEB5425ABC2900057441B /* SimpleLoadingViewController.swift in Sources */,
-				509EEB5D25ABC4170057441B /* LoadingScreenManager.swift in Sources */,
 				50C7BCFF25A785B4006A235D /* SceneDelegate.swift in Sources */,
 				50BFB01A25ACB4A1009F34FA /* DetailsCollectionViewCell.swift in Sources */,
 			);

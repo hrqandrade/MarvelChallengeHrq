@@ -19,17 +19,12 @@ extension HeroesDetailsViewController: UICollectionViewDataSource, UICollectionV
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == comicCollectionView {
-            let cell = comicCollectionView.dequeueReusableCell(withReuseIdentifier: cellComics, for: indexPath) as! DetailsCollectionViewCell
-            
-            cell.setupCell(description: viewModel.comics[indexPath.row].name ?? "")
-            return cell
-        } else {
-            let cell = seriesCollectionView.dequeueReusableCell(withReuseIdentifier: cellSeries, for: indexPath) as! DetailsCollectionViewCell
-            
-            cell.setupCell(description: viewModel.series[indexPath.row].name ?? "")
-            return cell
-        }
+        let isComicsCollection = collectionView == comicCollectionView
+        let reuseIdentifier = isComicsCollection ? cellComics : cellSeries
+        let item = isComicsCollection ? viewModel.comics[indexPath.row] : viewModel.series[indexPath.row]
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
+        (cell as? DetailsCollectionViewCell)?.setupCell(description: item.name ?? "")
+        return cell
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {

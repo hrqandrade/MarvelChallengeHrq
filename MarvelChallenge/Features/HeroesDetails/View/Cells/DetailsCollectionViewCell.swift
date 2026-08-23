@@ -9,12 +9,13 @@
 import UIKit
 import MarvelDesignSystem
 
-class DetailsCollectionViewCell: UICollectionViewCell {
+final class DetailsCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet weak var labelDescription: UILabel!
     @IBOutlet weak var borderedView: UIView!
-    override class func awakeFromNib() {
-        super.awakeFromNib()
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        labelDescription.text = nil
     }
     
     func setupCell(description: String){
