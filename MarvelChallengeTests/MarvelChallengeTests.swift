@@ -173,13 +173,94 @@ final class MarvelChallengeTests: XCTestCase {
     func testFavoritesStoreSavesAndRemovesCharacter() throws {
         let store = FavoritesStore(fileURL: temporaryFileURL())
         let favorite = FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)
+        let saveExpectation = expectation(description: "save")
+        let removeExpectation = expectation(description: "remove")
 
-        try store.save(favorite)
+        store.save(favorite) { result in
+            if case .failure(let error) = result { XCTFail("Unexpected error: \(error)") }
+            saveExpectation.fulfill()
+        }
+        wait(for: [saveExpectation], timeout: 1)
         XCTAssertTrue(store.contains(id: 1))
         XCTAssertEqual(store.all(), [favorite])
 
-        try store.remove(id: 1)
+        store.remove(id: 1) { result in
+            if case .failure(let error) = result { XCTFail("Unexpected error: \(error)") }
+            removeExpectation.fulfill()
+        }
+        wait(for: [removeExpectation], timeout: 1)
         XCTAssertFalse(store.contains(id: 1))
+    }
+
+    func testFavoritesStoreDifferentiatesMissingAndCorruptedFiles() throws {
+        let fileURL = temporaryFileURL()
+        let missingStore = FavoritesStore(fileURL: fileURL)
+        let missingExpectation = expectation(description: "missing file")
+
+        missingStore.load { result in
+            XCTAssertEqual(result.failure, .fileNotFound)
+            missingExpectation.fulfill()
+        }
+        wait(for: [missingExpectation], timeout: 1)
+
+        try Data("invalid".utf8).write(to: fileURL)
+        let corruptedStore = FavoritesStore(fileURL: fileURL)
+        let corruptedExpectation = expectation(description: "corrupted file")
+        corruptedStore.load { result in
+            XCTAssertEqual(result.failure, .corruptedFile)
+            corruptedExpectation.fulfill()
+        }
+        wait(for: [corruptedExpectation], timeout: 1)
+    }
+
+    func testFavoritesStoreReportsWritingFailureWithoutChangingCache() {
+        let store = FavoritesStore(fileURL: URL(fileURLWithPath: "/dev/null/favorites.json"))
+        let expectation = expectation(description: "writing failure")
+
+        store.save(FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)) { result in
+            XCTAssertEqual(result.failure, .writing)
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+        XCTAssertFalse(store.contains(id: 1))
+    }
+
+    func testFavoritesStoreSerializesConcurrentMutationsAndWritesValidFile() {
+        let fileURL = temporaryFileURL()
+        let store = FavoritesStore(fileURL: fileURL)
+        let expectations = (0..<20).map { index in
+            expectation(description: "save \(index)")
+        }
+
+        for index in 0..<20 {
+            DispatchQueue.global().async {
+                store.save(FavoriteCharacter(id: index, name: "Hero \(index)", imageURL: nil)) { result in
+                    if case .failure(let error) = result { XCTFail("Unexpected error: \(error)") }
+                    expectations[index].fulfill()
+                }
+            }
+        }
+
+        wait(for: expectations, timeout: 3)
+        XCTAssertEqual(store.all().count, 20)
+        XCTAssertNoThrow(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)))
+    }
+
+    func testCatalogPublishesFavoriteWritingFailure() throws {
+        let viewModel = HeroesCatalogViewModel(
+            service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
+            favorites: FailingFavoritesStoreStub()
+        )
+        let expectation = expectation(description: "favorite writing failure")
+        viewModel.onStateChange = { state in
+            guard state == .failed(Localizable.Error.favoritesWriting) else { return }
+            expectation.fulfill()
+        }
+
+        viewModel.toggleFavorite(try makeCharacter())
+
+        wait(for: [expectation], timeout: 1)
     }
 
     func testGridLayoutCalculatesTwoColumnsWithoutRecursion() {
@@ -269,6 +350,13 @@ final class MarvelChallengeTests: XCTestCase {
     }
 }
 
+private extension Result {
+    var failure: Failure? {
+        if case .failure(let error) = self { return error }
+        return nil
+    }
+}
+
 private final class HeroServiceStub: HeroServicing {
     let result: Result<HeroesPage, HeroServiceError>
 
@@ -322,5 +410,22 @@ private final class BackgroundHeroServiceStub: HeroServicing {
             completion(.success(self.page))
         }
         return nil
+    }
+}
+
+private final class FailingFavoritesStoreStub: FavoritesStoring {
+    func all() -> [FavoriteCharacter] { [] }
+    func contains(id: Int) -> Bool { false }
+
+    func load(completion: @escaping (Result<[FavoriteCharacter], FavoritesStoreError>) -> Void) {
+        completion(.success([]))
+    }
+
+    func save(_ character: FavoriteCharacter, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void) {
+        completion(.failure(.writing))
+    }
+
+    func remove(id: Int, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void) {
+        completion(.failure(.writing))
     }
 }

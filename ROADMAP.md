@@ -52,7 +52,7 @@ Critério de conclusão: ausência de caminhos conhecidos de crash por cast/unwr
 
 Critério de conclusão: paginação determinística, operações canceláveis e testes cobrindo concorrência, reload, falha e fim da lista.
 
-### 4. Persistência robusta — planejada
+### 4. Persistência robusta — concluída
 
 - Manter um índice de favoritos em memória para evitar leitura de disco durante a renderização.
 - Retirar I/O síncrono do caminho crítico da interface.
@@ -69,6 +69,8 @@ Critério de conclusão: consultas sem I/O na main thread, erros observáveis pe
 - Retirar localização e mensagens de interface dos erros de infraestrutura.
 - Introduzir uma fábrica de telas para tornar a injeção obrigatória e testável.
 - Fazer o Coordinator controlar apresentação e encerramento de todos os fluxos.
+- Remover Storyboards e construir as telas programaticamente com Auto Layout.
+- Eliminar outlets, actions e identifiers, tornando dependências obrigatórias por inicializador.
 
 Critério de conclusão: UI sem dependência direta de DTOs, infraestrutura sem dependência de localização e navegação testável fora das ViewControllers.
 
