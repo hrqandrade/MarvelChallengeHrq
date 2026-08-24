@@ -20,6 +20,7 @@ O resultado é um estudo prático sobre manutenção de software: partir de uma 
 | --- | --- | --- |
 | Arquitetura | MVC com lógica e navegação próximas das telas | MVVM-C com responsabilidades separadas |
 | Criação do fluxo | ViewControllers instanciavam e controlavam dependências | Coordinator monta o fluxo e injeta dependências |
+| Construção das telas | Storyboard, outlets, actions e identifiers | UIKit programático, Auto Layout e inicializadores obrigatórios |
 | Comunicação | Delegates concretos entre managers e telas | Estados observáveis e serviços definidos por protocolos |
 | Rede | Manager acoplado e validação por `ReachabilitySwift` | `URLSession`, erros tipados e tratamento de resposta HTTP |
 | Favoritos | `RealmSwift` e imagem persistida em Base64 | `Codable` e armazenamento local atrás de protocolo |
@@ -140,7 +141,7 @@ git switch -c feat/image-loader-spm
 
 ## Testes
 
-Os testes cobrem estados e concorrência do ViewModel, cancelamento e paginação, cache e persistência atômica de favoritos, cálculo dos layouts e desalocação dos principais fluxos de tela. Para executá-los:
+Os testes cobrem estados e concorrência do ViewModel, cancelamento e paginação, cache e persistência atômica de favoritos, layouts, composição programática, navegação e desalocação dos principais fluxos. Para executá-los:
 
 ```bash
 xcodebuild test \

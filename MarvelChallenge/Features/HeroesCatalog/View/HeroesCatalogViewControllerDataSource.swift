@@ -6,7 +6,7 @@ extension HeroesCatalogViewController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let identifier = isGridLayout ? "HeroesCollectionViewCell" : "HeroesCollectionListCell"
+        let identifier = isGridLayout ? HeroesCollectionViewCell.reuseIdentifier : HeroesCollectionListCell.reuseIdentifier
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
         if let character = viewModel.character(at: indexPath.item) {
             let action: () -> Void = { [weak self] in

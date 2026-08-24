@@ -102,11 +102,11 @@ final class HeroesCatalogViewModel {
     }
 
     func isFavorite(_ character: Character) -> Bool {
-        character.id.map(favorites.contains(id:)) ?? false
+        favorites.contains(id: character.id)
     }
 
     func toggleFavorite(_ character: Character) {
-        guard let id = character.id else { return }
+        let id = character.id
         let completion: (Result<Void, FavoritesStoreError>) -> Void = { [weak self] result in
             self?.handleFavoriteMutation(result)
         }
@@ -114,7 +114,7 @@ final class HeroesCatalogViewModel {
             favorites.remove(id: id, completion: completion)
         } else {
             favorites.save(
-                FavoriteCharacter(id: id, name: character.name ?? "", imageURL: character.imageURL),
+                FavoriteCharacter(id: id, name: character.name, imageURL: character.imageURL),
                 completion: completion
             )
         }
@@ -166,7 +166,7 @@ final class HeroesCatalogViewModel {
             }
             publishCurrentState()
         case .failure(let error):
-            onStateChange?(.failed(error.message))
+            onStateChange?(.failed(message(for: error)))
         }
     }
 
@@ -199,6 +199,16 @@ final class HeroesCatalogViewModel {
 
     private func publishCurrentState() {
         onStateChange?(itemCount == 0 ? .empty : .loaded)
+    }
+
+    private func message(for error: HeroServiceError) -> String {
+        switch error {
+        case .missingCredentials: return Localizable.Error.missingCredentials
+        case .invalidURL: return Localizable.Error.invalidURL
+        case .transport: return Localizable.Error.transport
+        case .invalidResponse: return Localizable.Error.invalidResponse
+        case .decoding: return Localizable.Error.decoding
+        }
     }
 }
 

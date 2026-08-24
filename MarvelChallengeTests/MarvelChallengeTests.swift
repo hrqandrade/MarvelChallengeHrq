@@ -130,7 +130,7 @@ final class MarvelChallengeTests: XCTestCase {
         service.completeRequest(at: 0, with: .failure(.transport))
         viewModel.reload()
 
-        XCTAssertEqual(states, [.initialLoading, .failed(HeroServiceError.transport.message), .refreshing])
+        XCTAssertEqual(states, [.initialLoading, .failed(Localizable.Error.transport), .refreshing])
         XCTAssertEqual(service.requests.map(\.page), [0, 0])
     }
 
@@ -287,24 +287,22 @@ final class MarvelChallengeTests: XCTestCase {
         weak var weakCoordinator: AppCoordinator?
         weak var weakCatalog: HeroesCatalogViewController?
 
-        try autoreleasepool {
-            let storyboard = UIStoryboard(name: "Main", bundle: .main)
-            let catalog = try XCTUnwrap(storyboard.instantiateInitialViewController() as? HeroesCatalogViewController)
+        autoreleasepool {
             let window = UIWindow()
-            window.rootViewController = catalog
             var coordinator: AppCoordinator? = AppCoordinator(
                 window: window,
-                storyboard: storyboard,
-                dependencies: AppDependencies(
+                screenFactory: AppScreenFactory(dependencies: AppDependencies(
                     heroService: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
                     favoritesStore: FavoritesStore(fileURL: temporaryFileURL())
-                )
+                ))
             )
 
             coordinator?.start()
-            catalog.loadViewIfNeeded()
+            let catalog = window.rootViewController as? HeroesCatalogViewController
+            catalog?.loadViewIfNeeded()
             weakCoordinator = coordinator
             weakCatalog = catalog
+            window.isHidden = true
             window.rootViewController = nil
             coordinator = nil
         }
@@ -313,20 +311,29 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertNil(weakCatalog)
     }
 
+    func testCoordinatorBuildsDetailsWhenCatalogSelectsCharacter() throws {
+        let window = UIWindow()
+        let factory = ScreenFactorySpy()
+        let coordinator = AppCoordinator(window: window, screenFactory: factory)
+        let character = try makeCharacter()
+
+        coordinator.start()
+        factory.onSelect?(character)
+
+        XCTAssertTrue(window.rootViewController === factory.catalog)
+        XCTAssertEqual(factory.detailsCharacter, character)
+    }
+
     func testDetailsControllerAndViewModelAreReleasedAfterDismissal() throws {
         weak var weakController: HeroesDetailsViewController?
         weak var weakViewModel: HeroesDetailsViewModel?
 
         try autoreleasepool {
-            let storyboard = UIStoryboard(name: "Main", bundle: .main)
-            var controller: HeroesDetailsViewController? = try XCTUnwrap(
-                storyboard.instantiateViewController(withIdentifier: "HeroesDetailsViewController") as? HeroesDetailsViewController
-            )
             var viewModel: HeroesDetailsViewModel? = HeroesDetailsViewModel(
                 character: try makeCharacter(),
                 favorites: FavoritesStore(fileURL: temporaryFileURL())
             )
-            controller?.viewModel = try XCTUnwrap(viewModel)
+            var controller: HeroesDetailsViewController? = HeroesDetailsViewController(viewModel: try XCTUnwrap(viewModel))
             controller?.loadViewIfNeeded()
 
             weakController = controller
@@ -344,9 +351,7 @@ final class MarvelChallengeTests: XCTestCase {
     }
 
     private func makeCharacter(id: Int = 1, name: String = "Spider-Man") throws -> Character {
-        let json = #"{"id":\#(id),"name":"\#(name)","description":""}"#
-        let data = try XCTUnwrap(json.data(using: .utf8))
-        return try JSONDecoder().decode(Character.self, from: data)
+        Character(id: id, name: name, description: "", imageURL: nil, comics: [], series: [])
     }
 }
 
@@ -427,5 +432,27 @@ private final class FailingFavoritesStoreStub: FavoritesStoring {
 
     func remove(id: Int, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void) {
         completion(.failure(.writing))
+    }
+}
+
+private final class ScreenFactorySpy: ScreenBuilding {
+    let catalog = HeroesCatalogViewController(viewModel: HeroesCatalogViewModel(
+        service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
+        favorites: FavoritesStore(fileURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))
+    ))
+    private(set) var onSelect: ((Character) -> Void)?
+    private(set) var detailsCharacter: Character?
+
+    func makeCatalog(onSelect: @escaping (Character) -> Void) -> HeroesCatalogViewController {
+        self.onSelect = onSelect
+        return catalog
+    }
+
+    func makeDetails(for character: Character, onClose: @escaping () -> Void) -> HeroesDetailsViewController {
+        detailsCharacter = character
+        return HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
+            character: character,
+            favorites: FavoritesStore(fileURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))
+        ))
     }
 }
