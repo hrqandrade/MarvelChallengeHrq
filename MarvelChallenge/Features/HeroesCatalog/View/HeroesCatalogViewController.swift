@@ -5,7 +5,7 @@ final class HeroesCatalogViewController: UIViewController {
     private enum Metrics {
         static let barHeight: CGFloat = 50
         static let controlHeight: CGFloat = 40
-        static let iconSize: CGFloat = 32
+        static let minimumTouchTarget: CGFloat = 44
     }
 
     // MARK: - UI
@@ -117,7 +117,7 @@ final class HeroesCatalogViewController: UIViewController {
 
             layoutButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: DesignSystem.Spacing.medium),
             layoutButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
-            layoutButton.widthAnchor.constraint(equalToConstant: Metrics.iconSize),
+            layoutButton.widthAnchor.constraint(equalToConstant: Metrics.minimumTouchTarget),
             layoutButton.heightAnchor.constraint(equalTo: layoutButton.widthAnchor),
 
             headerLabel.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),

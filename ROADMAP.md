@@ -79,6 +79,8 @@ Critério de conclusão: UI sem dependência direta de DTOs, infraestrutura sem 
 - Cobrir estados e transições dos ViewModels.
 - Testar o `HeroService` com `URLProtocol`, sem rede real.
 - Cobrir paginação, cancelamento, respostas inválidas e códigos HTTP.
+- Centralizar a configuração de page size e validar offset e limite nos testes do serviço.
+- Definir e testar a política para respostas parcialmente inválidas, sem descarte silencioso de DTOs.
 - Cobrir persistência, atualização, ordenação, corrupção e falha de escrita.
 - Adicionar testes de navegação, reuso de células e desalocação.
 - Definir uma base pequena de testes de interface para os fluxos críticos.
@@ -89,6 +91,8 @@ Critério de conclusão: riscos principais cobertos por testes determinísticos 
 
 - Evoluir tokens para componentes reutilizáveis.
 - Padronizar loading, empty state, cards, botões e mensagens de erro.
+- Extrair `HeroesCatalogView` e `HeroesDetailsView`, mantendo as ViewControllers focadas em lifecycle e binding.
+- Criar tokens semânticos para área mínima de toque, ícones, barras, cards e bordas.
 - Validar Dynamic Type, contraste, VoiceOver e tamanhos de toque.
 
 Critério de conclusão: telas principais compostas por estilos e componentes compartilhados, com validação básica de acessibilidade.
@@ -97,6 +101,8 @@ Critério de conclusão: telas principais compostas por estilos e componentes co
 
 - Executar build e testes em Pull Requests.
 - Aplicar SwiftFormat e SwiftLint de forma reproduzível.
+- Tornar explícitos os contratos de fila dos serviços e remover dispatches defensivos redundantes.
+- Remover métodos vazios e comentários residuais dos templates do Xcode.
 - Adicionar regras de contribuição e checklist de revisão.
 - Monitorar tempo de build, warnings e estabilidade dos testes.
 

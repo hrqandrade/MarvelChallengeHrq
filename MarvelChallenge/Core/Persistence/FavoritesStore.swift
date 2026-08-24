@@ -24,72 +24,87 @@ enum FavoritesStoreError: Error, Equatable {
 final class FavoritesStore: FavoritesStoring {
     private let fileURL: URL
     private let fileManager: FileManager
-    private let queue = DispatchQueue(label: "com.marvelchallenge.favorites", qos: .utility)
-    private var favorites: [FavoriteCharacter] = []
+    private let ioQueue: DispatchQueue
+    private let cacheLock = NSLock()
+    private var favoritesByID: [Int: FavoriteCharacter] = [:]
 
     init(fileManager: FileManager = .default) {
         self.fileManager = fileManager
+        ioQueue = DispatchQueue(label: "com.marvelchallenge.favorites.io", qos: .utility)
         let directory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         fileURL = directory.appendingPathComponent("favorites.json")
     }
 
-    init(fileURL: URL, fileManager: FileManager = .default) {
+    init(
+        fileURL: URL,
+        fileManager: FileManager = .default,
+        ioQueue: DispatchQueue = DispatchQueue(label: "com.marvelchallenge.favorites.io", qos: .utility)
+    ) {
         self.fileURL = fileURL
         self.fileManager = fileManager
+        self.ioQueue = ioQueue
     }
 
     func all() -> [FavoriteCharacter] {
-        queue.sync { sorted(favorites) }
+        cacheLock.withLock {
+            sorted(Array(favoritesByID.values))
+        }
     }
 
     func contains(id: Int) -> Bool {
-        queue.sync { favorites.contains { $0.id == id } }
+        cacheLock.withLock {
+            favoritesByID[id] != nil
+        }
     }
 
     func load(completion: @escaping (Result<[FavoriteCharacter], FavoritesStoreError>) -> Void) {
-        queue.async { [self] in
+        ioQueue.async { [self] in
             guard fileManager.fileExists(atPath: fileURL.path) else {
-                favorites = []
+                replaceCache(with: [])
                 deliver(.failure(.fileNotFound), to: completion)
                 return
             }
             do {
                 let data = try Data(contentsOf: fileURL)
                 let decoded = try JSONDecoder().decode([FavoriteCharacter].self, from: data)
-                favorites = decoded
+                replaceCache(with: decoded)
                 deliver(.success(sorted(decoded)), to: completion)
             } catch {
-                favorites = []
+                replaceCache(with: [])
                 deliver(.failure(.corruptedFile), to: completion)
             }
         }
     }
 
     func save(_ character: FavoriteCharacter, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void) {
-        queue.async { [self] in
-            var updated = favorites.filter { $0.id != character.id }
-            updated.append(character)
+        ioQueue.async { [self] in
+            var updated = cachedFavorites()
+            updated[character.id] = character
             deliver(persist(updated), to: completion)
         }
     }
 
     func remove(id: Int, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void) {
-        queue.async { [self] in
-            deliver(persist(favorites.filter { $0.id != id }), to: completion)
+        ioQueue.async { [self] in
+            var updated = cachedFavorites()
+            updated[id] = nil
+            deliver(persist(updated), to: completion)
         }
     }
 
-    private func persist(_ updated: [FavoriteCharacter]) -> Result<Void, FavoritesStoreError> {
+    private func persist(_ updated: [Int: FavoriteCharacter]) -> Result<Void, FavoritesStoreError> {
         let data: Data
         do {
-            data = try JSONEncoder().encode(updated)
+            data = try JSONEncoder().encode(sorted(Array(updated.values)))
         } catch {
             return .failure(.encoding)
         }
         do {
             try fileManager.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
             try data.write(to: fileURL, options: .atomic)
-            favorites = updated
+            cacheLock.withLock {
+                favoritesByID = updated
+            }
             return .success(())
         } catch {
             return .failure(.writing)
@@ -100,10 +115,28 @@ final class FavoritesStore: FavoritesStoring {
         values.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
+    private func cachedFavorites() -> [Int: FavoriteCharacter] {
+        cacheLock.withLock { favoritesByID }
+    }
+
+    private func replaceCache(with favorites: [FavoriteCharacter]) {
+        cacheLock.withLock {
+            favoritesByID = Dictionary(favorites.map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
+        }
+    }
+
     private func deliver<Success>(
         _ result: Result<Success, FavoritesStoreError>,
         to completion: @escaping (Result<Success, FavoritesStoreError>) -> Void
     ) {
         DispatchQueue.main.async { completion(result) }
+    }
+}
+
+private extension NSLock {
+    func withLock<T>(_ action: () throws -> T) rethrows -> T {
+        lock()
+        defer { unlock() }
+        return try action()
     }
 }
