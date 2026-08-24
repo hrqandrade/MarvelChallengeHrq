@@ -33,6 +33,10 @@ enum HeroServiceError: Error, Equatable {
 }
 
 final class HeroService: HeroServicing {
+    private enum Configuration {
+        static let pageSize = 20
+    }
+
     private let session: URLSession
     private let baseURL: URL
     private let publicKey: String
@@ -77,8 +81,8 @@ final class HeroService: HeroServicing {
                     return
                 }
                 completion(.success(HeroesPage(
-                    characters: result.results?.compactMap { $0.domainModel() } ?? [],
-                    offset: result.offset ?? page * 20,
+                    characters: try result.results?.map { try $0.domainModel() } ?? [],
+                    offset: result.offset ?? page * Configuration.pageSize,
                     total: result.total
                 )))
             } catch {
@@ -90,7 +94,6 @@ final class HeroService: HeroServicing {
     }
 
     private func makeURL(page: Int) -> URL? {
-        let limit = 20
         let timestamp = String(Date().timeIntervalSince1970)
         let hash = md5(timestamp + privateKey + publicKey)
         var components = URLComponents(
@@ -98,8 +101,8 @@ final class HeroService: HeroServicing {
             resolvingAgainstBaseURL: true
         )
         components?.queryItems = [
-            URLQueryItem(name: "offset", value: String(page * limit)),
-            URLQueryItem(name: "limit", value: String(limit)),
+            URLQueryItem(name: "offset", value: String(page * Configuration.pageSize)),
+            URLQueryItem(name: "limit", value: String(Configuration.pageSize)),
             URLQueryItem(name: "orderBy", value: "name"),
             URLQueryItem(name: "ts", value: timestamp),
             URLQueryItem(name: "hash", value: hash),

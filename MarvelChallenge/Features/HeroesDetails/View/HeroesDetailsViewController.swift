@@ -42,6 +42,8 @@ final class HeroesDetailsViewController: UIViewController {
 
     // MARK: - Lifecycle
 
+    override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
@@ -59,7 +61,8 @@ final class HeroesDetailsViewController: UIViewController {
     // MARK: - Configuration
 
     private func configureView() {
-        view.backgroundColor = DesignSystem.Color.backgroundPrimary
+        view.backgroundColor = DesignSystem.Color.accent
+        scrollView.backgroundColor = DesignSystem.Color.backgroundPrimary
     }
 
     private func configureHeaderView() {

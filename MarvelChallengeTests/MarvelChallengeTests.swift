@@ -362,6 +362,83 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertNil(weakViewModel)
     }
 
+    func testHeroServiceBuildsPaginatedRequestAndMapsResponse() throws {
+        let service = makeHeroService { request in
+            let components = try XCTUnwrap(URLComponents(url: try XCTUnwrap(request.url), resolvingAgainstBaseURL: false))
+            let query = Dictionary(uniqueKeysWithValues: (components.queryItems ?? []).compactMap { item in
+                item.value.map { (item.name, $0) }
+            })
+            XCTAssertEqual(components.path, "/v1/public/characters")
+            XCTAssertEqual(query["offset"], "40")
+            XCTAssertEqual(query["limit"], "20")
+            XCTAssertEqual(query["orderBy"], "name")
+            XCTAssertEqual(query["apikey"], "public")
+            return (200, Data(Self.validHeroesJSON.utf8))
+        }
+        let expectation = expectation(description: "service success")
+
+        service.fetchHeroes(page: 2) { result in
+            guard case let .success(page) = result else {
+                return XCTFail("Expected a successful page")
+            }
+            XCTAssertEqual(page.characters.map(\.name), ["Spider-Man"])
+            XCTAssertEqual(page.offset, 40)
+            XCTAssertEqual(page.total, 41)
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testHeroServiceRejectsHTTPErrorAndInvalidPayload() {
+        assertHeroService(statusCode: 500, data: Data(), expectedError: .invalidResponse)
+        assertHeroService(statusCode: 200, data: Data("not-json".utf8), expectedError: .decoding)
+        assertHeroService(statusCode: 200, data: Data(#"{"data":{"results":[{"name":"Missing id"}]}}"#.utf8), expectedError: .decoding)
+    }
+
+    func testHeroServiceFailsWithoutCredentialsBeforeStartingRequest() {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [URLProtocolStub.self]
+        let service = HeroService(
+            session: URLSession(configuration: configuration),
+            baseURL: URL(string: "https://example.com")!,
+            publicKey: "",
+            privateKey: ""
+        )
+        var receivedResult: Result<HeroesPage, HeroServiceError>?
+
+        let request = service.fetchHeroes(page: 0) { receivedResult = $0 }
+
+        XCTAssertNil(request)
+        XCTAssertEqual(receivedResult?.failure, .missingCredentials)
+    }
+
+    private static let validHeroesJSON = #"{"data":{"offset":40,"total":41,"results":[{"id":1,"name":"Spider-Man","description":"Hero","thumbnail":{"path":"https://example.com/hero","extension":"jpg"},"comics":{"items":[]},"series":{"items":[]}}]}}"#
+
+    private func makeHeroService(
+        handler: @escaping (URLRequest) throws -> (Int, Data)
+    ) -> HeroService {
+        URLProtocolStub.handler = handler
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [URLProtocolStub.self]
+        return HeroService(
+            session: URLSession(configuration: configuration),
+            baseURL: URL(string: "https://example.com")!,
+            publicKey: "public",
+            privateKey: "private"
+        )
+    }
+
+    private func assertHeroService(statusCode: Int, data: Data, expectedError: HeroServiceError) {
+        let service = makeHeroService { _ in (statusCode, data) }
+        let expectation = expectation(description: "service failure \(expectedError)")
+        service.fetchHeroes(page: 0) { result in
+            XCTAssertEqual(result.failure, expectedError)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
     private func temporaryFileURL() -> URL {
         FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
     }
@@ -369,6 +446,33 @@ final class MarvelChallengeTests: XCTestCase {
     private func makeCharacter(id: Int = 1, name: String = "Spider-Man") throws -> Character {
         Character(id: id, name: name, description: "", imageURL: nil, comics: [], series: [])
     }
+}
+
+private final class URLProtocolStub: URLProtocol {
+    static var handler: ((URLRequest) throws -> (Int, Data))?
+
+    override class func canInit(with _: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        do {
+            let handler = try XCTUnwrap(Self.handler)
+            let (statusCode, data) = try handler(request)
+            let response = try XCTUnwrap(HTTPURLResponse(
+                url: try XCTUnwrap(request.url),
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: nil
+            ))
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() {}
 }
 
 private extension Result {
