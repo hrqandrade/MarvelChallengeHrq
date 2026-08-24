@@ -1,4 +1,4 @@
-import CommonCrypto
+import CryptoKit
 import Foundation
 
 protocol HeroServicing {
@@ -30,23 +30,6 @@ enum HeroServiceError: Error, Equatable {
     case transport
     case invalidResponse
     case decoding
-}
-
-extension HeroServiceError {
-    var message: String {
-        switch self {
-        case .missingCredentials:
-            return Localizable.Error.missingCredentials
-        case .invalidURL:
-            return Localizable.Error.invalidURL
-        case .transport:
-            return Localizable.Error.transport
-        case .invalidResponse:
-            return Localizable.Error.invalidResponse
-        case .decoding:
-            return Localizable.Error.decoding
-        }
-    }
 }
 
 final class HeroService: HeroServicing {
@@ -88,13 +71,13 @@ final class HeroService: HeroServicing {
                 return
             }
             do {
-                let response = try JSONDecoder().decode(CharacterData.self, from: data)
+                let response = try JSONDecoder().decode(CharacterDataDTO.self, from: data)
                 guard let result = response.data else {
                     completion(.failure(.invalidResponse))
                     return
                 }
                 completion(.success(HeroesPage(
-                    characters: result.results ?? [],
+                    characters: result.results?.compactMap { $0.domainModel() } ?? [],
                     offset: result.offset ?? page * 20,
                     total: result.total
                 )))
@@ -126,11 +109,6 @@ final class HeroService: HeroServicing {
     }
 
     private func md5(_ value: String) -> String {
-        let data = Data(value.utf8)
-        var digest = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
-        data.withUnsafeBytes { bytes in
-            _ = CC_MD5(bytes.baseAddress, CC_LONG(data.count), &digest)
-        }
-        return digest.map { String(format: "%02x", $0) }.joined()
+        Insecure.MD5.hash(data: Data(value.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 }

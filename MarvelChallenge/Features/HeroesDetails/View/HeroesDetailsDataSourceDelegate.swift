@@ -12,10 +12,9 @@ extension HeroesDetailsViewController: UICollectionViewDataSource, UICollectionV
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let isComicsCollection = collectionView == comicCollectionView
-        let reuseIdentifier = isComicsCollection ? cellComics : cellSeries
         let item = isComicsCollection ? viewModel.comics[indexPath.row] : viewModel.series[indexPath.row]
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
-        (cell as? DetailsCollectionViewCell)?.setupCell(description: item.name ?? "")
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailsCollectionViewCell.reuseIdentifier, for: indexPath)
+        (cell as? DetailsCollectionViewCell)?.setupCell(description: item.name)
         return cell
     }
     

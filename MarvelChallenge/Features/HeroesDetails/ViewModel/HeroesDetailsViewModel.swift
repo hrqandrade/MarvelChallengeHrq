@@ -14,18 +14,17 @@ final class HeroesDetailsViewModel {
         self.favorites = favorites
     }
 
-    var name: String { character.name ?? "" }
+    var name: String { character.name }
     var description: String {
-        guard let description = character.resultDescription, !description.isEmpty else { return Localizable.Details.descriptionUnavailable }
-        return description
+        character.description.isEmpty ? Localizable.Details.descriptionUnavailable : character.description
     }
     var imageURL: URL? { character.imageURL }
-    var comics: [ComicsItem] { character.comics?.items ?? [] }
-    var series: [ComicsItem] { character.series?.items ?? [] }
-    var isFavorite: Bool { character.id.map(favorites.contains(id:)) ?? false }
+    var comics: [CharacterReference] { character.comics }
+    var series: [CharacterReference] { character.series }
+    var isFavorite: Bool { favorites.contains(id: character.id) }
 
     func toggleFavorite(completion: @escaping (HeroesDetailsFavoriteResult) -> Void) {
-        guard let id = character.id else { return }
+        let id = character.id
         let mutationCompletion: (Result<Void, FavoritesStoreError>) -> Void = { [weak self] result in
             DispatchQueue.main.async {
                 guard let self else { return }
@@ -40,12 +39,5 @@ final class HeroesDetailsViewModel {
         } else {
             favorites.save(FavoriteCharacter(id: id, name: name, imageURL: imageURL), completion: mutationCompletion)
         }
-    }
-}
-
-extension Character {
-    var imageURL: URL? {
-        guard let path = thumbnail?.path, let fileExtension = thumbnail?.thumbnailExtension else { return nil }
-        return URL(string: path + "." + fileExtension)
     }
 }

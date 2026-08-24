@@ -62,14 +62,14 @@ Critério de conclusão: paginação determinística, operações canceláveis e
 
 Critério de conclusão: consultas sem I/O na main thread, erros observáveis pela UI e testes de persistência e concorrência.
 
-### 5. Limites arquiteturais e navegação — planejada
+### 5. Limites arquiteturais e navegação — concluída
 
 - Separar DTOs da API, modelos de domínio e modelos de apresentação.
 - Mapear respostas opcionais na fronteira da camada de rede.
 - Retirar localização e mensagens de interface dos erros de infraestrutura.
 - Introduzir uma fábrica de telas para tornar a injeção obrigatória e testável.
 - Fazer o Coordinator controlar apresentação e encerramento de todos os fluxos.
-- Remover Storyboards e construir as telas programaticamente com Auto Layout.
+- Remover Storyboards das telas e construí-las programaticamente com Auto Layout.
 - Eliminar outlets, actions e identifiers, tornando dependências obrigatórias por inicializador.
 
 Critério de conclusão: UI sem dependência direta de DTOs, infraestrutura sem dependência de localização e navegação testável fora das ViewControllers.
