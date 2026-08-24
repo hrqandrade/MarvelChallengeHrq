@@ -1,8 +1,15 @@
-import UIKit
-import MarvelImageLoader
 import MarvelDesignSystem
+import MarvelImageLoader
+import UIKit
 
 final class HeroesCollectionViewCell: UICollectionViewCell {
+    private enum Metrics {
+        static let imageHeight: CGFloat = 120
+        static let iconSize: CGFloat = 32
+    }
+
+    // MARK: - UI
+
     static let reuseIdentifier = String(describing: HeroesCollectionViewCell.self)
     private let heroImageView = UIImageView()
     private let nameLabel = UILabel()
@@ -10,39 +17,76 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
     private let favoriteButton = UIButton(type: .system)
     private var onFavorite: (() -> Void)?
 
-    override init(frame: CGRect) { super.init(frame: frame); configureView() }
-    @available(*, unavailable) required init?(coder: NSCoder) { nil }
+    // MARK: - Initialization
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configureCardView()
+        configureImageView()
+        configureNameLabel()
+        configureFavoriteButton()
+        configureHierarchy()
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) { nil }
+
+    // MARK: - Lifecycle
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        heroImageView.cancelImageLoad(); heroImageView.image = nil; nameLabel.text = nil
-        favoriteButton.setImage(nil, for: .normal); onFavorite = nil
+        heroImageView.cancelImageLoad()
+        heroImageView.image = nil
+        nameLabel.text = nil
+        favoriteButton.setImage(nil, for: .normal)
+        onFavorite = nil
     }
 
     func configure(character: Character, isFavorite: Bool, onFavorite: @escaping () -> Void) {
         configure(name: character.name, imageURL: character.imageURL, isFavorite: isFavorite, onFavorite: onFavorite)
     }
+
     func configure(favorite: FavoriteCharacter, onFavorite: @escaping () -> Void) {
         configure(name: favorite.name, imageURL: favorite.imageURL, isFavorite: true, onFavorite: onFavorite)
     }
 
-    private func configureView() {
+    // MARK: - Configuration
+
+    private func configureCardView() {
         cardView.translatesAutoresizingMaskIntoConstraints = false
         cardView.backgroundColor = DesignSystem.Color.surface
         cardView.layer.cornerRadius = DesignSystem.Radius.medium
         cardView.layer.apply(.card)
+    }
+
+    private func configureImageView() {
         heroImageView.contentMode = .scaleAspectFit
         heroImageView.layer.cornerRadius = DesignSystem.Radius.small
         heroImageView.clipsToBounds = true
+    }
+
+    private func configureNameLabel() {
         nameLabel.font = DesignSystem.Typography.headline
         nameLabel.textColor = DesignSystem.Color.textPrimary
         nameLabel.numberOfLines = 2
+    }
+
+    private func configureFavoriteButton() {
         favoriteButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
+    }
+
+    private func configureHierarchy() {
         let footer = UIStackView(arrangedSubviews: [nameLabel, favoriteButton])
-        footer.alignment = .center; footer.spacing = DesignSystem.Spacing.small
+        footer.alignment = .center
+        footer.spacing = DesignSystem.Spacing.small
+
         let stack = UIStackView(arrangedSubviews: [heroImageView, footer])
-        stack.translatesAutoresizingMaskIntoConstraints = false; stack.axis = .vertical; stack.spacing = DesignSystem.Spacing.small
-        contentView.addSubview(cardView); cardView.addSubview(stack)
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = DesignSystem.Spacing.small
+
+        contentView.addSubview(cardView)
+        cardView.addSubview(stack)
         NSLayoutConstraint.activate([
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: DesignSystem.Spacing.small),
             cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: DesignSystem.Spacing.small),
@@ -52,14 +96,22 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
             stack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: DesignSystem.Spacing.small),
             stack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -DesignSystem.Spacing.small),
             stack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -DesignSystem.Spacing.small),
-            heroImageView.heightAnchor.constraint(equalToConstant: 120),
-            favoriteButton.widthAnchor.constraint(equalToConstant: 32), favoriteButton.heightAnchor.constraint(equalTo: favoriteButton.widthAnchor)
+            heroImageView.heightAnchor.constraint(equalToConstant: Metrics.imageHeight),
+            favoriteButton.widthAnchor.constraint(equalToConstant: Metrics.iconSize),
+            favoriteButton.heightAnchor.constraint(equalTo: favoriteButton.widthAnchor),
         ])
     }
 
     private func configure(name: String, imageURL: URL?, isFavorite: Bool, onFavorite: @escaping () -> Void) {
-        nameLabel.text = name; heroImageView.setImage(from: imageURL, placeholder: UIImage(named: "MarvelLogo"))
-        favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal); self.onFavorite = onFavorite
+        nameLabel.text = name
+        heroImageView.setImage(from: imageURL, placeholder: UIImage(named: "MarvelLogo"))
+        favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
+        self.onFavorite = onFavorite
     }
-    @objc private func didTapFavorite() { onFavorite?() }
+
+    // MARK: - Actions
+
+    @objc private func didTapFavorite() {
+        onFavorite?()
+    }
 }
