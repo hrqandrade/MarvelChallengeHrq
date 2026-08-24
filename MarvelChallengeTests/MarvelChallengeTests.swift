@@ -247,6 +247,22 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertNoThrow(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)))
     }
 
+    func testFavoritesCacheQueriesDoNotWaitForIOQueue() {
+        let ioQueue = DispatchQueue(label: "favorites.blocked.io")
+        ioQueue.suspend()
+        let store = FavoritesStore(fileURL: temporaryFileURL(), ioQueue: ioQueue)
+        let expectation = expectation(description: "cache query")
+
+        store.save(FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)) { _ in }
+        DispatchQueue.global().async {
+            XCTAssertFalse(store.contains(id: 1))
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+        ioQueue.resume()
+    }
+
     func testCatalogPublishesFavoriteWritingFailure() throws {
         let viewModel = HeroesCatalogViewModel(
             service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),

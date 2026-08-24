@@ -5,7 +5,7 @@ import UIKit
 final class HeroesDetailsViewController: UIViewController {
     private enum Metrics {
         static let headerHeight: CGFloat = 50
-        static let iconSize: CGFloat = 32
+        static let minimumTouchTarget: CGFloat = 44
         static let imageHeight: CGFloat = 200
         static let collectionHeight: CGFloat = 120
     }
@@ -153,8 +153,10 @@ final class HeroesDetailsViewController: UIViewController {
             headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             headerView.heightAnchor.constraint(equalToConstant: Metrics.headerHeight),
 
-            closeButton.widthAnchor.constraint(equalToConstant: Metrics.iconSize),
-            favoriteButton.widthAnchor.constraint(equalToConstant: Metrics.iconSize),
+            closeButton.widthAnchor.constraint(equalToConstant: Metrics.minimumTouchTarget),
+            closeButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Metrics.minimumTouchTarget),
+            favoriteButton.widthAnchor.constraint(equalToConstant: Metrics.minimumTouchTarget),
+            favoriteButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Metrics.minimumTouchTarget),
 
             scrollView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),

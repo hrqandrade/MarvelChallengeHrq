@@ -5,7 +5,7 @@ import UIKit
 final class HeroesCollectionViewCell: UICollectionViewCell {
     private enum Metrics {
         static let imageHeight: CGFloat = 120
-        static let iconSize: CGFloat = 32
+        static let minimumTouchTarget: CGFloat = 44
     }
 
     // MARK: - UI
@@ -97,7 +97,7 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
             stack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -DesignSystem.Spacing.small),
             stack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -DesignSystem.Spacing.small),
             heroImageView.heightAnchor.constraint(equalToConstant: Metrics.imageHeight),
-            favoriteButton.widthAnchor.constraint(equalToConstant: Metrics.iconSize),
+            favoriteButton.widthAnchor.constraint(equalToConstant: Metrics.minimumTouchTarget),
             favoriteButton.heightAnchor.constraint(equalTo: favoriteButton.widthAnchor),
         ])
     }
