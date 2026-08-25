@@ -38,8 +38,12 @@ struct ThumbnailDTO: Decodable {
 }
 
 extension CharacterDTO {
-    func domainModel() -> Character? {
-        guard let id, let name else { return nil }
+    enum MappingError: Error {
+        case missingRequiredField
+    }
+
+    func domainModel() throws -> Character {
+        guard let id, let name else { throw MappingError.missingRequiredField }
         let imageURL = thumbnail.flatMap { value -> URL? in
             guard let path = value.path, let fileExtension = value.fileExtension else { return nil }
             return URL(string: path + "." + fileExtension)

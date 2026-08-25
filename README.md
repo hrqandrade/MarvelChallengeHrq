@@ -141,7 +141,7 @@ git switch -c feat/image-loader-spm
 
 ## Testes
 
-Os testes cobrem estados e concorrência do ViewModel, cancelamento e paginação, cache e persistência atômica de favoritos, layouts, composição programática, navegação e desalocação dos principais fluxos. Para executá-los:
+Os testes cobrem estados e concorrência do ViewModel, contratos HTTP do `HeroService` com `URLProtocol`, cancelamento e paginação, política de payload inválido, cache e persistência atômica de favoritos, reuso de células, composição programática, navegação e desalocação dos principais fluxos. Para executá-los:
 
 ```bash
 xcodebuild test \

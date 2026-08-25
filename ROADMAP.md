@@ -74,7 +74,7 @@ Critério de conclusão: consultas sem I/O na main thread, erros observáveis pe
 
 Critério de conclusão: UI sem dependência direta de DTOs, infraestrutura sem dependência de localização e navegação testável fora das ViewControllers.
 
-### 6. Estratégia de testes — planejada
+### 6. Estratégia de testes — concluída
 
 - Cobrir estados e transições dos ViewModels.
 - Testar o `HeroService` com `URLProtocol`, sem rede real.
