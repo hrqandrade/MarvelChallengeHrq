@@ -44,6 +44,7 @@ final class DetailsCollectionViewCell: UICollectionViewCell {
     private func configureDescriptionLabel() {
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.font = DesignSystem.Typography.caption
+        descriptionLabel.adjustsFontForContentSizeCategory = true
         descriptionLabel.textColor = DesignSystem.Color.textPrimary
         descriptionLabel.textAlignment = .center
         descriptionLabel.numberOfLines = 0

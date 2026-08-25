@@ -67,6 +67,7 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
 
     private func configureNameLabel() {
         nameLabel.font = DesignSystem.Typography.headline
+        nameLabel.adjustsFontForContentSizeCategory = true
         nameLabel.textColor = DesignSystem.Color.textPrimary
         nameLabel.numberOfLines = 2
     }
@@ -106,6 +107,7 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
         nameLabel.text = name
         heroImageView.setImage(from: imageURL, placeholder: UIImage(named: "MarvelLogo"))
         favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
+        favoriteButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable.Details.addFavorite
         self.onFavorite = onFavorite
     }
 

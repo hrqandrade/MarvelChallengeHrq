@@ -1,13 +1,17 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "catalog.changeLayout" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Change list layout" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Alterar layout da lista" } } } },
     "catalog.characters" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Characters" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Personagens" } } } },
     "catalog.favorites" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Favorites" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Favoritos" } } } },
     "common.error" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Error" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Erro" } } } },
     "common.ok" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "OK" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "OK" } } } },
+    "details.addFavorite" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Add to favorites" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Adicionar aos favoritos" } } } },
+    "details.back" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Back" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Voltar" } } } },
     "details.comics" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Comics" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Quadrinhos" } } } },
     "details.descriptionUnavailable" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Description not found" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Descrição não encontrada" } } } },
     "details.series" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Series" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Séries" } } } },
+    "details.removeFavorite" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Remove from favorites" } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Remover dos favoritos" } } } },
     "error.decoding" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "The API response could not be decoded." } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Não foi possível interpretar a resposta da API." } } } },
     "error.favoritesReading" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Favorites could not be loaded." } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Não foi possível carregar os favoritos." } } } },
     "error.favoritesWriting" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "The favorite could not be updated." } }, "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Não foi possível atualizar o favorito." } } } },
