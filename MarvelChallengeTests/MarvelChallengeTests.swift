@@ -3,6 +3,13 @@ import UIKit
 @testable import MarvelChallenge
 
 final class MarvelChallengeTests: XCTestCase {
+    override func tearDown() {
+        URLProtocolStub.handler = nil
+        URLProtocolStub.shouldFinishLoading = true
+        URLProtocolStub.onStopLoading = nil
+        super.tearDown()
+    }
+
     func testCatalogPublishesEmptyStateWhenServiceReturnsNoCharacters() {
         let service = HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0)))
         let store = FavoritesStore(fileURL: temporaryFileURL())
@@ -247,6 +254,35 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertNoThrow(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)))
     }
 
+    func testFavoritesStoreLoadsSortedValuesAndUpdatesExistingCharacter() throws {
+        let fileURL = temporaryFileURL()
+        let initialValues = [
+            FavoriteCharacter(id: 2, name: "Thor", imageURL: nil),
+            FavoriteCharacter(id: 1, name: "Captain America", imageURL: nil),
+        ]
+        try JSONEncoder().encode(initialValues).write(to: fileURL)
+        let store = FavoritesStore(fileURL: fileURL)
+        let loadExpectation = expectation(description: "load sorted favorites")
+
+        store.load { result in
+            XCTAssertEqual(try? result.get().map(\.name), ["Captain America", "Thor"])
+            loadExpectation.fulfill()
+        }
+        wait(for: [loadExpectation], timeout: 1)
+
+        let updateExpectation = expectation(description: "update existing favorite")
+        store.save(FavoriteCharacter(id: 2, name: "Mighty Thor", imageURL: nil)) { result in
+            if case let .failure(error) = result {
+                XCTFail("Unexpected error: \(error)")
+            }
+            updateExpectation.fulfill()
+        }
+        wait(for: [updateExpectation], timeout: 1)
+
+        XCTAssertEqual(store.all().map(\.name), ["Captain America", "Mighty Thor"])
+        XCTAssertEqual(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)).count, 2)
+    }
+
     func testFavoritesCacheQueriesDoNotWaitForIOQueue() {
         let ioQueue = DispatchQueue(label: "favorites.blocked.io")
         ioQueue.suspend()
@@ -362,6 +398,51 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertNil(weakViewModel)
     }
 
+    func testProgrammaticScreensLoadTheirCriticalViews() throws {
+        let catalog = HeroesCatalogViewController(viewModel: HeroesCatalogViewModel(
+            service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
+            favorites: FavoritesStore(fileURL: temporaryFileURL())
+        ))
+        let details = HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
+            character: try makeCharacter(),
+            favorites: FavoritesStore(fileURL: temporaryFileURL())
+        ))
+
+        catalog.loadViewIfNeeded()
+        details.loadViewIfNeeded()
+
+        XCTAssertTrue(catalog.heroesCollectionView.isDescendant(of: catalog.view))
+        XCTAssertTrue(details.comicCollectionView.isDescendant(of: details.view))
+        XCTAssertEqual(catalog.preferredStatusBarStyle, .darkContent)
+        XCTAssertEqual(details.preferredStatusBarStyle, .darkContent)
+    }
+
+    func testGridAndListCellsReleaseFavoriteActionsOnReuse() throws {
+        weak var gridOwner: ClosureOwner?
+        weak var listOwner: ClosureOwner?
+        let character = try makeCharacter()
+
+        autoreleasepool {
+            var owner: ClosureOwner? = ClosureOwner()
+            let gridCell = HeroesCollectionViewCell(frame: .zero)
+            gridCell.configure(character: character, isFavorite: false) { [owner] in owner?.run() }
+            gridOwner = owner
+            gridCell.prepareForReuse()
+            owner = nil
+        }
+        autoreleasepool {
+            var owner: ClosureOwner? = ClosureOwner()
+            let listCell = HeroesCollectionListCell(frame: .zero)
+            listCell.configure(character: character, isFavorite: false) { [owner] in owner?.run() }
+            listOwner = owner
+            listCell.prepareForReuse()
+            owner = nil
+        }
+
+        XCTAssertNil(gridOwner)
+        XCTAssertNil(listOwner)
+    }
+
     func testHeroServiceBuildsPaginatedRequestAndMapsResponse() throws {
         let service = makeHeroService { request in
             let components = try XCTUnwrap(URLComponents(url: try XCTUnwrap(request.url), resolvingAgainstBaseURL: false))
@@ -393,7 +474,37 @@ final class MarvelChallengeTests: XCTestCase {
     func testHeroServiceRejectsHTTPErrorAndInvalidPayload() {
         assertHeroService(statusCode: 500, data: Data(), expectedError: .invalidResponse)
         assertHeroService(statusCode: 200, data: Data("not-json".utf8), expectedError: .decoding)
+        assertHeroService(statusCode: 200, data: Data(#"{}"#.utf8), expectedError: .invalidResponse)
         assertHeroService(statusCode: 200, data: Data(#"{"data":{"results":[{"name":"Missing id"}]}}"#.utf8), expectedError: .decoding)
+    }
+
+    func testHeroServiceMapsTransportFailure() {
+        let service = makeHeroService { _ in throw URLError(.notConnectedToInternet) }
+        let expectation = expectation(description: "transport failure")
+
+        service.fetchHeroes(page: 0) { result in
+            XCTAssertEqual(result.failure, .transport)
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testHeroServiceCancelsUnderlyingRequest() throws {
+        let requestStarted = expectation(description: "request started")
+        let requestCancelled = expectation(description: "request cancelled")
+        URLProtocolStub.shouldFinishLoading = false
+        URLProtocolStub.onStopLoading = { requestCancelled.fulfill() }
+        let service = makeHeroService { _ in
+            requestStarted.fulfill()
+            return (200, Data(Self.validHeroesJSON.utf8))
+        }
+
+        let request = try XCTUnwrap(service.fetchHeroes(page: 0) { _ in })
+        wait(for: [requestStarted], timeout: 1)
+        request.cancel()
+
+        wait(for: [requestCancelled], timeout: 1)
     }
 
     func testHeroServiceFailsWithoutCredentialsBeforeStartingRequest() {
@@ -450,6 +561,8 @@ final class MarvelChallengeTests: XCTestCase {
 
 private final class URLProtocolStub: URLProtocol {
     static var handler: ((URLRequest) throws -> (Int, Data))?
+    static var shouldFinishLoading = true
+    static var onStopLoading: (() -> Void)?
 
     override class func canInit(with _: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
@@ -458,6 +571,7 @@ private final class URLProtocolStub: URLProtocol {
         do {
             let handler = try XCTUnwrap(Self.handler)
             let (statusCode, data) = try handler(request)
+            guard Self.shouldFinishLoading else { return }
             let response = try XCTUnwrap(HTTPURLResponse(
                 url: try XCTUnwrap(request.url),
                 statusCode: statusCode,
@@ -472,7 +586,13 @@ private final class URLProtocolStub: URLProtocol {
         }
     }
 
-    override func stopLoading() {}
+    override func stopLoading() {
+        Self.onStopLoading?()
+    }
+}
+
+private final class ClosureOwner {
+    func run() {}
 }
 
 private extension Result {
