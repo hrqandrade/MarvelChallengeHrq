@@ -3,19 +3,9 @@ import MarvelImageLoader
 import UIKit
 
 final class HeroesDetailsView: UIView {
-    private enum Metrics {
-        static let headerHeight: CGFloat = 50
-        static let minimumTouchTarget: CGFloat = 44
-        static let imageHeight: CGFloat = 200
-        static let collectionHeight: CGFloat = 120
-    }
-
     let comicCollectionView = HeroesDetailsView.makeCollectionView()
     let seriesCollectionView = HeroesDetailsView.makeCollectionView()
-    private let headerView = UIStackView()
-    private let closeButton = UIButton(type: .system)
-    private let titleLabel = UILabel()
-    private let favoriteButton = UIButton(type: .system)
+    private let headerView = MarvelScreenHeaderView(title: "")
     private let scrollView = UIScrollView()
     private let contentStack = UIStackView()
     private let heroImageView = UIImageView()
@@ -46,7 +36,7 @@ final class HeroesDetailsView: UIView {
         hasComics: Bool,
         hasSeries: Bool
     ) {
-        titleLabel.text = name
+        headerView.setTitle(name)
         descriptionLabel.text = description
         heroImageView.setImage(from: imageURL, placeholder: UIImage(named: "MarvelLogo"))
         comicLabel.isHidden = !hasComics
@@ -57,12 +47,12 @@ final class HeroesDetailsView: UIView {
     }
 
     func renderFavorite(isFavorite: Bool) {
-        favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
-        favoriteButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable.Details.addFavorite
+        headerView.trailingButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
+        headerView.trailingButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable.Details.addFavorite
     }
 
     func setFavoriteEnabled(_ isEnabled: Bool) {
-        favoriteButton.isEnabled = isEnabled
+        headerView.trailingButton.isEnabled = isEnabled
     }
 
     private func configureView() {
@@ -71,25 +61,10 @@ final class HeroesDetailsView: UIView {
     }
 
     private func configureHeader() {
-        headerView.axis = .horizontal
-        headerView.alignment = .center
-        headerView.spacing = DesignSystem.Spacing.small
-        headerView.isLayoutMarginsRelativeArrangement = true
-        headerView.layoutMargins = UIEdgeInsets(top: .zero, left: DesignSystem.Spacing.medium, bottom: .zero, right: DesignSystem.Spacing.medium)
-        headerView.backgroundColor = DesignSystem.Color.accent
-        closeButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
-        closeButton.tintColor = DesignSystem.Color.onAccent
-        closeButton.accessibilityLabel = Localizable.Details.back
-        closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
-        titleLabel.font = DesignSystem.Typography.title
-        titleLabel.adjustsFontForContentSizeCategory = true
-        titleLabel.textColor = DesignSystem.Color.onAccent
-        titleLabel.textAlignment = .center
-        favoriteButton.tintColor = DesignSystem.Color.onAccent
-        favoriteButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
-        headerView.addArrangedSubview(closeButton)
-        headerView.addArrangedSubview(titleLabel)
-        headerView.addArrangedSubview(favoriteButton)
+        headerView.leadingButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
+        headerView.leadingButton.accessibilityLabel = Localizable.Details.back
+        headerView.leadingButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
+        headerView.trailingButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
     }
 
     private func configureContent() {
@@ -124,11 +99,7 @@ final class HeroesDetailsView: UIView {
             headerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: Metrics.headerHeight),
-            closeButton.widthAnchor.constraint(equalToConstant: Metrics.minimumTouchTarget),
-            closeButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Metrics.minimumTouchTarget),
-            favoriteButton.widthAnchor.constraint(equalToConstant: Metrics.minimumTouchTarget),
-            favoriteButton.heightAnchor.constraint(greaterThanOrEqualToConstant: Metrics.minimumTouchTarget),
+            headerView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.navigationBarHeight),
             scrollView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -137,9 +108,9 @@ final class HeroesDetailsView: UIView {
             contentStack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: DesignSystem.Spacing.medium),
             contentStack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -DesignSystem.Spacing.medium),
             contentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -DesignSystem.Spacing.large),
-            heroImageView.heightAnchor.constraint(equalToConstant: Metrics.imageHeight),
-            comicCollectionView.heightAnchor.constraint(equalToConstant: Metrics.collectionHeight),
-            seriesCollectionView.heightAnchor.constraint(equalToConstant: Metrics.collectionHeight),
+            heroImageView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.heroImageHeight),
+            comicCollectionView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.detailsCarouselHeight),
+            seriesCollectionView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.detailsCarouselHeight),
         ])
     }
 

@@ -56,7 +56,7 @@ final class HeroesCatalogViewController: UIViewController {
             guard let self else { return }
             switch state {
             case .initialLoading:
-                self.contentView.clearBackground()
+                self.contentView.renderLoading()
             case .refreshing, .loadingNextPage, .idle:
                 break
             case .loaded:
@@ -64,6 +64,7 @@ final class HeroesCatalogViewController: UIViewController {
             case .empty:
                 self.contentView.renderEmpty(section: self.selectedSection)
             case let .failed(message):
+                self.contentView.endRefreshing()
                 self.presentAlert(withTitle: Localizable.Common.error, message: message)
             }
         }

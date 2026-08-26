@@ -2,18 +2,10 @@ import MarvelDesignSystem
 import UIKit
 
 final class HeroesCatalogView: UIView {
-    private enum Metrics {
-        static let barHeight: CGFloat = 50
-        static let controlHeight: CGFloat = 40
-        static let minimumTouchTarget: CGFloat = 44
-    }
-
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: GridFlowLayout())
     let segmentedControl = UISegmentedControl(items: [Localizable.Catalog.characters, Localizable.Catalog.favorites])
-    private let headerView = UIView()
+    private let headerView = MarvelScreenHeaderView(title: Localizable.Catalog.characters)
     private let footerView = UIView()
-    private let layoutButton = UIButton(type: .system)
-    private let titleLabel = UILabel()
     private let refreshControl = UIRefreshControl()
 
     var onRefresh: (() -> Void)?
@@ -34,7 +26,7 @@ final class HeroesCatalogView: UIView {
     required init?(coder _: NSCoder) { nil }
 
     func renderLayout(isGrid: Bool, animated: Bool) {
-        layoutButton.setImage(UIImage(named: isGrid ? "list" : "grid"), for: .normal)
+        headerView.leadingButton.setImage(UIImage(named: isGrid ? "list" : "grid"), for: .normal)
         let layout: UICollectionViewLayout = isGrid ? GridFlowLayout() : ListFlowLayout()
         collectionView.setCollectionViewLayout(layout, animated: animated)
     }
@@ -49,15 +41,16 @@ final class HeroesCatalogView: UIView {
         refreshControl.endRefreshing()
         collectionView.reloadData()
         let imageName = section == .characters ? "emptyList" : "emptyFavorite"
-        let imageView = UIImageView(image: UIImage(named: imageName))
-        imageView.contentMode = .scaleAspectFit
-        imageView.isAccessibilityElement = true
-        imageView.accessibilityLabel = section == .characters ? Localizable.Catalog.characters : Localizable.Catalog.favorites
-        collectionView.backgroundView = imageView
+        let label = section == .characters ? Localizable.Catalog.characters : Localizable.Catalog.favorites
+        collectionView.backgroundView = MarvelEmptyStateView(image: UIImage(named: imageName), accessibilityLabel: label)
     }
 
-    func clearBackground() {
-        collectionView.backgroundView = nil
+    func renderLoading() {
+        collectionView.backgroundView = MarvelLoadingView()
+    }
+
+    func endRefreshing() {
+        refreshControl.endRefreshing()
     }
 
     private func configureView() {
@@ -65,15 +58,9 @@ final class HeroesCatalogView: UIView {
     }
 
     private func configureHeader() {
-        headerView.backgroundColor = DesignSystem.Color.accent
-        titleLabel.font = DesignSystem.Typography.title
-        titleLabel.adjustsFontForContentSizeCategory = true
-        titleLabel.textColor = DesignSystem.Color.onAccent
-        titleLabel.text = Localizable.Catalog.characters
-        titleLabel.textAlignment = .center
-        layoutButton.tintColor = DesignSystem.Color.onAccent
-        layoutButton.accessibilityLabel = Localizable.Catalog.changeLayout
-        layoutButton.addTarget(self, action: #selector(didTapLayout), for: .touchUpInside)
+        headerView.leadingButton.accessibilityLabel = Localizable.Catalog.changeLayout
+        headerView.leadingButton.addTarget(self, action: #selector(didTapLayout), for: .touchUpInside)
+        headerView.trailingButton.isHidden = true
     }
 
     private func configureCollection() {
@@ -92,14 +79,12 @@ final class HeroesCatalogView: UIView {
     }
 
     private func configureHierarchy() {
-        [headerView, collectionView, footerView, layoutButton, titleLabel, segmentedControl].forEach {
+        [headerView, collectionView, footerView, segmentedControl].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         addSubview(headerView)
         addSubview(collectionView)
         addSubview(footerView)
-        headerView.addSubview(layoutButton)
-        headerView.addSubview(titleLabel)
         footerView.addSubview(segmentedControl)
     }
 
@@ -108,13 +93,7 @@ final class HeroesCatalogView: UIView {
             headerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: Metrics.barHeight),
-            layoutButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: DesignSystem.Spacing.medium),
-            layoutButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
-            layoutButton.widthAnchor.constraint(equalToConstant: Metrics.minimumTouchTarget),
-            layoutButton.heightAnchor.constraint(equalTo: layoutButton.widthAnchor),
-            titleLabel.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
+            headerView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.navigationBarHeight),
             collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -122,10 +101,10 @@ final class HeroesCatalogView: UIView {
             footerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             footerView.trailingAnchor.constraint(equalTo: trailingAnchor),
             footerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-            footerView.heightAnchor.constraint(equalToConstant: Metrics.barHeight),
+            footerView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.navigationBarHeight),
             segmentedControl.centerXAnchor.constraint(equalTo: footerView.centerXAnchor),
             segmentedControl.centerYAnchor.constraint(equalTo: footerView.centerYAnchor),
-            segmentedControl.heightAnchor.constraint(equalToConstant: Metrics.controlHeight),
+            segmentedControl.heightAnchor.constraint(equalToConstant: MarvelComponentSize.segmentedControlHeight),
         ])
     }
 
@@ -134,7 +113,7 @@ final class HeroesCatalogView: UIView {
 
     @objc private func didChangeSection() {
         let section: HeroesCatalogSection = segmentedControl.selectedSegmentIndex == 0 ? .characters : .favorites
-        titleLabel.text = section == .characters ? Localizable.Catalog.characters : Localizable.Catalog.favorites
+        headerView.setTitle(section == .characters ? Localizable.Catalog.characters : Localizable.Catalog.favorites)
         onSectionChange?(section)
     }
 }

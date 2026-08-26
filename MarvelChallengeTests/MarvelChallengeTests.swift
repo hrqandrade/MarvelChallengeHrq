@@ -411,10 +411,21 @@ final class MarvelChallengeTests: XCTestCase {
         catalog.loadViewIfNeeded()
         details.loadViewIfNeeded()
 
+        XCTAssertTrue(catalog.view is HeroesCatalogView)
+        XCTAssertTrue(details.view is HeroesDetailsView)
         XCTAssertTrue(catalog.heroesCollectionView.isDescendant(of: catalog.view))
         XCTAssertTrue(details.comicCollectionView.isDescendant(of: details.view))
         XCTAssertEqual(catalog.preferredStatusBarStyle, .darkContent)
         XCTAssertEqual(details.preferredStatusBarStyle, .darkContent)
+    }
+
+    func testSharedHeaderProvidesAccessibleMinimumTouchTargets() {
+        let header = MarvelScreenHeaderView(title: "Title")
+        header.frame = CGRect(x: 0, y: 0, width: 320, height: MarvelComponentSize.navigationBarHeight)
+        header.layoutIfNeeded()
+
+        XCTAssertGreaterThanOrEqual(header.leadingButton.bounds.height, MarvelComponentSize.minimumTouchTarget)
+        XCTAssertGreaterThanOrEqual(header.trailingButton.bounds.height, MarvelComponentSize.minimumTouchTarget)
     }
 
     func testGridAndListCellsReleaseFavoriteActionsOnReuse() throws {

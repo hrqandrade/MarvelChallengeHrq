@@ -13,7 +13,7 @@ final class HeroesCollectionListCell: UICollectionViewCell {
     static let reuseIdentifier = String(describing: HeroesCollectionListCell.self)
     private let heroImageView = UIImageView()
     private let nameLabel = UILabel()
-    private let cardView = UIView()
+    private let cardView = MarvelCardView()
     private let favoriteButton = UIButton(type: .system)
     private var onFavorite: (() -> Void)?
 
@@ -54,9 +54,6 @@ final class HeroesCollectionListCell: UICollectionViewCell {
 
     private func configureCardView() {
         cardView.translatesAutoresizingMaskIntoConstraints = false
-        cardView.backgroundColor = DesignSystem.Color.surface
-        cardView.layer.cornerRadius = DesignSystem.Radius.medium
-        cardView.layer.apply(.card)
     }
 
     private func configureImageView() {

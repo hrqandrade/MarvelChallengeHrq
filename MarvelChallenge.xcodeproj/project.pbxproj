@@ -35,6 +35,7 @@
 		EE0000000000000000000001 /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000011 /* Character.swift */; };
 		FF0000000000000000000001 /* HeroesCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000011 /* HeroesCatalogView.swift */; };
 		FF0000000000000000000002 /* HeroesDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000012 /* HeroesDetailsView.swift */; };
+		AB0000000000000000000001 /* MarvelComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000011 /* MarvelComponents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +92,7 @@
 		EE0000000000000000000011 /* Character.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Character.swift; sourceTree = "<group>"; };
 		FF0000000000000000000011 /* HeroesCatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCatalogView.swift; sourceTree = "<group>"; };
 		FF0000000000000000000012 /* HeroesDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesDetailsView.swift; sourceTree = "<group>"; };
+		AB0000000000000000000011 /* MarvelComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarvelComponents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,6 +279,22 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		AB0000000000000000000020 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000021 /* DesignSystem */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		AB0000000000000000000021 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				AB0000000000000000000011 /* MarvelComponents.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
 		50C7BCF025A785B4006A235D = {
 			isa = PBXGroup;
 			children = (
@@ -301,6 +319,7 @@
 				DD0000000000000000000001 /* Application */,
 				DD0000000000000000000002 /* Core */,
 				DD0000000000000000000008 /* Features */,
+				AB0000000000000000000020 /* Shared */,
 				50C7BD0525A785B6006A235D /* Assets.xcassets */,
 				50C7BD0725A785B6006A235D /* LaunchScreen.storyboard */,
 				50C7BD0A25A785B6006A235D /* Info.plist */,
@@ -428,6 +447,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB0000000000000000000001 /* MarvelComponents.swift in Sources */,
 				FF0000000000000000000001 /* HeroesCatalogView.swift in Sources */,
 				FF0000000000000000000002 /* HeroesDetailsView.swift in Sources */,
 				CC0000000000000000000002 /* Localizable.swift in Sources */,
