@@ -29,7 +29,9 @@ final class HeroesCollectionListCell: UICollectionViewCell {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 
     // MARK: - Lifecycle
 
@@ -84,7 +86,10 @@ final class HeroesCollectionListCell: UICollectionViewCell {
         NSLayoutConstraint.activate([
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: DesignSystem.Spacing.small),
             cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: DesignSystem.Spacing.small),
-            cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -DesignSystem.Spacing.small),
+            cardView.trailingAnchor.constraint(
+                equalTo: contentView.trailingAnchor,
+                constant: -DesignSystem.Spacing.small
+            ),
             cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -DesignSystem.Spacing.small),
             stack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: DesignSystem.Spacing.small),
             stack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: DesignSystem.Spacing.small),
@@ -101,7 +106,8 @@ final class HeroesCollectionListCell: UICollectionViewCell {
         nameLabel.text = name
         heroImageView.setImage(from: imageURL, placeholder: UIImage(named: "MarvelLogo"))
         favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
-        favoriteButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable.Details.addFavorite
+        favoriteButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable.Details
+            .addFavorite
         self.onFavorite = onFavorite
     }
 

@@ -1,0 +1,11 @@
+--swiftversion 5.0
+--indent 4
+--linebreaks lf
+--maxwidth 120
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--self remove
+--stripunusedargs closure-only
+--disable redundantFileprivate
+--exclude .build,DerivedData

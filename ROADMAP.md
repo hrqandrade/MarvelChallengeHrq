@@ -97,7 +97,7 @@ Critério de conclusão: riscos principais cobertos por testes determinísticos 
 
 Critério de conclusão: telas principais compostas por estilos e componentes compartilhados, com validação básica de acessibilidade.
 
-### 8. Integração contínua e qualidade — planejada
+### 8. Integração contínua e qualidade — em andamento
 
 - Executar build e testes em Pull Requests.
 - Aplicar SwiftFormat e SwiftLint de forma reproduzível.

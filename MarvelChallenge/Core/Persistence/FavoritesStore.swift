@@ -7,10 +7,15 @@ struct FavoriteCharacter: Codable, Equatable {
 }
 
 protocol FavoritesStoring: AnyObject {
+    /// Returns the current in-memory snapshot synchronously from any queue.
     func all() -> [FavoriteCharacter]
+    /// Queries the current in-memory snapshot synchronously from any queue.
     func contains(id: Int) -> Bool
+    /// Performs file access off the main thread and completes on the main thread.
     func load(completion: @escaping (Result<[FavoriteCharacter], FavoritesStoreError>) -> Void)
+    /// Performs file access off the main thread and completes on the main thread.
     func save(_ character: FavoriteCharacter, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void)
+    /// Performs file access off the main thread and completes on the main thread.
     func remove(id: Int, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void)
 }
 

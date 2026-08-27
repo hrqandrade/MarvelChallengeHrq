@@ -3,6 +3,15 @@ import MarvelImageLoader
 import UIKit
 
 final class HeroesDetailsView: UIView {
+    struct State {
+        let name: String
+        let description: String
+        let imageURL: URL?
+        let isFavorite: Bool
+        let hasComics: Bool
+        let hasSeries: Bool
+    }
+
     let comicCollectionView = HeroesDetailsView.makeCollectionView()
     let seriesCollectionView = HeroesDetailsView.makeCollectionView()
     private let headerView = MarvelScreenHeaderView(title: "")
@@ -26,29 +35,25 @@ final class HeroesDetailsView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 
-    func render(
-        name: String,
-        description: String,
-        imageURL: URL?,
-        isFavorite: Bool,
-        hasComics: Bool,
-        hasSeries: Bool
-    ) {
-        headerView.setTitle(name)
-        descriptionLabel.text = description
-        heroImageView.setImage(from: imageURL, placeholder: UIImage(named: "MarvelLogo"))
-        comicLabel.isHidden = !hasComics
-        comicCollectionView.isHidden = !hasComics
-        seriesLabel.isHidden = !hasSeries
-        seriesCollectionView.isHidden = !hasSeries
-        renderFavorite(isFavorite: isFavorite)
+    func render(_ state: State) {
+        headerView.setTitle(state.name)
+        descriptionLabel.text = state.description
+        heroImageView.setImage(from: state.imageURL, placeholder: UIImage(named: "MarvelLogo"))
+        comicLabel.isHidden = !state.hasComics
+        comicCollectionView.isHidden = !state.hasComics
+        seriesLabel.isHidden = !state.hasSeries
+        seriesCollectionView.isHidden = !state.hasSeries
+        renderFavorite(isFavorite: state.isFavorite)
     }
 
     func renderFavorite(isFavorite: Bool) {
         headerView.trailingButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
-        headerView.trailingButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable.Details.addFavorite
+        headerView.trailingButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable
+            .Details.addFavorite
     }
 
     func setFavoriteEnabled(_ isEnabled: Bool) {
@@ -84,7 +89,8 @@ final class HeroesDetailsView: UIView {
         seriesLabel.text = Localizable.Details.series
         contentStack.axis = .vertical
         contentStack.spacing = DesignSystem.Spacing.small
-        [heroImageView, descriptionLabel, comicLabel, comicCollectionView, seriesLabel, seriesCollectionView].forEach(contentStack.addArrangedSubview)
+        [heroImageView, descriptionLabel, comicLabel, comicCollectionView, seriesLabel, seriesCollectionView]
+            .forEach(contentStack.addArrangedSubview)
     }
 
     private func configureHierarchy() {
@@ -104,18 +110,35 @@ final class HeroesDetailsView: UIView {
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            contentStack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: DesignSystem.Spacing.medium),
-            contentStack.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: DesignSystem.Spacing.medium),
-            contentStack.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: -DesignSystem.Spacing.medium),
-            contentStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -DesignSystem.Spacing.large),
+            contentStack.topAnchor.constraint(
+                equalTo: scrollView.contentLayoutGuide.topAnchor,
+                constant: DesignSystem.Spacing.medium
+            ),
+            contentStack.leadingAnchor.constraint(
+                equalTo: scrollView.frameLayoutGuide.leadingAnchor,
+                constant: DesignSystem.Spacing.medium
+            ),
+            contentStack.trailingAnchor.constraint(
+                equalTo: scrollView.frameLayoutGuide.trailingAnchor,
+                constant: -DesignSystem.Spacing.medium
+            ),
+            contentStack.bottomAnchor.constraint(
+                equalTo: scrollView.contentLayoutGuide.bottomAnchor,
+                constant: -DesignSystem.Spacing.large
+            ),
             heroImageView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.heroImageHeight),
             comicCollectionView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.detailsCarouselHeight),
             seriesCollectionView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.detailsCarouselHeight),
         ])
     }
 
-    @objc private func didTapClose() { onClose?() }
-    @objc private func didTapFavorite() { onFavorite?() }
+    @objc private func didTapClose() {
+        onClose?()
+    }
+
+    @objc private func didTapFavorite() {
+        onFavorite?()
+    }
 
     private static func makeCollectionView() -> UICollectionView {
         let layout = UICollectionViewFlowLayout()
@@ -123,7 +146,10 @@ final class HeroesDetailsView: UIView {
         layout.minimumLineSpacing = DesignSystem.Spacing.small
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
-        collectionView.register(DetailsCollectionViewCell.self, forCellWithReuseIdentifier: DetailsCollectionViewCell.reuseIdentifier)
+        collectionView.register(
+            DetailsCollectionViewCell.self,
+            forCellWithReuseIdentifier: DetailsCollectionViewCell.reuseIdentifier
+        )
         return collectionView
     }
 }
