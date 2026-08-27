@@ -13,7 +13,7 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = String(describing: HeroesCollectionViewCell.self)
     private let heroImageView = UIImageView()
     private let nameLabel = UILabel()
-    private let cardView = UIView()
+    private let cardView = MarvelCardView()
     private let favoriteButton = UIButton(type: .system)
     private var onFavorite: (() -> Void)?
 
@@ -54,9 +54,6 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
 
     private func configureCardView() {
         cardView.translatesAutoresizingMaskIntoConstraints = false
-        cardView.backgroundColor = DesignSystem.Color.surface
-        cardView.layer.cornerRadius = DesignSystem.Radius.medium
-        cardView.layer.apply(.card)
     }
 
     private func configureImageView() {
@@ -67,6 +64,7 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
 
     private func configureNameLabel() {
         nameLabel.font = DesignSystem.Typography.headline
+        nameLabel.adjustsFontForContentSizeCategory = true
         nameLabel.textColor = DesignSystem.Color.textPrimary
         nameLabel.numberOfLines = 2
     }
@@ -106,6 +104,7 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
         nameLabel.text = name
         heroImageView.setImage(from: imageURL, placeholder: UIImage(named: "MarvelLogo"))
         favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
+        favoriteButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable.Details.addFavorite
         self.onFavorite = onFavorite
     }
 

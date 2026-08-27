@@ -87,7 +87,7 @@ Critério de conclusão: UI sem dependência direta de DTOs, infraestrutura sem 
 
 Critério de conclusão: riscos principais cobertos por testes determinísticos e suíte executável localmente por um único comando.
 
-### 7. Componentes do Design System — planejada
+### 7. Componentes do Design System — concluída
 
 - Evoluir tokens para componentes reutilizáveis.
 - Padronizar loading, empty state, cards, botões e mensagens de erro.

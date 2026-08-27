@@ -1,0 +1,130 @@
+import MarvelDesignSystem
+import UIKit
+
+enum MarvelComponentSize {
+    static let minimumTouchTarget: CGFloat = 44
+    static let navigationBarHeight: CGFloat = 50
+    static let segmentedControlHeight: CGFloat = 40
+    static let heroImageHeight: CGFloat = 200
+    static let detailsCarouselHeight: CGFloat = 120
+}
+
+final class MarvelScreenHeaderView: UIView {
+    let leadingButton = UIButton(type: .system)
+    let trailingButton = UIButton(type: .system)
+    private let titleLabel = UILabel()
+
+    init(title: String) {
+        super.init(frame: .zero)
+        backgroundColor = DesignSystem.Color.accent
+        titleLabel.font = DesignSystem.Typography.title
+        titleLabel.adjustsFontForContentSizeCategory = true
+        titleLabel.textColor = DesignSystem.Color.onAccent
+        titleLabel.textAlignment = .center
+        titleLabel.text = title
+        [leadingButton, trailingButton].forEach {
+            $0.tintColor = DesignSystem.Color.onAccent
+        }
+        configureHierarchy()
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) { nil }
+
+    func setTitle(_ title: String) {
+        titleLabel.text = title
+    }
+
+    private func configureHierarchy() {
+        [leadingButton, titleLabel, trailingButton].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            addSubview($0)
+        }
+        NSLayoutConstraint.activate([
+            leadingButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: DesignSystem.Spacing.medium),
+            leadingButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+            leadingButton.widthAnchor.constraint(equalToConstant: MarvelComponentSize.minimumTouchTarget),
+            leadingButton.heightAnchor.constraint(greaterThanOrEqualToConstant: MarvelComponentSize.minimumTouchTarget),
+            titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: leadingButton.trailingAnchor, constant: DesignSystem.Spacing.small),
+            titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            trailingButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: DesignSystem.Spacing.small),
+            trailingButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
+            trailingButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+            trailingButton.widthAnchor.constraint(equalToConstant: MarvelComponentSize.minimumTouchTarget),
+            trailingButton.heightAnchor.constraint(greaterThanOrEqualToConstant: MarvelComponentSize.minimumTouchTarget),
+        ])
+    }
+}
+
+final class MarvelCardView: UIView {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = DesignSystem.Color.surface
+        layer.cornerRadius = DesignSystem.Radius.medium
+        layer.apply(.card)
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) { nil }
+}
+
+final class MarvelEmptyStateView: UIView {
+    init(image: UIImage?, accessibilityLabel: String) {
+        super.init(frame: .zero)
+        let imageView = UIImageView(image: image)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        imageView.isAccessibilityElement = true
+        imageView.accessibilityLabel = accessibilityLabel
+        addSubview(imageView)
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: topAnchor),
+            imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) { nil }
+}
+
+final class MarvelLoadingView: UIView {
+    private let activityIndicator = UIActivityIndicatorView(style: .large)
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        let titleLabel = makeLabel(text: Localizable.Loading.title, font: DesignSystem.Typography.headline)
+        let descriptionLabel = makeLabel(text: Localizable.Loading.description, font: DesignSystem.Typography.body)
+        let stack = UIStackView(arrangedSubviews: [activityIndicator, titleLabel, descriptionLabel])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.alignment = .center
+        stack.spacing = DesignSystem.Spacing.small
+        addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.centerXAnchor.constraint(equalTo: centerXAnchor),
+            stack.centerYAnchor.constraint(equalTo: centerYAnchor),
+            stack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: DesignSystem.Spacing.medium),
+            stack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
+        ])
+        activityIndicator.startAnimating()
+        accessibilityLabel = Localizable.Loading.title
+        accessibilityTraits = .updatesFrequently
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) { nil }
+
+    private func makeLabel(text: String, font: UIFont) -> UILabel {
+        let label = UILabel()
+        label.font = font
+        label.adjustsFontForContentSizeCategory = true
+        label.textColor = DesignSystem.Color.textPrimary
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.text = text
+        return label
+    }
+}

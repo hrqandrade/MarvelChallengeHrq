@@ -8,13 +8,17 @@ enum Localizable {
 
     enum Catalog {
         static let characters = text("catalog.characters")
+        static let changeLayout = text("catalog.changeLayout")
         static let favorites = text("catalog.favorites")
     }
 
     enum Details {
+        static let addFavorite = text("details.addFavorite")
+        static let back = text("details.back")
         static let descriptionUnavailable = text("details.descriptionUnavailable")
         static let comics = text("details.comics")
         static let series = text("details.series")
+        static let removeFavorite = text("details.removeFavorite")
     }
 
     enum Loading {

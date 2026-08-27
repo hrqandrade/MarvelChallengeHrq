@@ -86,6 +86,8 @@ ViewModels
 - **View:** renderiza estado e encaminha ações do usuário.
 - **ViewModel:** concentra estado e regras de apresentação sem depender de UIKit.
 - **Services/Stores:** implementam infraestrutura atrás de protocolos, permitindo mocks nos testes.
+- **Views:** encapsulam hierarquia, Auto Layout e renderização, mantendo as ViewControllers focadas em lifecycle e binding.
+- **Shared Design System:** reúne header, cards, loading, empty state e métricas semânticas reutilizadas pelas features.
 
 ### Organização do código
 
