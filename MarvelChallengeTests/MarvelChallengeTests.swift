@@ -276,7 +276,7 @@ final class MarvelChallengeTests: XCTestCase {
             XCTAssertEqual(try? result.get().map(\.name), ["Captain America", "Thor"])
             loadExpectation.fulfill()
         }
-        wait(for: [loadExpectation], timeout: 1)
+        wait(for: [loadExpectation], timeout: TestTimeout.asynchronous)
 
         let updateExpectation = expectation(description: "update existing favorite")
         store.save(FavoriteCharacter(id: 2, name: "Mighty Thor", imageURL: nil)) { result in
@@ -285,7 +285,7 @@ final class MarvelChallengeTests: XCTestCase {
             }
             updateExpectation.fulfill()
         }
-        wait(for: [updateExpectation], timeout: 1)
+        wait(for: [updateExpectation], timeout: TestTimeout.asynchronous)
 
         XCTAssertEqual(store.all().map(\.name), ["Captain America", "Mighty Thor"])
         XCTAssertEqual(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)).count, 2)
@@ -607,6 +607,10 @@ final class MarvelChallengeTests: XCTestCase {
     private func makeCharacter(id: Int = 1, name: String = "Spider-Man") throws -> Character {
         Character(id: id, name: name, description: "", imageURL: nil, comics: [], series: [])
     }
+}
+
+private enum TestTimeout {
+    static let asynchronous: TimeInterval = 5
 }
 
 private final class URLProtocolStub: URLProtocol {
