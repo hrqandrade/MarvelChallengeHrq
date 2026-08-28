@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		AA0000000000000000000001 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000011 /* AppCoordinator.swift */; };
+		FA0000000000000000000001 /* DebugAppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000011 /* DebugAppDependencies.swift */; };
 		AA0000000000000000000002 /* HeroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000012 /* HeroService.swift */; };
 		AA0000000000000000000003 /* FavoritesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000013 /* FavoritesStore.swift */; };
 		BB0000000000000000000001 /* MarvelImageLoader in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000000000000000000003 /* MarvelImageLoader */; };
@@ -64,6 +65,7 @@
 /* Begin PBXFileReference section */
 		5025353225A7C60A00B03C4D /* ListFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListFlowLayout.swift; sourceTree = "<group>"; };
 		AA0000000000000000000011 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
+		FA0000000000000000000011 /* DebugAppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugAppDependencies.swift; sourceTree = "<group>"; };
 		AA0000000000000000000012 /* HeroService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroService.swift; sourceTree = "<group>"; };
 		AA0000000000000000000013 /* FavoritesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStore.swift; sourceTree = "<group>"; };
 		AA0000000000000000000015 /* HeroesCatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCatalogViewModel.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0000000000000000000011 /* AppCoordinator.swift */,
+				FA0000000000000000000011 /* DebugAppDependencies.swift */,
 				50C7BCFC25A785B4006A235D /* AppDelegate.swift */,
 				50C7BCFE25A785B4006A235D /* SceneDelegate.swift */,
 			);
@@ -452,6 +455,7 @@
 				FF0000000000000000000002 /* HeroesDetailsView.swift in Sources */,
 				CC0000000000000000000002 /* Localizable.swift in Sources */,
 				AA0000000000000000000001 /* AppCoordinator.swift in Sources */,
+				FA0000000000000000000001 /* DebugAppDependencies.swift in Sources */,
 				AA0000000000000000000002 /* HeroService.swift in Sources */,
 				AA0000000000000000000003 /* FavoritesStore.swift in Sources */,
 				AA0000000000000000000005 /* HeroesCatalogViewModel.swift in Sources */,

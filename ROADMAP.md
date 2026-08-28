@@ -108,6 +108,15 @@ Critério de conclusão: telas principais compostas por estilos e componentes co
 
 Critério de conclusão: nenhuma alteração entra na `develop` sem validação automatizada da base.
 
+### 8.1. Ambiente de demonstração — em andamento
+
+- Disponibilizar dados representativos para revisão visual sem credenciais da API.
+- Ativar o modo de demonstração apenas por argumento de lançamento em builds Debug.
+- Preservar a composição real como comportamento padrão de desenvolvimento.
+- Garantir que serviços e dados de demonstração não sejam compilados em Release.
+
+Critério de conclusão: catálogo, favoritos e detalhes navegáveis com dados determinísticos, sem alterar o comportamento do aplicativo distribuído.
+
 ### 9. Release 2.0.0 — planejada
 
 - Executar regressão funcional e revisão de memória e performance.

@@ -436,6 +436,25 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertEqual(details.preferredStatusBarStyle, .darkContent)
     }
 
+    func testDebugArgumentSelectsDemoDependenciesWithoutChangingDefaultComposition() {
+        let demo = AppDependencies.resolve(arguments: ["MarvelChallenge", "-useMockData"])
+        let standard = AppDependencies.resolve(arguments: ["MarvelChallenge"])
+
+        XCTAssertTrue(demo.heroService is DebugHeroService)
+        XCTAssertTrue(demo.favoritesStore is DebugFavoritesStore)
+        XCTAssertTrue(standard.heroService is HeroService)
+        XCTAssertTrue(standard.favoritesStore is FavoritesStore)
+        XCTAssertFalse(demo.favoritesStore.all().isEmpty)
+
+        var receivedPage: HeroesPage?
+        demo.heroService.fetchHeroes(page: 0) { result in
+            receivedPage = try? result.get()
+        }
+
+        XCTAssertEqual(receivedPage?.characters.count, DebugSampleData.characters.count)
+        XCTAssertEqual(receivedPage?.hasNextPage, false)
+    }
+
     func testSharedHeaderProvidesAccessibleMinimumTouchTargets() {
         let header = MarvelScreenHeaderView(title: "Title")
         header.frame = CGRect(x: 0, y: 0, width: 320, height: MarvelComponentSize.navigationBarHeight)

@@ -165,6 +165,12 @@ make test
 
 Pull Requests para `develop` e `master` executam formatação, análise estática, build e os testes automatizados. O processo de contribuição e os critérios de revisão estão documentados em [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
+## Modo de demonstração
+
+Em builds `Debug`, o argumento de lançamento `-useMockData` inicia o aplicativo com personagens e favoritos em memória. Esse modo facilita a revisão visual do catálogo, das duas opções de layout, dos favoritos e da tela de detalhes sem depender de credenciais da API.
+
+No Xcode, edite o Scheme, abra `Run > Arguments` e adicione `-useMockData` em `Arguments Passed On Launch`. Sem esse argumento, o Debug continua usando as dependências reais. O suporte a dados de demonstração não é compilado em `Release`.
+
 ## Roadmap
 
 A evolução técnica até a release 2.0.0 está organizada no [`ROADMAP.md`](ROADMAP.md). O planejamento inclui segurança de runtime, ciclo de vida e memória, cancelamento, paginação, persistência, limites arquiteturais, testes, componentes do Design System e integração contínua.

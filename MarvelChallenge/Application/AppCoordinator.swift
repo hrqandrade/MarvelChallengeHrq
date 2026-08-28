@@ -31,7 +31,7 @@ struct AppScreenFactory: ScreenBuilding {
 final class AppCoordinator: Coordinator {
     private let window: UIWindow
     private let screenFactory: ScreenBuilding
-    init(window: UIWindow, screenFactory: ScreenBuilding = AppScreenFactory(dependencies: .live)) {
+    init(window: UIWindow, screenFactory: ScreenBuilding = AppScreenFactory(dependencies: .resolve())) {
         self.window = window
         self.screenFactory = screenFactory
     }
@@ -53,4 +53,13 @@ struct AppDependencies {
     let heroService: HeroServicing
     let favoritesStore: FavoritesStoring
     static let live = AppDependencies(heroService: HeroService(), favoritesStore: FavoritesStore())
+
+    static func resolve(arguments: [String] = ProcessInfo.processInfo.arguments) -> AppDependencies {
+        #if DEBUG
+            if arguments.contains("-useMockData") {
+                return AppDependencies(heroService: DebugHeroService(), favoritesStore: DebugFavoritesStore())
+            }
+        #endif
+        return .live
+    }
 }
