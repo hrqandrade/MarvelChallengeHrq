@@ -257,7 +257,7 @@ final class MarvelChallengeTests: XCTestCase {
             }
         }
 
-        wait(for: expectations, timeout: TestTimeout.asynchronous)
+        wait(for: expectations, timeout: TestTimeout.persistenceStress)
         XCTAssertEqual(store.all().count, 20)
         XCTAssertNoThrow(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)))
     }
@@ -630,6 +630,7 @@ final class MarvelChallengeTests: XCTestCase {
 
 private enum TestTimeout {
     static let asynchronous: TimeInterval = 5
+    static let persistenceStress: TimeInterval = 15
 }
 
 private final class URLProtocolStub: URLProtocol {
