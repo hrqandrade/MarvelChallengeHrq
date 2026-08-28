@@ -191,7 +191,7 @@ final class MarvelChallengeTests: XCTestCase {
             }
             saveExpectation.fulfill()
         }
-        wait(for: [saveExpectation], timeout: 1)
+        wait(for: [saveExpectation], timeout: TestTimeout.asynchronous)
         XCTAssertTrue(store.contains(id: 1))
         XCTAssertEqual(store.all(), [favorite])
 
@@ -201,7 +201,7 @@ final class MarvelChallengeTests: XCTestCase {
             }
             removeExpectation.fulfill()
         }
-        wait(for: [removeExpectation], timeout: 1)
+        wait(for: [removeExpectation], timeout: TestTimeout.asynchronous)
         XCTAssertFalse(store.contains(id: 1))
     }
 
@@ -214,7 +214,7 @@ final class MarvelChallengeTests: XCTestCase {
             XCTAssertEqual(result.failure, .fileNotFound)
             missingExpectation.fulfill()
         }
-        wait(for: [missingExpectation], timeout: 1)
+        wait(for: [missingExpectation], timeout: TestTimeout.asynchronous)
 
         try Data("invalid".utf8).write(to: fileURL)
         let corruptedStore = FavoritesStore(fileURL: fileURL)
@@ -235,7 +235,7 @@ final class MarvelChallengeTests: XCTestCase {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: TestTimeout.asynchronous)
         XCTAssertFalse(store.contains(id: 1))
     }
 
