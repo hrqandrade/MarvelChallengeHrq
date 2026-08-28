@@ -223,7 +223,7 @@ final class MarvelChallengeTests: XCTestCase {
             XCTAssertEqual(result.failure, .corruptedFile)
             corruptedExpectation.fulfill()
         }
-        wait(for: [corruptedExpectation], timeout: 1)
+        wait(for: [corruptedExpectation], timeout: TestTimeout.asynchronous)
     }
 
     func testFavoritesStoreReportsWritingFailureWithoutChangingCache() {
@@ -257,7 +257,7 @@ final class MarvelChallengeTests: XCTestCase {
             }
         }
 
-        wait(for: expectations, timeout: 3)
+        wait(for: expectations, timeout: TestTimeout.asynchronous)
         XCTAssertEqual(store.all().count, 20)
         XCTAssertNoThrow(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)))
     }
