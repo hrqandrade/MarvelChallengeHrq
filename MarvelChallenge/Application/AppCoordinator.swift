@@ -56,7 +56,7 @@ struct AppDependencies {
 
     static func resolve(arguments: [String] = ProcessInfo.processInfo.arguments) -> AppDependencies {
         #if DEBUG
-            if arguments.contains("-useMockData") {
+            if !arguments.contains("-useLiveData") {
                 return AppDependencies(heroService: DebugHeroService(), favoritesStore: DebugFavoritesStore())
             }
         #endif

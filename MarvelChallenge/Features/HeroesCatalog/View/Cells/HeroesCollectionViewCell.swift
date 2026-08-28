@@ -59,7 +59,8 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
     }
 
     private func configureImageView() {
-        heroImageView.contentMode = .scaleAspectFit
+        heroImageView.contentMode = .scaleAspectFill
+        heroImageView.backgroundColor = DesignSystem.Color.backgroundPrimary
         heroImageView.layer.cornerRadius = DesignSystem.Radius.small
         heroImageView.clipsToBounds = true
     }
@@ -72,6 +73,8 @@ final class HeroesCollectionViewCell: UICollectionViewCell {
     }
 
     private func configureFavoriteButton() {
+        favoriteButton.imageView?.contentMode = .scaleAspectFit
+        favoriteButton.imageView?.clipsToBounds = true
         favoriteButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
     }
 

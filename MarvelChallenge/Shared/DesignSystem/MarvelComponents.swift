@@ -3,8 +3,10 @@ import UIKit
 
 enum MarvelComponentSize {
     static let minimumTouchTarget: CGFloat = 44
-    static let navigationBarHeight: CGFloat = 50
+    static let navigationBarHeight: CGFloat = 64
+    static let tabBarHeight: CGFloat = 72
     static let segmentedControlHeight: CGFloat = 40
+    static let emptyStateImageSize: CGFloat = 144
     static let heroImageHeight: CGFloat = 200
     static let detailsCarouselHeight: CGFloat = 120
 }
@@ -24,6 +26,8 @@ final class MarvelScreenHeaderView: UIView {
         titleLabel.text = title
         for item in [leadingButton, trailingButton] {
             item.tintColor = DesignSystem.Color.onAccent
+            item.imageView?.contentMode = .scaleAspectFit
+            item.imageView?.clipsToBounds = true
         }
         configureHierarchy()
     }
@@ -83,17 +87,18 @@ final class MarvelCardView: UIView {
 final class MarvelEmptyStateView: UIView {
     init(image: UIImage?, accessibilityLabel: String) {
         super.init(frame: .zero)
-        let imageView = UIImageView(image: image)
+        let imageView = UIImageView(image: image?.withRenderingMode(.alwaysTemplate))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = DesignSystem.Color.accent
         imageView.isAccessibilityElement = true
         imageView.accessibilityLabel = accessibilityLabel
         addSubview(imageView)
         NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: topAnchor),
-            imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: MarvelComponentSize.emptyStateImageSize),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor),
         ])
     }
 

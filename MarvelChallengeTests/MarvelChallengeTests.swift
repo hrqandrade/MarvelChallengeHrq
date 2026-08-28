@@ -332,7 +332,7 @@ final class MarvelChallengeTests: XCTestCase {
 
         layout.prepare()
 
-        XCTAssertEqual(layout.itemSize, CGSize(width: 159.5, height: 190))
+        XCTAssertEqual(layout.itemSize, CGSize(width: 146, height: 220))
         XCTAssertTrue(collectionView.collectionViewLayout === layout)
     }
 
@@ -345,7 +345,7 @@ final class MarvelChallengeTests: XCTestCase {
 
         layout.prepare()
 
-        XCTAssertEqual(layout.itemSize, CGSize(width: 320, height: 95))
+        XCTAssertEqual(layout.itemSize, CGSize(width: 304, height: 104))
         XCTAssertTrue(collectionView.collectionViewLayout === layout)
     }
 
@@ -436,9 +436,9 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertEqual(details.preferredStatusBarStyle, .darkContent)
     }
 
-    func testDebugArgumentSelectsDemoDependenciesWithoutChangingDefaultComposition() {
-        let demo = AppDependencies.resolve(arguments: ["MarvelChallenge", "-useMockData"])
-        let standard = AppDependencies.resolve(arguments: ["MarvelChallenge"])
+    func testDebugUsesDemoDependenciesByDefaultAndAllowsLiveOptIn() {
+        let demo = AppDependencies.resolve(arguments: ["MarvelChallenge"])
+        let standard = AppDependencies.resolve(arguments: ["MarvelChallenge", "-useLiveData"])
 
         XCTAssertTrue(demo.heroService is DebugHeroService)
         XCTAssertTrue(demo.favoritesStore is DebugFavoritesStore)

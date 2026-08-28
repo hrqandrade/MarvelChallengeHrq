@@ -167,9 +167,9 @@ Pull Requests para `develop` e `master` executam formatação, análise estátic
 
 ## Modo de demonstração
 
-Em builds `Debug`, o argumento de lançamento `-useMockData` inicia o aplicativo com personagens e favoritos em memória. Esse modo facilita a revisão visual do catálogo, das duas opções de layout, dos favoritos e da tela de detalhes sem depender de credenciais da API.
+Builds `Debug` iniciam com personagens e favoritos em memória. Esse modo facilita a revisão visual do catálogo, das duas opções de layout, dos favoritos e da tela de detalhes sem depender de credenciais da API.
 
-No Xcode, edite o Scheme, abra `Run > Arguments` e adicione `-useMockData` em `Arguments Passed On Launch`. Sem esse argumento, o Debug continua usando as dependências reais. O suporte a dados de demonstração não é compilado em `Release`.
+Para validar a integração real durante o desenvolvimento, edite o Scheme no Xcode, abra `Run > Arguments` e adicione `-useLiveData` em `Arguments Passed On Launch`. Builds `Release` sempre usam as dependências reais e não compilam o suporte aos dados de demonstração.
 
 ## Roadmap
 

@@ -28,7 +28,11 @@ final class HeroesCatalogView: UIView {
     }
 
     func renderLayout(isGrid: Bool, animated: Bool) {
-        headerView.leadingButton.setImage(UIImage(named: isGrid ? "list" : "grid"), for: .normal)
+        let imageName = isGrid ? "list.bullet" : "square.grid.2x2"
+        let image = UIImage(systemName: imageName)?.withConfiguration(
+            UIImage.SymbolConfiguration(pointSize: MarvelComponentSize.minimumTouchTarget / 2, weight: .semibold)
+        )
+        headerView.leadingButton.setImage(image, for: .normal)
         let layout: UICollectionViewLayout = isGrid ? GridFlowLayout() : ListFlowLayout()
         collectionView.setCollectionViewLayout(layout, animated: animated)
     }
@@ -70,6 +74,8 @@ final class HeroesCatalogView: UIView {
 
     private func configureCollection() {
         collectionView.backgroundColor = DesignSystem.Color.backgroundPrimary
+        collectionView.alwaysBounceVertical = true
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.register(
             HeroesCollectionViewCell.self,
             forCellWithReuseIdentifier: HeroesCollectionViewCell.reuseIdentifier
@@ -83,9 +89,18 @@ final class HeroesCatalogView: UIView {
     }
 
     private func configureFooter() {
-        footerView.backgroundColor = DesignSystem.Color.accent
+        footerView.backgroundColor = DesignSystem.Color.surface
         segmentedControl.selectedSegmentIndex = 0
-        segmentedControl.selectedSegmentTintColor = DesignSystem.Color.surface
+        segmentedControl.backgroundColor = DesignSystem.Color.accent.withAlphaComponent(0.12)
+        segmentedControl.selectedSegmentTintColor = DesignSystem.Color.accent
+        segmentedControl.setTitleTextAttributes(
+            [.foregroundColor: DesignSystem.Color.textPrimary],
+            for: .normal
+        )
+        segmentedControl.setTitleTextAttributes(
+            [.foregroundColor: DesignSystem.Color.onAccent],
+            for: .selected
+        )
         segmentedControl.addTarget(self, action: #selector(didChangeSection), for: .valueChanged)
     }
 
@@ -109,13 +124,24 @@ final class HeroesCatalogView: UIView {
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: footerView.topAnchor),
+            footerView.topAnchor.constraint(
+                equalTo: safeAreaLayoutGuide.bottomAnchor,
+                constant: -MarvelComponentSize.tabBarHeight
+            ),
             footerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             footerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            footerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-            footerView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.navigationBarHeight),
+            footerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             segmentedControl.centerXAnchor.constraint(equalTo: footerView.centerXAnchor),
-            segmentedControl.centerYAnchor.constraint(equalTo: footerView.centerYAnchor),
+            segmentedControl.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -36),
             segmentedControl.heightAnchor.constraint(equalToConstant: MarvelComponentSize.segmentedControlHeight),
+            segmentedControl.leadingAnchor.constraint(
+                greaterThanOrEqualTo: footerView.leadingAnchor,
+                constant: DesignSystem.Spacing.large
+            ),
+            segmentedControl.trailingAnchor.constraint(
+                lessThanOrEqualTo: footerView.trailingAnchor,
+                constant: -DesignSystem.Spacing.large
+            ),
         ])
     }
 

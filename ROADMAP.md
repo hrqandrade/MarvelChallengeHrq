@@ -111,8 +111,8 @@ Critério de conclusão: nenhuma alteração entra na `develop` sem validação 
 ### 8.1. Ambiente de demonstração — em andamento
 
 - Disponibilizar dados representativos para revisão visual sem credenciais da API.
-- Ativar o modo de demonstração apenas por argumento de lançamento em builds Debug.
-- Preservar a composição real como comportamento padrão de desenvolvimento.
+- Ativar dados de demonstração por padrão em builds Debug.
+- Permitir integração real em Debug por argumento de lançamento explícito.
 - Garantir que serviços e dados de demonstração não sejam compilados em Release.
 
 Critério de conclusão: catálogo, favoritos e detalhes navegáveis com dados determinísticos, sem alterar o comportamento do aplicativo distribuído.
