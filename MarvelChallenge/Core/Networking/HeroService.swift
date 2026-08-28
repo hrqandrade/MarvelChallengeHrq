@@ -2,8 +2,10 @@ import CryptoKit
 import Foundation
 
 protocol HeroServicing {
+    /// Delivers completion on the URL session callback queue. Presentation consumers must hop to the main thread.
     @discardableResult
-    func fetchHeroes(page: Int, completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void) -> RequestCancellable?
+    func fetchHeroes(page: Int, completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void)
+        -> RequestCancellable?
 }
 
 protocol RequestCancellable: AnyObject {
@@ -55,7 +57,10 @@ final class HeroService: HeroServicing {
     }
 
     @discardableResult
-    func fetchHeroes(page: Int, completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void) -> RequestCancellable? {
+    func fetchHeroes(
+        page: Int,
+        completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void
+    ) -> RequestCancellable? {
         guard !publicKey.isEmpty, !privateKey.isEmpty else {
             completion(.failure(.missingCredentials))
             return nil
@@ -70,7 +75,9 @@ final class HeroService: HeroServicing {
                 completion(.failure(.transport))
                 return
             }
-            guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode), let data = data else {
+            guard let response = response as? HTTPURLResponse, (200 ..< 300).contains(response.statusCode),
+                  let data = data
+            else {
                 completion(.failure(.invalidResponse))
                 return
             }
@@ -80,8 +87,8 @@ final class HeroService: HeroServicing {
                     completion(.failure(.invalidResponse))
                     return
                 }
-                completion(.success(HeroesPage(
-                    characters: try result.results?.map { try $0.domainModel() } ?? [],
+                try completion(.success(HeroesPage(
+                    characters: result.results?.map { try $0.domainModel() } ?? [],
                     offset: result.offset ?? page * Configuration.pageSize,
                     total: result.total
                 )))
@@ -106,7 +113,7 @@ final class HeroService: HeroServicing {
             URLQueryItem(name: "orderBy", value: "name"),
             URLQueryItem(name: "ts", value: timestamp),
             URLQueryItem(name: "hash", value: hash),
-            URLQueryItem(name: "apikey", value: publicKey)
+            URLQueryItem(name: "apikey", value: publicKey),
         ]
         return components?.url
     }

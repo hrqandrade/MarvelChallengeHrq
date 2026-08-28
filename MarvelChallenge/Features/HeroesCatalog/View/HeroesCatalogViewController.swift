@@ -6,8 +6,11 @@ final class HeroesCatalogViewController: UIViewController {
     var onSelectCharacter: ((Character) -> Void)?
     var isGridLayout = true
     private var selectedSection: HeroesCatalogSection = .characters
+    private var hasRequestedInitialLoad = false
 
-    var heroesCollectionView: UICollectionView { contentView.collectionView }
+    var heroesCollectionView: UICollectionView {
+        contentView.collectionView
+    }
 
     init(viewModel: HeroesCatalogViewModel) {
         self.viewModel = viewModel
@@ -15,9 +18,13 @@ final class HeroesCatalogViewController: UIViewController {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 
-    override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .darkContent
+    }
 
     override func loadView() {
         view = contentView
@@ -30,6 +37,12 @@ final class HeroesCatalogViewController: UIViewController {
         bindViewActions()
         bindViewModel()
         contentView.renderLayout(isGrid: isGridLayout, animated: false)
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        guard !hasRequestedInitialLoad else { return }
+        hasRequestedInitialLoad = true
         viewModel.loadInitial()
     }
 

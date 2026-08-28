@@ -23,7 +23,9 @@ final class HeroesCatalogView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 
     func renderLayout(isGrid: Bool, animated: Bool) {
         headerView.leadingButton.setImage(UIImage(named: isGrid ? "list" : "grid"), for: .normal)
@@ -42,7 +44,10 @@ final class HeroesCatalogView: UIView {
         collectionView.reloadData()
         let imageName = section == .characters ? "emptyList" : "emptyFavorite"
         let label = section == .characters ? Localizable.Catalog.characters : Localizable.Catalog.favorites
-        collectionView.backgroundView = MarvelEmptyStateView(image: UIImage(named: imageName), accessibilityLabel: label)
+        collectionView.backgroundView = MarvelEmptyStateView(
+            image: UIImage(named: imageName),
+            accessibilityLabel: label
+        )
     }
 
     func renderLoading() {
@@ -65,8 +70,14 @@ final class HeroesCatalogView: UIView {
 
     private func configureCollection() {
         collectionView.backgroundColor = DesignSystem.Color.backgroundPrimary
-        collectionView.register(HeroesCollectionViewCell.self, forCellWithReuseIdentifier: HeroesCollectionViewCell.reuseIdentifier)
-        collectionView.register(HeroesCollectionListCell.self, forCellWithReuseIdentifier: HeroesCollectionListCell.reuseIdentifier)
+        collectionView.register(
+            HeroesCollectionViewCell.self,
+            forCellWithReuseIdentifier: HeroesCollectionViewCell.reuseIdentifier
+        )
+        collectionView.register(
+            HeroesCollectionListCell.self,
+            forCellWithReuseIdentifier: HeroesCollectionListCell.reuseIdentifier
+        )
         refreshControl.addTarget(self, action: #selector(didRefresh), for: .valueChanged)
         collectionView.refreshControl = refreshControl
     }
@@ -79,8 +90,8 @@ final class HeroesCatalogView: UIView {
     }
 
     private func configureHierarchy() {
-        [headerView, collectionView, footerView, segmentedControl].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
+        for item in [headerView, collectionView, footerView, segmentedControl] {
+            item.translatesAutoresizingMaskIntoConstraints = false
         }
         addSubview(headerView)
         addSubview(collectionView)
@@ -108,8 +119,13 @@ final class HeroesCatalogView: UIView {
         ])
     }
 
-    @objc private func didRefresh() { onRefresh?() }
-    @objc private func didTapLayout() { onLayoutChange?() }
+    @objc private func didRefresh() {
+        onRefresh?()
+    }
+
+    @objc private func didTapLayout() {
+        onLayoutChange?()
+    }
 
     @objc private func didChangeSection() {
         let section: HeroesCatalogSection = segmentedControl.selectedSegmentIndex == 0 ? .characters : .favorites

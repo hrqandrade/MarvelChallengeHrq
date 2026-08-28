@@ -10,13 +10,19 @@ protocol ScreenBuilding {
 struct AppScreenFactory: ScreenBuilding {
     let dependencies: AppDependencies
     func makeCatalog(onSelect: @escaping (Character) -> Void) -> HeroesCatalogViewController {
-        let controller = HeroesCatalogViewController(viewModel: HeroesCatalogViewModel(service: dependencies.heroService, favorites: dependencies.favoritesStore))
+        let controller = HeroesCatalogViewController(viewModel: HeroesCatalogViewModel(
+            service: dependencies.heroService,
+            favorites: dependencies.favoritesStore
+        ))
         controller.onSelectCharacter = onSelect
         return controller
     }
 
     func makeDetails(for character: Character, onClose: @escaping () -> Void) -> HeroesDetailsViewController {
-        let controller = HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(character: character, favorites: dependencies.favoritesStore))
+        let controller = HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
+            character: character,
+            favorites: dependencies.favoritesStore
+        ))
         controller.onClose = onClose
         return controller
     }
@@ -36,7 +42,8 @@ final class AppCoordinator: Coordinator {
     }
 
     private func showDetails(for character: Character) {
-        let details = screenFactory.makeDetails(for: character) { [weak self] in self?.window.rootViewController?.dismiss(animated: true) }
+        let details = screenFactory
+            .makeDetails(for: character) { [weak self] in self?.window.rootViewController?.dismiss(animated: true) }
         details.modalPresentationStyle = .fullScreen
         window.rootViewController?.present(details, animated: true)
     }

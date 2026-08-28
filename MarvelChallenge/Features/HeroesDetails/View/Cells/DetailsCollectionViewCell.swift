@@ -18,7 +18,9 @@ final class DetailsCollectionViewCell: UICollectionViewCell {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 
     // MARK: - Lifecycle
 
@@ -58,10 +60,22 @@ final class DetailsCollectionViewCell: UICollectionViewCell {
             borderedView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             borderedView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             borderedView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            descriptionLabel.topAnchor.constraint(equalTo: borderedView.topAnchor, constant: DesignSystem.Spacing.small),
-            descriptionLabel.leadingAnchor.constraint(equalTo: borderedView.leadingAnchor, constant: DesignSystem.Spacing.small),
-            descriptionLabel.trailingAnchor.constraint(equalTo: borderedView.trailingAnchor, constant: -DesignSystem.Spacing.small),
-            descriptionLabel.bottomAnchor.constraint(equalTo: borderedView.bottomAnchor, constant: -DesignSystem.Spacing.small),
+            descriptionLabel.topAnchor.constraint(
+                equalTo: borderedView.topAnchor,
+                constant: DesignSystem.Spacing.small
+            ),
+            descriptionLabel.leadingAnchor.constraint(
+                equalTo: borderedView.leadingAnchor,
+                constant: DesignSystem.Spacing.small
+            ),
+            descriptionLabel.trailingAnchor.constraint(
+                equalTo: borderedView.trailingAnchor,
+                constant: -DesignSystem.Spacing.small
+            ),
+            descriptionLabel.bottomAnchor.constraint(
+                equalTo: borderedView.bottomAnchor,
+                constant: -DesignSystem.Spacing.small
+            ),
         ])
     }
 }

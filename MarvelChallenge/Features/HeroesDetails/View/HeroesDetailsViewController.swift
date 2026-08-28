@@ -5,8 +5,13 @@ final class HeroesDetailsViewController: UIViewController {
     let viewModel: HeroesDetailsViewModel
     var onClose: (() -> Void)?
 
-    var comicCollectionView: UICollectionView { contentView.comicCollectionView }
-    var seriesCollectionView: UICollectionView { contentView.seriesCollectionView }
+    var comicCollectionView: UICollectionView {
+        contentView.comicCollectionView
+    }
+
+    var seriesCollectionView: UICollectionView {
+        contentView.seriesCollectionView
+    }
 
     init(viewModel: HeroesDetailsViewModel) {
         self.viewModel = viewModel
@@ -14,9 +19,13 @@ final class HeroesDetailsViewController: UIViewController {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 
-    override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .darkContent
+    }
 
     override func loadView() {
         view = contentView
@@ -30,9 +39,9 @@ final class HeroesDetailsViewController: UIViewController {
     }
 
     private func configureCollections() {
-        [comicCollectionView, seriesCollectionView].forEach {
-            $0.dataSource = self
-            $0.delegate = self
+        for item in [comicCollectionView, seriesCollectionView] {
+            item.dataSource = self
+            item.delegate = self
         }
     }
 
@@ -42,14 +51,14 @@ final class HeroesDetailsViewController: UIViewController {
     }
 
     private func render() {
-        contentView.render(
+        contentView.render(.init(
             name: viewModel.name,
             description: viewModel.description,
             imageURL: viewModel.imageURL,
             isFavorite: viewModel.isFavorite,
             hasComics: !viewModel.comics.isEmpty,
             hasSeries: !viewModel.series.isEmpty
-        )
+        ))
     }
 
     private func toggleFavorite() {

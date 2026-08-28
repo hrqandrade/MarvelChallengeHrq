@@ -1,39 +1,70 @@
-whitelist_rules:
-  - closure_spacing
-  - colon
-  - empty_enum_arguments
-  - fatal_error_message
-  - force_cast
-  - force_try
-  - force_unwrapping
-  - implicitly_unwrapped_optional
-  - legacy_cggeometry_functions
-  - legacy_constant
-  - legacy_constructor
-  - legacy_nsgeometry_functions
-  - operator_usage_whitespace
-  - redundant_string_enum_value
-  - redundant_void_return
-  - return_arrow_whitespace
-  - trailing_newline
-  #- type_name
-  - unused_closure_parameter
-  - unused_optional_binding
-  - vertical_whitespace
-  - void_return
-  - custom_rules
+included:
+  - MarvelChallenge
+  - MarvelChallengeTests
 
 excluded:
-  - Pods
+  - .build
+  - DerivedData
 
-colon:
-  apply_to_dictionaries: false
+analyzer_rules:
+  - unused_declaration
+  - unused_import
 
-indentation: 2
+opt_in_rules:
+  - closure_spacing
+  - empty_count
+  - empty_string
+  - explicit_init
+  - fatal_error_message
+  - first_where
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - last_where
+  - legacy_multiple
+  - modifier_order
+  - multiline_arguments
+  - multiline_parameters
+  - overridden_super_call
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_parameter_alignment_on_call
+
+disabled_rules:
+  - static_over_final_class
+  - todo
+
+line_length:
+  warning: 120
+  error: 160
+  ignores_comments: true
+  ignores_urls: true
+
+file_length:
+  warning: 800
+  error: 900
+
+function_body_length:
+  warning: 60
+  error: 100
+
+type_body_length:
+  warning: 550
+  error: 650
+
+trailing_comma:
+  mandatory_comma: true
+
+identifier_name:
+  min_length:
+    warning: 2
+  excluded:
+    - id
 
 custom_rules:
-  no_objcMembers:
+  no_objc_members:
     name: "@objcMembers"
     regex: "@objcMembers"
-    message: "Explicitly use @objc on each member you want to expose to Objective-C"
+    message: "Expose only the members that require Objective-C interoperability."
     severity: error

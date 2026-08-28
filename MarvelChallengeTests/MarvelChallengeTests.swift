@@ -1,6 +1,6 @@
-import XCTest
-import UIKit
 @testable import MarvelChallenge
+import UIKit
+import XCTest
 
 final class MarvelChallengeTests: XCTestCase {
     override func tearDown() {
@@ -17,7 +17,9 @@ final class MarvelChallengeTests: XCTestCase {
         let expectation = expectation(description: "empty state")
 
         viewModel.onStateChange = { state in
-            if state == .empty { expectation.fulfill() }
+            if state == .empty {
+                expectation.fulfill()
+            }
         }
         viewModel.loadInitial()
 
@@ -42,15 +44,15 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertEqual(service.requests.map(\.page), [0, 0])
         XCTAssertEqual(states, [.initialLoading, .refreshing])
 
-        service.completeRequest(at: 0, with: .success(HeroesPage(
-            characters: [try makeCharacter(id: 1, name: "Old")],
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter(id: 1, name: "Old")],
             offset: 0,
             total: 1
         )))
         XCTAssertTrue(viewModel.characters.isEmpty)
 
-        service.completeRequest(at: 1, with: .success(HeroesPage(
-            characters: [try makeCharacter(id: 2, name: "Current")],
+        try service.completeRequest(at: 1, with: .success(HeroesPage(
+            characters: [makeCharacter(id: 2, name: "Current")],
             offset: 0,
             total: 1
         )))
@@ -66,8 +68,8 @@ final class MarvelChallengeTests: XCTestCase {
         )
 
         viewModel.loadInitial()
-        service.completeRequest(at: 0, with: .success(HeroesPage(
-            characters: [try makeCharacter()],
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
             offset: 0,
             total: 1
         )))
@@ -86,8 +88,8 @@ final class MarvelChallengeTests: XCTestCase {
         viewModel.onStateChange = { states.append($0) }
 
         viewModel.loadInitial()
-        service.completeRequest(at: 0, with: .success(HeroesPage(
-            characters: [try makeCharacter(id: 1, name: "First")],
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter(id: 1, name: "First")],
             offset: 0,
             total: 2
         )))
@@ -96,8 +98,8 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertEqual(service.requests.map(\.page), [0, 1])
         XCTAssertEqual(states.last, .loadingNextPage)
 
-        service.completeRequest(at: 1, with: .success(HeroesPage(
-            characters: [try makeCharacter(id: 2, name: "Second")],
+        try service.completeRequest(at: 1, with: .success(HeroesPage(
+            characters: [makeCharacter(id: 2, name: "Second")],
             offset: 1,
             total: 2
         )))
@@ -113,8 +115,8 @@ final class MarvelChallengeTests: XCTestCase {
         )
 
         viewModel.loadInitial()
-        service.completeRequest(at: 0, with: .success(HeroesPage(
-            characters: [try makeCharacter()],
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
             offset: 0,
             total: 2
         )))
@@ -143,8 +145,8 @@ final class MarvelChallengeTests: XCTestCase {
 
     func testCatalogPublishesBackgroundCompletionOnMainThread() throws {
         let expectation = expectation(description: "main thread state")
-        let service = BackgroundHeroServiceStub(page: HeroesPage(
-            characters: [try makeCharacter()],
+        let service = try BackgroundHeroServiceStub(page: HeroesPage(
+            characters: [makeCharacter()],
             offset: 0,
             total: 1
         ))
@@ -177,14 +179,16 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertTrue(token.isCancelled)
     }
 
-    func testFavoritesStoreSavesAndRemovesCharacter() throws {
+    func testFavoritesStoreSavesAndRemovesCharacter() {
         let store = FavoritesStore(fileURL: temporaryFileURL())
         let favorite = FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)
         let saveExpectation = expectation(description: "save")
         let removeExpectation = expectation(description: "remove")
 
         store.save(favorite) { result in
-            if case .failure(let error) = result { XCTFail("Unexpected error: \(error)") }
+            if case let .failure(error) = result {
+                XCTFail("Unexpected error: \(error)")
+            }
             saveExpectation.fulfill()
         }
         wait(for: [saveExpectation], timeout: 1)
@@ -192,7 +196,9 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertEqual(store.all(), [favorite])
 
         store.remove(id: 1) { result in
-            if case .failure(let error) = result { XCTFail("Unexpected error: \(error)") }
+            if case let .failure(error) = result {
+                XCTFail("Unexpected error: \(error)")
+            }
             removeExpectation.fulfill()
         }
         wait(for: [removeExpectation], timeout: 1)
@@ -236,14 +242,16 @@ final class MarvelChallengeTests: XCTestCase {
     func testFavoritesStoreSerializesConcurrentMutationsAndWritesValidFile() {
         let fileURL = temporaryFileURL()
         let store = FavoritesStore(fileURL: fileURL)
-        let expectations = (0..<20).map { index in
+        let expectations = (0 ..< 20).map { index in
             expectation(description: "save \(index)")
         }
 
-        for index in 0..<20 {
+        for index in 0 ..< 20 {
             DispatchQueue.global().async {
                 store.save(FavoriteCharacter(id: index, name: "Hero \(index)", imageURL: nil)) { result in
-                    if case .failure(let error) = result { XCTFail("Unexpected error: \(error)") }
+                    if case let .failure(error) = result {
+                        XCTFail("Unexpected error: \(error)")
+                    }
                     expectations[index].fulfill()
                 }
             }
@@ -268,7 +276,7 @@ final class MarvelChallengeTests: XCTestCase {
             XCTAssertEqual(try? result.get().map(\.name), ["Captain America", "Thor"])
             loadExpectation.fulfill()
         }
-        wait(for: [loadExpectation], timeout: 1)
+        wait(for: [loadExpectation], timeout: TestTimeout.asynchronous)
 
         let updateExpectation = expectation(description: "update existing favorite")
         store.save(FavoriteCharacter(id: 2, name: "Mighty Thor", imageURL: nil)) { result in
@@ -277,7 +285,7 @@ final class MarvelChallengeTests: XCTestCase {
             }
             updateExpectation.fulfill()
         }
-        wait(for: [updateExpectation], timeout: 1)
+        wait(for: [updateExpectation], timeout: TestTimeout.asynchronous)
 
         XCTAssertEqual(store.all().map(\.name), ["Captain America", "Mighty Thor"])
         XCTAssertEqual(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)).count, 2)
@@ -310,14 +318,17 @@ final class MarvelChallengeTests: XCTestCase {
             expectation.fulfill()
         }
 
-        viewModel.toggleFavorite(try makeCharacter())
+        try viewModel.toggleFavorite(makeCharacter())
 
         wait(for: [expectation], timeout: 1)
     }
 
     func testGridLayoutCalculatesTwoColumnsWithoutRecursion() {
         let layout = GridFlowLayout()
-        let collectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: 320, height: 640), collectionViewLayout: layout)
+        let collectionView = UICollectionView(
+            frame: CGRect(x: 0, y: 0, width: 320, height: 640),
+            collectionViewLayout: layout
+        )
 
         layout.prepare()
 
@@ -327,7 +338,10 @@ final class MarvelChallengeTests: XCTestCase {
 
     func testListLayoutUsesAvailableCollectionWidth() {
         let layout = ListFlowLayout()
-        let collectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: 320, height: 640), collectionViewLayout: layout)
+        let collectionView = UICollectionView(
+            frame: CGRect(x: 0, y: 0, width: 320, height: 640),
+            collectionViewLayout: layout
+        )
 
         layout.prepare()
 
@@ -335,7 +349,7 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertTrue(collectionView.collectionViewLayout === layout)
     }
 
-    func testCoordinatorAndCatalogAreReleasedAfterFlowTeardown() throws {
+    func testCoordinatorAndCatalogAreReleasedAfterFlowTeardown() {
         weak var weakCoordinator: AppCoordinator?
         weak var weakCatalog: HeroesCatalogViewController?
 
@@ -364,16 +378,18 @@ final class MarvelChallengeTests: XCTestCase {
     }
 
     func testCoordinatorBuildsDetailsWhenCatalogSelectsCharacter() throws {
-        let window = UIWindow()
+        let window = UIWindow(frame: UIScreen.main.bounds)
         let factory = ScreenFactorySpy()
         let coordinator = AppCoordinator(window: window, screenFactory: factory)
         let character = try makeCharacter()
 
         coordinator.start()
+        window.makeKeyAndVisible()
         factory.onSelect?(character)
 
         XCTAssertTrue(window.rootViewController === factory.catalog)
         XCTAssertEqual(factory.detailsCharacter, character)
+        window.isHidden = true
     }
 
     func testDetailsControllerAndViewModelAreReleasedAfterDismissal() throws {
@@ -381,11 +397,12 @@ final class MarvelChallengeTests: XCTestCase {
         weak var weakViewModel: HeroesDetailsViewModel?
 
         try autoreleasepool {
-            var viewModel: HeroesDetailsViewModel? = HeroesDetailsViewModel(
-                character: try makeCharacter(),
+            var viewModel: HeroesDetailsViewModel? = try HeroesDetailsViewModel(
+                character: makeCharacter(),
                 favorites: FavoritesStore(fileURL: temporaryFileURL())
             )
-            var controller: HeroesDetailsViewController? = HeroesDetailsViewController(viewModel: try XCTUnwrap(viewModel))
+            var controller: HeroesDetailsViewController? =
+                try HeroesDetailsViewController(viewModel: XCTUnwrap(viewModel))
             controller?.loadViewIfNeeded()
 
             weakController = controller
@@ -403,8 +420,8 @@ final class MarvelChallengeTests: XCTestCase {
             service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
             favorites: FavoritesStore(fileURL: temporaryFileURL())
         ))
-        let details = HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
-            character: try makeCharacter(),
+        let details = try HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
+            character: makeCharacter(),
             favorites: FavoritesStore(fileURL: temporaryFileURL())
         ))
 
@@ -454,9 +471,12 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertNil(listOwner)
     }
 
-    func testHeroServiceBuildsPaginatedRequestAndMapsResponse() throws {
+    func testHeroServiceBuildsPaginatedRequestAndMapsResponse() {
         let service = makeHeroService { request in
-            let components = try XCTUnwrap(URLComponents(url: try XCTUnwrap(request.url), resolvingAgainstBaseURL: false))
+            let components = try XCTUnwrap(try URLComponents(
+                url: XCTUnwrap(request.url),
+                resolvingAgainstBaseURL: false
+            ))
             let query = Dictionary(uniqueKeysWithValues: (components.queryItems ?? []).compactMap { item in
                 item.value.map { (item.name, $0) }
             })
@@ -486,7 +506,11 @@ final class MarvelChallengeTests: XCTestCase {
         assertHeroService(statusCode: 500, data: Data(), expectedError: .invalidResponse)
         assertHeroService(statusCode: 200, data: Data("not-json".utf8), expectedError: .decoding)
         assertHeroService(statusCode: 200, data: Data(#"{}"#.utf8), expectedError: .invalidResponse)
-        assertHeroService(statusCode: 200, data: Data(#"{"data":{"results":[{"name":"Missing id"}]}}"#.utf8), expectedError: .decoding)
+        assertHeroService(
+            statusCode: 200,
+            data: Data(#"{"data":{"results":[{"name":"Missing id"}]}}"#.utf8),
+            expectedError: .decoding
+        )
     }
 
     func testHeroServiceMapsTransportFailure() {
@@ -518,12 +542,12 @@ final class MarvelChallengeTests: XCTestCase {
         wait(for: [requestCancelled], timeout: 1)
     }
 
-    func testHeroServiceFailsWithoutCredentialsBeforeStartingRequest() {
+    func testHeroServiceFailsWithoutCredentialsBeforeStartingRequest() throws {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLProtocolStub.self]
-        let service = HeroService(
+        let service = try HeroService(
             session: URLSession(configuration: configuration),
-            baseURL: URL(string: "https://example.com")!,
+            baseURL: XCTUnwrap(URL(string: "https://example.com")),
             publicKey: "",
             privateKey: ""
         )
@@ -535,7 +559,22 @@ final class MarvelChallengeTests: XCTestCase {
         XCTAssertEqual(receivedResult?.failure, .missingCredentials)
     }
 
-    private static let validHeroesJSON = #"{"data":{"offset":40,"total":41,"results":[{"id":1,"name":"Spider-Man","description":"Hero","thumbnail":{"path":"https://example.com/hero","extension":"jpg"},"comics":{"items":[]},"series":{"items":[]}}]}}"#
+    private static let validHeroesJSON = #"""
+    {
+        "data": {
+            "offset": 40,
+            "total": 41,
+            "results": [{
+                "id": 1,
+                "name": "Spider-Man",
+                "description": "Hero",
+                "thumbnail": { "path": "https://example.com/hero", "extension": "jpg" },
+                "comics": { "items": [] },
+                "series": { "items": [] }
+            }]
+        }
+    }
+    """#
 
     private func makeHeroService(
         handler: @escaping (URLRequest) throws -> (Int, Data)
@@ -570,21 +609,30 @@ final class MarvelChallengeTests: XCTestCase {
     }
 }
 
+private enum TestTimeout {
+    static let asynchronous: TimeInterval = 5
+}
+
 private final class URLProtocolStub: URLProtocol {
     static var handler: ((URLRequest) throws -> (Int, Data))?
     static var shouldFinishLoading = true
     static var onStopLoading: (() -> Void)?
 
-    override class func canInit(with _: URLRequest) -> Bool { true }
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override class func canInit(with _: URLRequest) -> Bool {
+        true
+    }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
 
     override func startLoading() {
         do {
             let handler = try XCTUnwrap(Self.handler)
             let (statusCode, data) = try handler(request)
             guard Self.shouldFinishLoading else { return }
-            let response = try XCTUnwrap(HTTPURLResponse(
-                url: try XCTUnwrap(request.url),
+            let response = try XCTUnwrap(try HTTPURLResponse(
+                url: XCTUnwrap(request.url),
                 statusCode: statusCode,
                 httpVersion: nil,
                 headerFields: nil
@@ -608,7 +656,9 @@ private final class ClosureOwner {
 
 private extension Result {
     var failure: Failure? {
-        if case .failure(let error) = self { return error }
+        if case let .failure(error) = self {
+            return error
+        }
         return nil
     }
 }
@@ -620,7 +670,10 @@ private final class HeroServiceStub: HeroServicing {
         self.result = result
     }
 
-    func fetchHeroes(page: Int, completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void) -> RequestCancellable? {
+    func fetchHeroes(
+        page: Int,
+        completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void
+    ) -> RequestCancellable? {
         completion(result)
         return nil
     }
@@ -635,7 +688,10 @@ private final class HeroServiceSpy: HeroServicing {
 
     private(set) var requests: [Request] = []
 
-    func fetchHeroes(page: Int, completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void) -> RequestCancellable? {
+    func fetchHeroes(
+        page: Int,
+        completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void
+    ) -> RequestCancellable? {
         let token = RequestTokenSpy()
         requests.append(Request(page: page, token: token, completion: completion))
         return token
@@ -661,7 +717,10 @@ private final class BackgroundHeroServiceStub: HeroServicing {
         self.page = page
     }
 
-    func fetchHeroes(page: Int, completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void) -> RequestCancellable? {
+    func fetchHeroes(
+        page: Int,
+        completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void
+    ) -> RequestCancellable? {
         DispatchQueue.global().async { [self] in
             completion(.success(self.page))
         }
@@ -670,8 +729,13 @@ private final class BackgroundHeroServiceStub: HeroServicing {
 }
 
 private final class FailingFavoritesStoreStub: FavoritesStoring {
-    func all() -> [FavoriteCharacter] { [] }
-    func contains(id: Int) -> Bool { false }
+    func all() -> [FavoriteCharacter] {
+        []
+    }
+
+    func contains(id: Int) -> Bool {
+        false
+    }
 
     func load(completion: @escaping (Result<[FavoriteCharacter], FavoritesStoreError>) -> Void) {
         completion(.success([]))
@@ -689,7 +753,8 @@ private final class FailingFavoritesStoreStub: FavoritesStoring {
 private final class ScreenFactorySpy: ScreenBuilding {
     let catalog = HeroesCatalogViewController(viewModel: HeroesCatalogViewModel(
         service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
-        favorites: FavoritesStore(fileURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))
+        favorites: FavoritesStore(fileURL: FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString))
     ))
     private(set) var onSelect: ((Character) -> Void)?
     private(set) var detailsCharacter: Character?
@@ -703,7 +768,8 @@ private final class ScreenFactorySpy: ScreenBuilding {
         detailsCharacter = character
         return HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
             character: character,
-            favorites: FavoritesStore(fileURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))
+            favorites: FavoritesStore(fileURL: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString))
         ))
     }
 }

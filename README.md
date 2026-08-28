@@ -152,6 +152,19 @@ xcodebuild test \
   -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
+## Qualidade e integração contínua
+
+As versões de SwiftFormat e SwiftLint são fixadas no `Mintfile`. Após instalar o [Mint](https://github.com/yonaskolb/Mint), a validação local pode ser reproduzida com os mesmos comandos executados pela integração contínua:
+
+```bash
+make bootstrap
+make quality
+make build
+make test
+```
+
+Pull Requests para `develop` e `master` executam formatação, análise estática, build e os testes automatizados. O processo de contribuição e os critérios de revisão estão documentados em [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## Roadmap
 
 A evolução técnica até a release 2.0.0 está organizada no [`ROADMAP.md`](ROADMAP.md). O planejamento inclui segurança de runtime, ciclo de vida e memória, cancelamento, paginação, persistência, limites arquiteturais, testes, componentes do Design System e integração contínua.

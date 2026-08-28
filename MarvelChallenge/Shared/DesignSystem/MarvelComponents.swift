@@ -22,37 +22,46 @@ final class MarvelScreenHeaderView: UIView {
         titleLabel.textColor = DesignSystem.Color.onAccent
         titleLabel.textAlignment = .center
         titleLabel.text = title
-        [leadingButton, trailingButton].forEach {
-            $0.tintColor = DesignSystem.Color.onAccent
+        for item in [leadingButton, trailingButton] {
+            item.tintColor = DesignSystem.Color.onAccent
         }
         configureHierarchy()
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 
     func setTitle(_ title: String) {
         titleLabel.text = title
     }
 
     private func configureHierarchy() {
-        [leadingButton, titleLabel, trailingButton].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            addSubview($0)
+        for item in [leadingButton, titleLabel, trailingButton] {
+            item.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(item)
         }
         NSLayoutConstraint.activate([
             leadingButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: DesignSystem.Spacing.medium),
             leadingButton.centerYAnchor.constraint(equalTo: centerYAnchor),
             leadingButton.widthAnchor.constraint(equalToConstant: MarvelComponentSize.minimumTouchTarget),
             leadingButton.heightAnchor.constraint(greaterThanOrEqualToConstant: MarvelComponentSize.minimumTouchTarget),
-            titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: leadingButton.trailingAnchor, constant: DesignSystem.Spacing.small),
+            titleLabel.leadingAnchor.constraint(
+                greaterThanOrEqualTo: leadingButton.trailingAnchor,
+                constant: DesignSystem.Spacing.small
+            ),
             titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            trailingButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: DesignSystem.Spacing.small),
+            trailingButton.leadingAnchor.constraint(
+                greaterThanOrEqualTo: titleLabel.trailingAnchor,
+                constant: DesignSystem.Spacing.small
+            ),
             trailingButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
             trailingButton.centerYAnchor.constraint(equalTo: centerYAnchor),
             trailingButton.widthAnchor.constraint(equalToConstant: MarvelComponentSize.minimumTouchTarget),
-            trailingButton.heightAnchor.constraint(greaterThanOrEqualToConstant: MarvelComponentSize.minimumTouchTarget),
+            trailingButton.heightAnchor
+                .constraint(greaterThanOrEqualToConstant: MarvelComponentSize.minimumTouchTarget),
         ])
     }
 }
@@ -66,7 +75,9 @@ final class MarvelCardView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 }
 
 final class MarvelEmptyStateView: UIView {
@@ -87,7 +98,9 @@ final class MarvelEmptyStateView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 }
 
 final class MarvelLoadingView: UIView {
@@ -115,7 +128,9 @@ final class MarvelLoadingView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder _: NSCoder) { nil }
+    required init?(coder _: NSCoder) {
+        nil
+    }
 
     private func makeLabel(text: String, font: UIFont) -> UILabel {
         let label = UILabel()

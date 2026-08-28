@@ -69,7 +69,9 @@ final class HeroesCatalogViewModel {
 
     func selectSection(_ section: HeroesCatalogSection) {
         self.section = section
-        if section == .favorites { reloadFavorites() }
+        if section == .favorites {
+            reloadFavorites()
+        }
         publishCurrentState()
     }
 
@@ -78,12 +80,16 @@ final class HeroesCatalogViewModel {
             self?.performOnMain { [weak self] in
                 guard let self else { return }
                 switch result {
-                case .success(let favorites):
+                case let .success(favorites):
                     self.favoriteCharacters = favorites
-                    if self.section == .favorites { self.publishCurrentState() }
+                    if self.section == .favorites {
+                        self.publishCurrentState()
+                    }
                 case .failure(.fileNotFound):
                     self.favoriteCharacters = []
-                    if self.section == .favorites { self.publishCurrentState() }
+                    if self.section == .favorites {
+                        self.publishCurrentState()
+                    }
                 case .failure:
                     self.onStateChange?(.failed(Localizable.Error.favoritesReading))
                 }
@@ -155,7 +161,7 @@ final class HeroesCatalogViewModel {
         currentRequestID = nil
 
         switch result {
-        case .success(let response):
+        case let .success(response):
             page = requestedPage
             hasMorePages = response.hasNextPage
             switch mode {
@@ -165,7 +171,7 @@ final class HeroesCatalogViewModel {
                 characters += response.characters
             }
             publishCurrentState()
-        case .failure(let error):
+        case let .failure(error):
             onStateChange?(.failed(message(for: error)))
         }
     }
