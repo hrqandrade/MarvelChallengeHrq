@@ -108,7 +108,7 @@ Critério de conclusão: telas principais compostas por estilos e componentes co
 
 Critério de conclusão: nenhuma alteração entra na `develop` sem validação automatizada da base.
 
-### 8.1. Ambiente de demonstração — em andamento
+### 8.1. Ambiente de demonstração — concluída
 
 - Disponibilizar dados representativos para revisão visual sem credenciais da API.
 - Ativar dados de demonstração por padrão em builds Debug.
