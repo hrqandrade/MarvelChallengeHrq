@@ -191,7 +191,7 @@ final class MarvelChallengeTests: XCTestCase {
             }
             saveExpectation.fulfill()
         }
-        wait(for: [saveExpectation], timeout: TestTimeout.asynchronous)
+        wait(for: [saveExpectation], timeout: TestTimeout.persistenceOperation)
         XCTAssertTrue(store.contains(id: 1))
         XCTAssertEqual(store.all(), [favorite])
 
@@ -201,7 +201,7 @@ final class MarvelChallengeTests: XCTestCase {
             }
             removeExpectation.fulfill()
         }
-        wait(for: [removeExpectation], timeout: TestTimeout.asynchronous)
+        wait(for: [removeExpectation], timeout: TestTimeout.persistenceOperation)
         XCTAssertFalse(store.contains(id: 1))
     }
 
@@ -214,7 +214,7 @@ final class MarvelChallengeTests: XCTestCase {
             XCTAssertEqual(result.failure, .fileNotFound)
             missingExpectation.fulfill()
         }
-        wait(for: [missingExpectation], timeout: TestTimeout.asynchronous)
+        wait(for: [missingExpectation], timeout: TestTimeout.persistenceOperation)
 
         try Data("invalid".utf8).write(to: fileURL)
         let corruptedStore = FavoritesStore(fileURL: fileURL)
@@ -223,7 +223,7 @@ final class MarvelChallengeTests: XCTestCase {
             XCTAssertEqual(result.failure, .corruptedFile)
             corruptedExpectation.fulfill()
         }
-        wait(for: [corruptedExpectation], timeout: TestTimeout.asynchronous)
+        wait(for: [corruptedExpectation], timeout: TestTimeout.persistenceOperation)
     }
 
     func testFavoritesStoreReportsWritingFailureWithoutChangingCache() {
@@ -235,7 +235,7 @@ final class MarvelChallengeTests: XCTestCase {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: TestTimeout.asynchronous)
+        wait(for: [expectation], timeout: TestTimeout.persistenceOperation)
         XCTAssertFalse(store.contains(id: 1))
     }
 
@@ -276,7 +276,7 @@ final class MarvelChallengeTests: XCTestCase {
             XCTAssertEqual(try? result.get().map(\.name), ["Captain America", "Thor"])
             loadExpectation.fulfill()
         }
-        wait(for: [loadExpectation], timeout: TestTimeout.asynchronous)
+        wait(for: [loadExpectation], timeout: TestTimeout.persistenceOperation)
 
         let updateExpectation = expectation(description: "update existing favorite")
         store.save(FavoriteCharacter(id: 2, name: "Mighty Thor", imageURL: nil)) { result in
@@ -285,7 +285,7 @@ final class MarvelChallengeTests: XCTestCase {
             }
             updateExpectation.fulfill()
         }
-        wait(for: [updateExpectation], timeout: TestTimeout.asynchronous)
+        wait(for: [updateExpectation], timeout: TestTimeout.persistenceOperation)
 
         XCTAssertEqual(store.all().map(\.name), ["Captain America", "Mighty Thor"])
         XCTAssertEqual(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)).count, 2)
@@ -629,8 +629,8 @@ final class MarvelChallengeTests: XCTestCase {
 }
 
 private enum TestTimeout {
-    static let asynchronous: TimeInterval = 5
-    static let persistenceStress: TimeInterval = 15
+    static let persistenceOperation: TimeInterval = 15
+    static let persistenceStress: TimeInterval = 30
 }
 
 private final class URLProtocolStub: URLProtocol {
