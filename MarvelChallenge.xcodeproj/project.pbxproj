@@ -31,6 +31,7 @@
 		50C7BD0625A785B6006A235D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50C7BD0525A785B6006A235D /* Assets.xcassets */; };
 		50C7BD0925A785B6006A235D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 50C7BD0725A785B6006A235D /* LaunchScreen.storyboard */; };
 		50C7BD1425A785B7006A235D /* MarvelChallengeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C7BD1325A785B7006A235D /* MarvelChallengeTests.swift */; };
+		AB0000000000000000000002 /* PresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000012 /* PresentationTests.swift */; };
 		50C7BD2425A79BD8006A235D /* HeroesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C7BD2225A79BD8006A235D /* HeroesCollectionViewCell.swift */; };
 		50C7BD2A25A7AECF006A235D /* GridFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C7BD2925A7AECF006A235D /* GridFlowLayout.swift */; };
 		EE0000000000000000000001 /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000011 /* Character.swift */; };
@@ -86,6 +87,7 @@
 		50C7BD0A25A785B6006A235D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50C7BD0F25A785B7006A235D /* MarvelChallengeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarvelChallengeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50C7BD1325A785B7006A235D /* MarvelChallengeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarvelChallengeTests.swift; sourceTree = "<group>"; };
+		AB0000000000000000000012 /* PresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationTests.swift; sourceTree = "<group>"; };
 		50C7BD1525A785B7006A235D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50C7BD2225A79BD8006A235D /* HeroesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCollectionViewCell.swift; sourceTree = "<group>"; };
 		50C7BD2925A7AECF006A235D /* GridFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridFlowLayout.swift; sourceTree = "<group>"; };
@@ -334,6 +336,7 @@
 			isa = PBXGroup;
 			children = (
 				50C7BD1325A785B7006A235D /* MarvelChallengeTests.swift */,
+				AB0000000000000000000012 /* PresentationTests.swift */,
 				50C7BD1525A785B7006A235D /* Info.plist */,
 			);
 			path = MarvelChallengeTests;
@@ -482,6 +485,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				50C7BD1425A785B7006A235D /* MarvelChallengeTests.swift in Sources */,
+				AB0000000000000000000002 /* PresentationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

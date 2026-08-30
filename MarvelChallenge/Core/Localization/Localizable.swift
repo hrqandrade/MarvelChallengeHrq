@@ -10,6 +10,10 @@ enum Localizable {
         static let characters = text("catalog.characters")
         static let changeLayout = text("catalog.changeLayout")
         static let favorites = text("catalog.favorites")
+        static let emptyCharactersTitle = text("catalog.emptyCharacters.title")
+        static let emptyCharactersDescription = text("catalog.emptyCharacters.description")
+        static let emptyFavoritesTitle = text("catalog.emptyFavorites.title")
+        static let emptyFavoritesDescription = text("catalog.emptyFavorites.description")
     }
 
     enum Details {
@@ -23,7 +27,15 @@ enum Localizable {
 
     enum Loading {
         static let title = text("loading.title")
-        static let description = text("loading.description")
+    }
+
+    enum Demo {
+        static let spiderManDescription = text("demo.spiderMan.description")
+        static let blackPantherDescription = text("demo.blackPanther.description")
+        static let captainMarvelDescription = text("demo.captainMarvel.description")
+        static let ironManDescription = text("demo.ironMan.description")
+        static let stormDescription = text("demo.storm.description")
+        static let doctorStrangeDescription = text("demo.doctorStrange.description")
     }
 
     enum Error {

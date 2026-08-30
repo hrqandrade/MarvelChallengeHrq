@@ -47,10 +47,16 @@ final class HeroesCatalogView: UIView {
         refreshControl.endRefreshing()
         collectionView.reloadData()
         let imageName = section == .characters ? "emptyList" : "emptyFavorite"
-        let label = section == .characters ? Localizable.Catalog.characters : Localizable.Catalog.favorites
+        let title = section == .characters
+            ? Localizable.Catalog.emptyCharactersTitle
+            : Localizable.Catalog.emptyFavoritesTitle
+        let description = section == .characters
+            ? Localizable.Catalog.emptyCharactersDescription
+            : Localizable.Catalog.emptyFavoritesDescription
         collectionView.backgroundView = MarvelEmptyStateView(
             image: UIImage(named: imageName),
-            accessibilityLabel: label
+            title: title,
+            description: description
         )
     }
 

@@ -85,26 +85,48 @@ final class MarvelCardView: UIView {
 }
 
 final class MarvelEmptyStateView: UIView {
-    init(image: UIImage?, accessibilityLabel: String) {
+    init(image: UIImage?, title: String, description: String) {
         super.init(frame: .zero)
         let imageView = UIImageView(image: image?.withRenderingMode(.alwaysTemplate))
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = DesignSystem.Color.accent
-        imageView.isAccessibilityElement = true
-        imageView.accessibilityLabel = accessibilityLabel
-        addSubview(imageView)
+        imageView.isAccessibilityElement = false
+
+        let titleLabel = makeLabel(text: title, font: DesignSystem.Typography.headline)
+        let descriptionLabel = makeLabel(text: description, font: DesignSystem.Typography.body)
+        descriptionLabel.textColor = DesignSystem.Color.textSecondary
+        let stack = UIStackView(arrangedSubviews: [imageView, titleLabel, descriptionLabel])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.alignment = .center
+        stack.spacing = DesignSystem.Spacing.small
+        addSubview(stack)
         NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             imageView.widthAnchor.constraint(equalToConstant: MarvelComponentSize.emptyStateImageSize),
             imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor),
+            stack.centerXAnchor.constraint(equalTo: centerXAnchor),
+            stack.centerYAnchor.constraint(equalTo: centerYAnchor),
+            stack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: DesignSystem.Spacing.large),
+            stack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -DesignSystem.Spacing.large),
         ])
+        isAccessibilityElement = true
+        accessibilityLabel = "\(title). \(description)"
     }
 
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         nil
+    }
+
+    private func makeLabel(text: String, font: UIFont) -> UILabel {
+        let label = UILabel()
+        label.font = font
+        label.adjustsFontForContentSizeCategory = true
+        label.textColor = DesignSystem.Color.textPrimary
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.text = text
+        return label
     }
 }
 
@@ -114,8 +136,7 @@ final class MarvelLoadingView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         let titleLabel = makeLabel(text: Localizable.Loading.title, font: DesignSystem.Typography.headline)
-        let descriptionLabel = makeLabel(text: Localizable.Loading.description, font: DesignSystem.Typography.body)
-        let stack = UIStackView(arrangedSubviews: [activityIndicator, titleLabel, descriptionLabel])
+        let stack = UIStackView(arrangedSubviews: [activityIndicator, titleLabel])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.alignment = .center
