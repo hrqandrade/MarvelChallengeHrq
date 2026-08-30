@@ -2,7 +2,7 @@
 
 Aplicativo iOS para consultar personagens da Marvel, ver detalhes e manter uma lista local de favoritos. Mais do que uma demonstração de interface, este repositório registra a evolução de um projeto legado para uma base moderna, modular e testável.
 
-Versão atual: **2.0.0**
+Versão em desenvolvimento: **2.0.0**
 
 ## A história do projeto
 
@@ -115,7 +115,7 @@ MarvelChallenge
 │       └── ViewModel
 ```
 
-Cada feature mantém sua View e seu ViewModel próximos. Infraestruturas compartilhadas ficam em `Core` e o ciclo de vida do aplicativo fica em `Application`. Um diretório `Shared` será introduzido quando houver componentes de interface efetivamente reutilizados por mais de uma feature.
+Cada feature mantém sua View e seu ViewModel próximos. Infraestruturas compartilhadas ficam em `Core`, o ciclo de vida do aplicativo fica em `Application` e os componentes de interface reutilizados pelas features ficam em `Shared`.
 
 O carregamento de imagens é fornecido pelo pacote próprio [`MarvelImageLoader`](https://github.com/hrqandrade/MarvelImageLoader), integrado por Swift Package Manager e construído com `URLSession` e `NSCache`.
 
@@ -131,7 +131,7 @@ Os textos de interface ficam no String Catalog `Localizable.xcstrings`, com trad
 - `develop`: integração das próximas entregas.
 - `feat/{nome-da-feature}`: desenvolvimento de cada funcionalidade ou melhoria.
 
-Toda feature parte da `develop` e retorna por Pull Request para a `develop`. A `master` recebe apenas entregas estabilizadas por Pull Request vindo da `develop`.
+Toda feature parte da `develop` e retorna por Pull Request para a `develop`. A `master` recebe apenas entregas estabilizadas por Pull Requests originados da `develop`.
 
 Exemplo:
 
@@ -167,7 +167,7 @@ Pull Requests para `develop` e `master` executam formatação, análise estátic
 
 ## Modo de demonstração
 
-Builds `Debug` iniciam com personagens e favoritos em memória. Esse modo facilita a revisão visual do catálogo, das duas opções de layout, dos favoritos e da tela de detalhes sem depender de credenciais da API.
+Builds `Debug` iniciam com personagens e favoritos em memória. Esse modo oferece dados previsíveis para revisar o catálogo, as duas opções de layout, os favoritos e a tela de detalhes sem depender de credenciais da API. As imagens continuam sendo carregadas de URLs públicas e, por isso, precisam de conexão com a internet.
 
 Para validar a integração real durante o desenvolvimento, edite o Scheme no Xcode, abra `Run > Arguments` e adicione `-useLiveData` em `Arguments Passed On Launch`. Builds `Release` sempre usam as dependências reais e não compilam o suporte aos dados de demonstração.
 
