@@ -116,12 +116,75 @@ Esta fase foi concluída com checks obrigatórios de qualidade, build e testes a
 
 Esta fase ficou pronta com catálogo, favoritos e detalhes navegáveis usando dados previsíveis. O código de demonstração não faz parte dos builds de Release.
 
-### 10. Release 2.0.0 — planejada
+### 10. Estabilidade da suíte e persistência — próxima
 
-- Executar regressão funcional e revisão de memória e performance.
-- Atualizar changelog e documentação de execução.
+- Corrigir o warning de transição de aparência que ainda aparece durante os testes.
+- Separar as regras do `FavoritesStore` do acesso físico ao arquivo.
+- Manter poucos testes de integração com disco e executar os demais com uma implementação em memória.
+- Reduzir a dependência de timeouts longos sem diminuir a carga ou as verificações dos testes.
+- Revisar escrita atômica, concorrência e comportamento durante o encerramento do app.
+
+Esta fase estará pronta quando a suíte executar sem warnings conhecidos e os testes de persistência forem rápidos e previsíveis tanto localmente quanto na CI.
+
+### 11. Demonstração offline — planejada
+
+- Substituir as imagens remotas do modo demo por assets locais com origem documentada.
+- Manter as URLs reais apenas no fluxo de integração com a API.
+- Garantir que catálogo, favoritos e detalhes possam ser avaliados sem conexão com a internet.
+
+Esta fase estará pronta quando toda a navegação de demonstração funcionar em modo avião sem placeholders inesperados.
+
+### 12. Estados de erro e feedback — planejada
+
+- Apresentar falhas de catálogo no contexto da tela, com opção de tentar novamente.
+- Preservar o conteúdo existente quando refresh, paginação ou favoritos falharem.
+- Diferenciar loading inicial, atualização e carregamento da próxima página visualmente.
+- Dar retorno claro ao adicionar ou remover um favorito.
+
+Esta fase estará pronta quando cada operação assíncrona tiver estados de carregamento, sucesso e falha perceptíveis sem interromper a navegação desnecessariamente.
+
+### 13. Acessibilidade e adaptação de layout — planejada
+
+- Validar VoiceOver, ordem de leitura, traits e estado dos controles.
+- Revisar contraste, Bold Text, Reduce Motion e os maiores tamanhos de Dynamic Type.
+- Remover alturas fixas que causem truncamento nos tamanhos de acessibilidade.
+- Definir e validar as orientações realmente suportadas no iPhone e no iPad.
+
+Esta fase estará pronta depois de uma passagem manual documentada pelas configurações de acessibilidade e tamanhos de tela suportados.
+
+### 14. Testes dos fluxos principais — planejada
+
+- Criar um target enxuto de UI Tests.
+- Cobrir abertura em modo demo, troca de layout, detalhes e favoritos.
+- Validar a presença das localizações em inglês e português do Brasil.
+- Impedir que chaves de localização apareçam diretamente na interface.
+
+Esta fase estará pronta com os fluxos essenciais cobertos sem rede real e executando de forma estável na CI.
+
+### 15. Assets e acabamento visual — planejada
+
+- Revisar App Icon, logo, favoritos e ilustrações de estado vazio.
+- Preferir SF Symbols ou assets vetoriais quando fizer sentido.
+- Remover arquivos duplicados ou herdados que não sejam mais usados.
+- Conferir consistência visual entre a Launch Screen e a primeira tela.
+
+Esta fase estará pronta com um catálogo de assets pequeno, rastreável e adequado às escalas e aparências suportadas.
+
+### 16. Preparação da release — planejada
+
+- Gerar e validar um archive de Release.
+- Confirmar que mocks, argumentos de demonstração e credenciais não estão no binário final.
+- Executar regressão funcional, Memory Graph, Leaks, Allocations e revisão de performance durante scroll.
+- Revisar warnings, licenças, atribuições e limitações conhecidas.
+- Criar o changelog da versão 2.0.0.
+
+Esta fase estará pronta com um archive limpo, reproduzível e acompanhado das evidências da regressão final.
+
+### 17. Release 2.0.0 — planejada
+
 - Abrir Pull Request da `develop` para a `master`.
 - Criar a tag e a release 2.0.0.
+- Publicar o resumo da modernização e as limitações conhecidas.
 
 A versão 2.0.0 estará pronta quando puder ser reproduzida a partir da `master`, com documentação, tag e regressão final concluídas.
 
