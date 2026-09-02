@@ -116,15 +116,15 @@ Esta fase foi concluída com checks obrigatórios de qualidade, build e testes a
 
 Esta fase ficou pronta com catálogo, favoritos e detalhes navegáveis usando dados previsíveis. O código de demonstração não faz parte dos builds de Release.
 
-### 10. Estabilidade da suíte e persistência — próxima
+### 10. Estabilidade da suíte e persistência — concluída
 
 - Corrigir o warning de transição de aparência que ainda aparece durante os testes.
 - Separar as regras do `FavoritesStore` do acesso físico ao arquivo.
 - Manter poucos testes de integração com disco e executar os demais com uma implementação em memória.
 - Reduzir a dependência de timeouts longos sem diminuir a carga ou as verificações dos testes.
-- Revisar escrita atômica, concorrência e comportamento durante o encerramento do app.
+- Preservar a escrita atômica e atualizar o cache somente depois que os dados forem persistidos.
 
-Esta fase estará pronta quando a suíte executar sem warnings conhecidos e os testes de persistência forem rápidos e previsíveis tanto localmente quanto na CI.
+Esta fase ficou pronta com a navegação testável sem lifecycle artificial, regras de persistência executadas em memória e testes de integração dedicados ao arquivo real.
 
 ### 11. Demonstração offline — planejada
 

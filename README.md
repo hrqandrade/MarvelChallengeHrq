@@ -79,7 +79,8 @@ ViewModels
     ├── HeroServicing
     │   └── HeroService (URLSession)
     └── FavoritesStoring
-        └── FavoritesStore (Codable + arquivo local)
+        └── FavoritesStore
+            └── FileFavoritesPersistence (Codable + arquivo local)
 ```
 
 - **Coordinator:** cria o fluxo, injeta dependências e controla a navegação.
@@ -143,7 +144,7 @@ git switch -c feat/image-loader-spm
 
 ## Testes
 
-Os testes cobrem estados e concorrência do ViewModel, contratos HTTP do `HeroService` com `URLProtocol`, cancelamento e paginação, política de payload inválido, cache e persistência atômica de favoritos, reuso de células, composição programática, navegação e desalocação dos principais fluxos. Para executá-los:
+Os testes cobrem estados e concorrência do ViewModel, contratos HTTP do `HeroService` com `URLProtocol`, cancelamento e paginação, política de payload inválido, cache e persistência de favoritos, reuso de células, composição programática, navegação e desalocação dos principais fluxos. As regras do `FavoritesStore` usam uma persistência em memória nos testes; um conjunto menor valida o adaptador de arquivo real. Para executá-los:
 
 ```bash
 xcodebuild test \

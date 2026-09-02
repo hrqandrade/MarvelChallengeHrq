@@ -12,7 +12,7 @@ final class MarvelChallengeTests: XCTestCase {
 
     func testCatalogPublishesEmptyStateWhenServiceReturnsNoCharacters() {
         let service = HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0)))
-        let store = FavoritesStore(fileURL: temporaryFileURL())
+        let store = makeTransientFavoritesStore()
         let viewModel = HeroesCatalogViewModel(service: service, favorites: store)
         let expectation = expectation(description: "empty state")
 
@@ -31,7 +31,7 @@ final class MarvelChallengeTests: XCTestCase {
         let service = HeroServiceSpy()
         let viewModel = HeroesCatalogViewModel(
             service: service,
-            favorites: FavoritesStore(fileURL: temporaryFileURL())
+            favorites: makeTransientFavoritesStore()
         )
         var states: [HeroesCatalogState] = []
         viewModel.onStateChange = { states.append($0) }
@@ -64,7 +64,7 @@ final class MarvelChallengeTests: XCTestCase {
         let service = HeroServiceSpy()
         let viewModel = HeroesCatalogViewModel(
             service: service,
-            favorites: FavoritesStore(fileURL: temporaryFileURL())
+            favorites: makeTransientFavoritesStore()
         )
 
         viewModel.loadInitial()
@@ -82,7 +82,7 @@ final class MarvelChallengeTests: XCTestCase {
         let service = HeroServiceSpy()
         let viewModel = HeroesCatalogViewModel(
             service: service,
-            favorites: FavoritesStore(fileURL: temporaryFileURL())
+            favorites: makeTransientFavoritesStore()
         )
         var states: [HeroesCatalogState] = []
         viewModel.onStateChange = { states.append($0) }
@@ -111,7 +111,7 @@ final class MarvelChallengeTests: XCTestCase {
         let service = HeroServiceSpy()
         let viewModel = HeroesCatalogViewModel(
             service: service,
-            favorites: FavoritesStore(fileURL: temporaryFileURL())
+            favorites: makeTransientFavoritesStore()
         )
 
         viewModel.loadInitial()
@@ -130,7 +130,7 @@ final class MarvelChallengeTests: XCTestCase {
         let service = HeroServiceSpy()
         let viewModel = HeroesCatalogViewModel(
             service: service,
-            favorites: FavoritesStore(fileURL: temporaryFileURL())
+            favorites: makeTransientFavoritesStore()
         )
         var states: [HeroesCatalogState] = []
         viewModel.onStateChange = { states.append($0) }
@@ -152,7 +152,7 @@ final class MarvelChallengeTests: XCTestCase {
         ))
         let viewModel = HeroesCatalogViewModel(
             service: service,
-            favorites: FavoritesStore(fileURL: temporaryFileURL())
+            favorites: makeTransientFavoritesStore()
         )
         viewModel.onStateChange = { state in
             guard state == .loaded else { return }
@@ -169,7 +169,7 @@ final class MarvelChallengeTests: XCTestCase {
         let service = HeroServiceSpy()
         var viewModel: HeroesCatalogViewModel? = HeroesCatalogViewModel(
             service: service,
-            favorites: FavoritesStore(fileURL: temporaryFileURL())
+            favorites: makeTransientFavoritesStore()
         )
 
         viewModel?.loadInitial()
@@ -177,134 +177,6 @@ final class MarvelChallengeTests: XCTestCase {
         viewModel = nil
 
         XCTAssertTrue(token.isCancelled)
-    }
-
-    func testFavoritesStoreSavesAndRemovesCharacter() {
-        let store = FavoritesStore(fileURL: temporaryFileURL())
-        let favorite = FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)
-        let saveExpectation = expectation(description: "save")
-        let removeExpectation = expectation(description: "remove")
-
-        store.save(favorite) { result in
-            if case let .failure(error) = result {
-                XCTFail("Unexpected error: \(error)")
-            }
-            saveExpectation.fulfill()
-        }
-        wait(for: [saveExpectation], timeout: TestTimeout.persistenceOperation)
-        XCTAssertTrue(store.contains(id: 1))
-        XCTAssertEqual(store.all(), [favorite])
-
-        store.remove(id: 1) { result in
-            if case let .failure(error) = result {
-                XCTFail("Unexpected error: \(error)")
-            }
-            removeExpectation.fulfill()
-        }
-        wait(for: [removeExpectation], timeout: TestTimeout.persistenceOperation)
-        XCTAssertFalse(store.contains(id: 1))
-    }
-
-    func testFavoritesStoreDifferentiatesMissingAndCorruptedFiles() throws {
-        let fileURL = temporaryFileURL()
-        let missingStore = FavoritesStore(fileURL: fileURL)
-        let missingExpectation = expectation(description: "missing file")
-
-        missingStore.load { result in
-            XCTAssertEqual(result.failure, .fileNotFound)
-            missingExpectation.fulfill()
-        }
-        wait(for: [missingExpectation], timeout: TestTimeout.persistenceOperation)
-
-        try Data("invalid".utf8).write(to: fileURL)
-        let corruptedStore = FavoritesStore(fileURL: fileURL)
-        let corruptedExpectation = expectation(description: "corrupted file")
-        corruptedStore.load { result in
-            XCTAssertEqual(result.failure, .corruptedFile)
-            corruptedExpectation.fulfill()
-        }
-        wait(for: [corruptedExpectation], timeout: TestTimeout.persistenceOperation)
-    }
-
-    func testFavoritesStoreReportsWritingFailureWithoutChangingCache() {
-        let store = FavoritesStore(fileURL: URL(fileURLWithPath: "/dev/null/favorites.json"))
-        let expectation = expectation(description: "writing failure")
-
-        store.save(FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)) { result in
-            XCTAssertEqual(result.failure, .writing)
-            expectation.fulfill()
-        }
-
-        wait(for: [expectation], timeout: TestTimeout.persistenceOperation)
-        XCTAssertFalse(store.contains(id: 1))
-    }
-
-    func testFavoritesStoreSerializesConcurrentMutationsAndWritesValidFile() {
-        let fileURL = temporaryFileURL()
-        let store = FavoritesStore(fileURL: fileURL)
-        let expectations = (0 ..< 20).map { index in
-            expectation(description: "save \(index)")
-        }
-
-        for index in 0 ..< 20 {
-            DispatchQueue.global().async {
-                store.save(FavoriteCharacter(id: index, name: "Hero \(index)", imageURL: nil)) { result in
-                    if case let .failure(error) = result {
-                        XCTFail("Unexpected error: \(error)")
-                    }
-                    expectations[index].fulfill()
-                }
-            }
-        }
-
-        wait(for: expectations, timeout: TestTimeout.persistenceStress)
-        XCTAssertEqual(store.all().count, 20)
-        XCTAssertNoThrow(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)))
-    }
-
-    func testFavoritesStoreLoadsSortedValuesAndUpdatesExistingCharacter() throws {
-        let fileURL = temporaryFileURL()
-        let initialValues = [
-            FavoriteCharacter(id: 2, name: "Thor", imageURL: nil),
-            FavoriteCharacter(id: 1, name: "Captain America", imageURL: nil),
-        ]
-        try JSONEncoder().encode(initialValues).write(to: fileURL)
-        let store = FavoritesStore(fileURL: fileURL)
-        let loadExpectation = expectation(description: "load sorted favorites")
-
-        store.load { result in
-            XCTAssertEqual(try? result.get().map(\.name), ["Captain America", "Thor"])
-            loadExpectation.fulfill()
-        }
-        wait(for: [loadExpectation], timeout: TestTimeout.persistenceOperation)
-
-        let updateExpectation = expectation(description: "update existing favorite")
-        store.save(FavoriteCharacter(id: 2, name: "Mighty Thor", imageURL: nil)) { result in
-            if case let .failure(error) = result {
-                XCTFail("Unexpected error: \(error)")
-            }
-            updateExpectation.fulfill()
-        }
-        wait(for: [updateExpectation], timeout: TestTimeout.persistenceOperation)
-
-        XCTAssertEqual(store.all().map(\.name), ["Captain America", "Mighty Thor"])
-        XCTAssertEqual(try JSONDecoder().decode([FavoriteCharacter].self, from: Data(contentsOf: fileURL)).count, 2)
-    }
-
-    func testFavoritesCacheQueriesDoNotWaitForIOQueue() {
-        let ioQueue = DispatchQueue(label: "favorites.blocked.io")
-        ioQueue.suspend()
-        let store = FavoritesStore(fileURL: temporaryFileURL(), ioQueue: ioQueue)
-        let expectation = expectation(description: "cache query")
-
-        store.save(FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)) { _ in }
-        DispatchQueue.global().async {
-            XCTAssertFalse(store.contains(id: 1))
-            expectation.fulfill()
-        }
-
-        wait(for: [expectation], timeout: 1)
-        ioQueue.resume()
     }
 
     func testCatalogPublishesFavoriteWritingFailure() throws {
@@ -359,7 +231,7 @@ final class MarvelChallengeTests: XCTestCase {
                 window: window,
                 screenFactory: AppScreenFactory(dependencies: AppDependencies(
                     heroService: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
-                    favoritesStore: FavoritesStore(fileURL: temporaryFileURL())
+                    favoritesStore: makeTransientFavoritesStore()
                 ))
             )
 
@@ -380,16 +252,27 @@ final class MarvelChallengeTests: XCTestCase {
     func testCoordinatorBuildsDetailsWhenCatalogSelectsCharacter() throws {
         let window = UIWindow(frame: UIScreen.main.bounds)
         let factory = ScreenFactorySpy()
-        let coordinator = AppCoordinator(window: window, screenFactory: factory)
+        let modalPresenter = ModalPresenterSpy()
+        let coordinator = AppCoordinator(
+            window: window,
+            screenFactory: factory,
+            modalPresenter: modalPresenter
+        )
         let character = try makeCharacter()
 
         coordinator.start()
-        window.makeKeyAndVisible()
         factory.onSelect?(character)
 
         XCTAssertTrue(window.rootViewController === factory.catalog)
         XCTAssertEqual(factory.detailsCharacter, character)
-        window.isHidden = true
+        XCTAssertTrue(modalPresenter.presentingViewController === factory.catalog)
+        XCTAssertTrue(modalPresenter.presentedViewController is HeroesDetailsViewController)
+        XCTAssertTrue(modalPresenter.presentedAnimated)
+
+        factory.onClose?()
+
+        XCTAssertTrue(modalPresenter.dismissedViewController === factory.catalog)
+        XCTAssertTrue(modalPresenter.dismissedAnimated)
     }
 
     func testDetailsControllerAndViewModelAreReleasedAfterDismissal() throws {
@@ -399,7 +282,7 @@ final class MarvelChallengeTests: XCTestCase {
         try autoreleasepool {
             var viewModel: HeroesDetailsViewModel? = try HeroesDetailsViewModel(
                 character: makeCharacter(),
-                favorites: FavoritesStore(fileURL: temporaryFileURL())
+                favorites: makeTransientFavoritesStore()
             )
             var controller: HeroesDetailsViewController? =
                 try HeroesDetailsViewController(viewModel: XCTUnwrap(viewModel))
@@ -418,11 +301,11 @@ final class MarvelChallengeTests: XCTestCase {
     func testProgrammaticScreensLoadTheirCriticalViews() throws {
         let catalog = HeroesCatalogViewController(viewModel: HeroesCatalogViewModel(
             service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
-            favorites: FavoritesStore(fileURL: temporaryFileURL())
+            favorites: makeTransientFavoritesStore()
         ))
         let details = try HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
             character: makeCharacter(),
-            favorites: FavoritesStore(fileURL: temporaryFileURL())
+            favorites: makeTransientFavoritesStore()
         ))
 
         catalog.loadViewIfNeeded()
@@ -619,18 +502,9 @@ final class MarvelChallengeTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    private func temporaryFileURL() -> URL {
-        FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
-    }
-
     private func makeCharacter(id: Int = 1, name: String = "Spider-Man") throws -> Character {
         Character(id: id, name: name, description: "", imageURL: nil, comics: [], series: [])
     }
-}
-
-private enum TestTimeout {
-    static let persistenceOperation: TimeInterval = 15
-    static let persistenceStress: TimeInterval = 30
 }
 
 private final class URLProtocolStub: URLProtocol {
@@ -773,10 +647,10 @@ private final class FailingFavoritesStoreStub: FavoritesStoring {
 private final class ScreenFactorySpy: ScreenBuilding {
     let catalog = HeroesCatalogViewController(viewModel: HeroesCatalogViewModel(
         service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
-        favorites: FavoritesStore(fileURL: FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString))
+        favorites: makeTransientFavoritesStore()
     ))
     private(set) var onSelect: ((Character) -> Void)?
+    private(set) var onClose: (() -> Void)?
     private(set) var detailsCharacter: Character?
 
     func makeCatalog(onSelect: @escaping (Character) -> Void) -> HeroesCatalogViewController {
@@ -786,10 +660,49 @@ private final class ScreenFactorySpy: ScreenBuilding {
 
     func makeDetails(for character: Character, onClose: @escaping () -> Void) -> HeroesDetailsViewController {
         detailsCharacter = character
+        self.onClose = onClose
         return HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
             character: character,
-            favorites: FavoritesStore(fileURL: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString))
+            favorites: makeTransientFavoritesStore()
         ))
+    }
+}
+
+private final class ModalPresenterSpy: ModalPresenting {
+    private(set) weak var presentingViewController: UIViewController?
+    private(set) var presentedViewController: UIViewController?
+    private(set) var presentedAnimated = false
+    private(set) weak var dismissedViewController: UIViewController?
+    private(set) var dismissedAnimated = false
+
+    func present(
+        _ viewController: UIViewController,
+        from presentingViewController: UIViewController?,
+        animated: Bool
+    ) {
+        self.presentingViewController = presentingViewController
+        presentedViewController = viewController
+        presentedAnimated = animated
+    }
+
+    func dismissPresented(from presentingViewController: UIViewController?, animated: Bool) {
+        dismissedViewController = presentingViewController
+        dismissedAnimated = animated
+    }
+}
+
+private func makeTransientFavoritesStore() -> FavoritesStore {
+    FavoritesStore(persistence: TransientFavoritesPersistence())
+}
+
+private final class TransientFavoritesPersistence: FavoritesPersistence {
+    private var data: Data?
+
+    func read() throws -> Data? {
+        data
+    }
+
+    func write(_ data: Data) throws {
+        self.data = data
     }
 }
