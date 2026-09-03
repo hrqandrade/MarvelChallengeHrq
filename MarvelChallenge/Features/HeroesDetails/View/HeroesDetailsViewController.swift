@@ -52,6 +52,7 @@ final class HeroesDetailsViewController: UIViewController {
 
     private func render() {
         contentView.render(.init(
+            id: viewModel.id,
             name: viewModel.name,
             description: viewModel.description,
             imageURL: viewModel.imageURL,

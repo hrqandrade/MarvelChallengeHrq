@@ -168,7 +168,7 @@ Pull Requests para `develop` e `master` executam formatação, análise estátic
 
 ## Modo de demonstração
 
-Builds `Debug` iniciam com personagens e favoritos em memória. Esse modo oferece dados previsíveis para revisar o catálogo, as duas opções de layout, os favoritos e a tela de detalhes sem depender de credenciais da API. As imagens continuam sendo carregadas de URLs públicas e, por isso, precisam de conexão com a internet.
+Builds `Debug` iniciam com personagens e favoritos em memória. Esse modo oferece dados previsíveis para revisar o catálogo, as duas opções de layout, os favoritos e a tela de detalhes sem depender de credenciais da API. As ilustrações são geradas localmente a partir de cada personagem, permitindo avaliar todo o fluxo em modo avião sem incluir imagens de terceiros no repositório. No fluxo real, elas também funcionam como fallback quando uma imagem não está disponível.
 
 Para validar a integração real durante o desenvolvimento, edite o Scheme no Xcode, abra `Run > Arguments` e adicione `-useLiveData` em `Arguments Passed On Launch`. Builds `Release` sempre usam as dependências reais e não compilam o suporte aos dados de demonstração.
 

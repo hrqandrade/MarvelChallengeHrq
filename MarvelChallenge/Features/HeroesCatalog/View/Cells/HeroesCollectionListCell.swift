@@ -45,11 +45,23 @@ final class HeroesCollectionListCell: UICollectionViewCell {
     }
 
     func configure(character: Character, isFavorite: Bool, onFavorite: @escaping () -> Void) {
-        configure(name: character.name, imageURL: character.imageURL, isFavorite: isFavorite, onFavorite: onFavorite)
+        configure(
+            id: character.id,
+            name: character.name,
+            imageURL: character.imageURL,
+            isFavorite: isFavorite,
+            onFavorite: onFavorite
+        )
     }
 
     func configure(favorite: FavoriteCharacter, onFavorite: @escaping () -> Void) {
-        configure(name: favorite.name, imageURL: favorite.imageURL, isFavorite: true, onFavorite: onFavorite)
+        configure(
+            id: favorite.id,
+            name: favorite.name,
+            imageURL: favorite.imageURL,
+            isFavorite: true,
+            onFavorite: onFavorite
+        )
     }
 
     // MARK: - Configuration
@@ -105,9 +117,15 @@ final class HeroesCollectionListCell: UICollectionViewCell {
         ])
     }
 
-    private func configure(name: String, imageURL: URL?, isFavorite: Bool, onFavorite: @escaping () -> Void) {
+    private func configure(
+        id: Int,
+        name: String,
+        imageURL: URL?,
+        isFavorite: Bool,
+        onFavorite: @escaping () -> Void
+    ) {
         nameLabel.text = name
-        heroImageView.setImage(from: imageURL, placeholder: UIImage(named: "MarvelLogo"))
+        heroImageView.setImage(from: imageURL, placeholder: HeroArtworkFactory.image(id: id, name: name))
         favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
         favoriteButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable.Details
             .addFavorite

@@ -68,7 +68,7 @@
                 id: 1,
                 name: "Spider-Man",
                 description: Localizable.Demo.spiderManDescription,
-                imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/3/50/526548a343e4b.jpg"),
+                imageURL: nil,
                 comics: references("Amazing Fantasy", "The Amazing Spider-Man", "Secret Wars"),
                 series: references("Spider-Verse", "Ultimate Spider-Man")
             ),
@@ -76,7 +76,7 @@
                 id: 2,
                 name: "Black Panther",
                 description: Localizable.Demo.blackPantherDescription,
-                imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/9/03/537ba26276348.jpg"),
+                imageURL: nil,
                 comics: references("Black Panther", "Avengers"),
                 series: references("World of Wakanda", "Agents of Wakanda")
             ),
@@ -84,7 +84,7 @@
                 id: 3,
                 name: "Captain Marvel",
                 description: Localizable.Demo.captainMarvelDescription,
-                imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/6/30/5190c90d5f2a3.jpg"),
+                imageURL: nil,
                 comics: references("Captain Marvel", "The Ultimates"),
                 series: references("Secret Invasion", "Civil War II")
             ),
@@ -92,7 +92,7 @@
                 id: 4,
                 name: "Iron Man",
                 description: Localizable.Demo.ironManDescription,
-                imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/9/c0/527bb7b37ff55.jpg"),
+                imageURL: nil,
                 comics: references("Tales of Suspense", "Invincible Iron Man"),
                 series: references("Armor Wars", "Avengers")
             ),
@@ -100,7 +100,7 @@
                 id: 5,
                 name: "Storm",
                 description: Localizable.Demo.stormDescription,
-                imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/6/40/526963dad214d.jpg"),
+                imageURL: nil,
                 comics: references("Uncanny X-Men", "X-Men Red"),
                 series: references("X-Men", "Extraordinary X-Men")
             ),
@@ -108,7 +108,7 @@
                 id: 6,
                 name: "Doctor Strange",
                 description: Localizable.Demo.doctorStrangeDescription,
-                imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/5/f0/5261a8648b4f0.jpg"),
+                imageURL: nil,
                 comics: references("Strange Tales", "Doctor Strange"),
                 series: references("Defenders", "New Avengers")
             ),

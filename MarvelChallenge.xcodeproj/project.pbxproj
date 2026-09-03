@@ -40,6 +40,7 @@
 		FF0000000000000000000001 /* HeroesCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000011 /* HeroesCatalogView.swift */; };
 		FF0000000000000000000002 /* HeroesDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0000000000000000000012 /* HeroesDetailsView.swift */; };
 		AB0000000000000000000001 /* MarvelComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000011 /* MarvelComponents.swift */; };
+		B10000000000000000000001 /* HeroArtworkFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000000000000000000011 /* HeroArtworkFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,7 @@
 		FF0000000000000000000011 /* HeroesCatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCatalogView.swift; sourceTree = "<group>"; };
 		FF0000000000000000000012 /* HeroesDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesDetailsView.swift; sourceTree = "<group>"; };
 		AB0000000000000000000011 /* MarvelComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarvelComponents.swift; sourceTree = "<group>"; };
+		B100000000000000000000011 /* HeroArtworkFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroArtworkFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -300,6 +302,7 @@
 		AB0000000000000000000021 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
+				B100000000000000000000011 /* HeroArtworkFactory.swift */,
 				AB0000000000000000000011 /* MarvelComponents.swift */,
 			);
 			path = DesignSystem;
@@ -459,6 +462,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B10000000000000000000001 /* HeroArtworkFactory.swift in Sources */,
 				AB0000000000000000000001 /* MarvelComponents.swift in Sources */,
 				FF0000000000000000000001 /* HeroesCatalogView.swift in Sources */,
 				FF0000000000000000000002 /* HeroesDetailsView.swift in Sources */,

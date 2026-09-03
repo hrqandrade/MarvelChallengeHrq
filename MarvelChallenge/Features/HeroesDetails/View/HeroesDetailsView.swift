@@ -4,6 +4,7 @@ import UIKit
 
 final class HeroesDetailsView: UIView {
     struct State {
+        let id: Int
         let name: String
         let description: String
         let imageURL: URL?
@@ -42,7 +43,10 @@ final class HeroesDetailsView: UIView {
     func render(_ state: State) {
         headerView.setTitle(state.name)
         descriptionLabel.text = state.description
-        heroImageView.setImage(from: state.imageURL, placeholder: UIImage(named: "MarvelLogo"))
+        heroImageView.setImage(
+            from: state.imageURL,
+            placeholder: HeroArtworkFactory.image(id: state.id, name: state.name)
+        )
         comicLabel.isHidden = !state.hasComics
         comicCollectionView.isHidden = !state.hasComics
         seriesLabel.isHidden = !state.hasSeries
