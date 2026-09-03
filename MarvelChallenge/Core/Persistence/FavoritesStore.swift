@@ -27,17 +27,18 @@ enum FavoritesStoreError: Error, Equatable {
 }
 
 final class FavoritesStore: FavoritesStoring {
-    private let fileURL: URL
-    private let fileManager: FileManager
+    private let persistence: FavoritesPersistence
     private let ioQueue: DispatchQueue
     private let cacheLock = NSLock()
     private var favoritesByID: [Int: FavoriteCharacter] = [:]
 
     init(fileManager: FileManager = .default) {
-        self.fileManager = fileManager
         ioQueue = DispatchQueue(label: "com.marvelchallenge.favorites.io", qos: .utility)
         let directory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        fileURL = directory.appendingPathComponent("favorites.json")
+        persistence = FileFavoritesPersistence(
+            fileURL: directory.appendingPathComponent("favorites.json"),
+            fileManager: fileManager
+        )
     }
 
     init(
@@ -45,8 +46,15 @@ final class FavoritesStore: FavoritesStoring {
         fileManager: FileManager = .default,
         ioQueue: DispatchQueue = DispatchQueue(label: "com.marvelchallenge.favorites.io", qos: .utility)
     ) {
-        self.fileURL = fileURL
-        self.fileManager = fileManager
+        persistence = FileFavoritesPersistence(fileURL: fileURL, fileManager: fileManager)
+        self.ioQueue = ioQueue
+    }
+
+    init(
+        persistence: FavoritesPersistence,
+        ioQueue: DispatchQueue = DispatchQueue(label: "com.marvelchallenge.favorites.io", qos: .utility)
+    ) {
+        self.persistence = persistence
         self.ioQueue = ioQueue
     }
 
@@ -64,13 +72,12 @@ final class FavoritesStore: FavoritesStoring {
 
     func load(completion: @escaping (Result<[FavoriteCharacter], FavoritesStoreError>) -> Void) {
         ioQueue.async { [self] in
-            guard fileManager.fileExists(atPath: fileURL.path) else {
-                replaceCache(with: [])
-                deliver(.failure(.fileNotFound), to: completion)
-                return
-            }
             do {
-                let data = try Data(contentsOf: fileURL)
+                guard let data = try persistence.read() else {
+                    replaceCache(with: [])
+                    deliver(.failure(.fileNotFound), to: completion)
+                    return
+                }
                 let decoded = try JSONDecoder().decode([FavoriteCharacter].self, from: data)
                 replaceCache(with: decoded)
                 deliver(.success(sorted(decoded)), to: completion)
@@ -105,8 +112,7 @@ final class FavoritesStore: FavoritesStoring {
             return .failure(.encoding)
         }
         do {
-            try fileManager.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try data.write(to: fileURL, options: .atomic)
+            try persistence.write(data)
             cacheLock.withLock {
                 favoritesByID = updated
             }

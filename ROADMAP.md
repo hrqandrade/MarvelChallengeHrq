@@ -1,14 +1,13 @@
 # Roadmap técnico
 
-Este roadmap organiza a evolução do Marvel Challenge até a versão 2.0.0. O planejamento combina entregas de produto, redução de risco e melhoria contínua da base de código.
+Este arquivo acompanha a modernização do Marvel Challenge até a versão 2.0.0. Ele nasceu para registrar o que já mudou, o que aprendemos no caminho e o que ainda falta antes da release.
 
-## Como o roadmap evolui
+## Como estamos trabalhando
 
-- Descobertas técnicas entram no planejamento com impacto, prioridade e critério de conclusão.
-- Riscos de crash, perda de dados, concorrência e retenção têm precedência sobre melhorias cosméticas.
-- Testes fazem parte de cada entrega; não são uma etapa deixada apenas para o final.
-- Refatorações devem preservar comportamento ou declarar explicitamente a mudança esperada.
-- Cada fase parte da `develop` e retorna por Pull Request com validação reproduzível.
+- Problemas de crash, perda de dados, concorrência e memória vêm antes de ajustes cosméticos.
+- Cada entrega leva seus próprios testes. Não deixamos toda a validação para o final.
+- Refatorações preservam o comportamento existente, salvo quando a mudança é intencional e documentada.
+- O trabalho parte da `develop` e volta para ela por Pull Request.
 
 ## Fases
 
@@ -29,7 +28,7 @@ Este roadmap organiza a evolução do Marvel Challenge até a versão 2.0.0. O p
 - Separar `Application`, `Core`, `Features` e `Shared`.
 - Remover arquivos e referências antigas sem uso.
 
-Critério de conclusão: projeto compilando, testes atuais aprovados e nenhuma referência quebrada após as movimentações.
+Consideramos esta fase pronta com o projeto compilando, os testes aprovados e as referências do Xcode organizadas.
 
 ### 2. Segurança de runtime e ciclo de vida — concluída
 
@@ -39,7 +38,7 @@ Critério de conclusão: projeto compilando, testes atuais aprovados e nenhuma r
 - Integrar o loading ao fluxo de estado ou remover o componente enquanto não tiver uso.
 - Validar desalocação de Coordinator, ViewControllers, ViewModels e células.
 
-Critério de conclusão: ausência de caminhos conhecidos de crash por cast/unwrap e testes básicos de desalocação. A análise manual no Memory Graph faz parte da regressão da release.
+Esta fase foi encerrada sem caminhos conhecidos de crash por cast ou unwrap e com testes básicos de desalocação. A regressão da release ainda inclui uma passagem manual pelo Memory Graph.
 
 ### 3. Concorrência, cancelamento e paginação — concluída
 
@@ -50,7 +49,7 @@ Critério de conclusão: ausência de caminhos conhecidos de crash por cast/unwr
 - Impedir respostas antigas de sobrescrever estados recentes.
 - Controlar última página e impedir requisições infinitas.
 
-Critério de conclusão: paginação determinística, operações canceláveis e testes cobrindo concorrência, reload, falha e fim da lista.
+Esta fase ficou pronta com paginação previsível, operações canceláveis e testes para reload, falhas, concorrência e fim da lista.
 
 ### 4. Persistência robusta — concluída
 
@@ -60,7 +59,7 @@ Critério de conclusão: paginação determinística, operações canceláveis e
 - Propagar erros de salvar e remover até o estado de apresentação.
 - Validar acesso concorrente e escrita atômica.
 
-Critério de conclusão: consultas sem I/O na main thread, erros observáveis pela UI e testes de persistência e concorrência.
+Esta fase ficou pronta quando as consultas deixaram de acessar disco na main thread e os erros passaram a chegar até a camada de apresentação.
 
 ### 5. Limites arquiteturais e navegação — concluída
 
@@ -72,7 +71,7 @@ Critério de conclusão: consultas sem I/O na main thread, erros observáveis pe
 - Remover Storyboards das telas e construí-las programaticamente com Auto Layout.
 - Eliminar outlets, actions e identifiers, tornando dependências obrigatórias por inicializador.
 
-Critério de conclusão: UI sem dependência direta de DTOs, infraestrutura sem dependência de localização e navegação testável fora das ViewControllers.
+Ao final desta fase, a UI deixou de depender dos DTOs da API, a infraestrutura deixou de conhecer textos de interface e a navegação passou a ser testável fora das ViewControllers.
 
 ### 6. Estratégia de testes — concluída
 
@@ -83,9 +82,9 @@ Critério de conclusão: UI sem dependência direta de DTOs, infraestrutura sem 
 - Definir e testar a política para respostas parcialmente inválidas, sem descarte silencioso de DTOs.
 - Cobrir persistência, atualização, ordenação, corrupção e falha de escrita.
 - Adicionar testes de navegação, reuso de células e desalocação.
-- Definir uma base pequena de testes de interface para os fluxos críticos.
+- Cobrir a composição programática e os fluxos principais das telas sem depender de rede real.
 
-Critério de conclusão: riscos principais cobertos por testes determinísticos e suíte executável localmente por um único comando.
+Esta fase foi concluída com os principais riscos cobertos e a suíte executável localmente por um único comando. Testes end-to-end de interface continuam como uma evolução futura.
 
 ### 7. Componentes do Design System — concluída
 
@@ -93,11 +92,11 @@ Critério de conclusão: riscos principais cobertos por testes determinísticos 
 - Padronizar loading, empty state, cards, botões e mensagens de erro.
 - Extrair `HeroesCatalogView` e `HeroesDetailsView`, mantendo as ViewControllers focadas em lifecycle e binding.
 - Criar tokens semânticos para área mínima de toque, ícones, barras, cards e bordas.
-- Validar Dynamic Type, contraste, VoiceOver e tamanhos de toque.
+- Adotar Dynamic Type, rótulos de VoiceOver e áreas mínimas de toque nos componentes principais.
 
-Critério de conclusão: telas principais compostas por estilos e componentes compartilhados, com validação básica de acessibilidade.
+Esta fase ficou pronta com as telas principais usando estilos e componentes compartilhados. A revisão completa de contraste e tamanhos extremos de Dynamic Type será repetida na regressão da release.
 
-### 8. Integração contínua e qualidade — em andamento
+### 8. Integração contínua e qualidade — concluída
 
 - Executar build e testes em Pull Requests.
 - Aplicar SwiftFormat e SwiftLint de forma reproduzível.
@@ -106,20 +105,92 @@ Critério de conclusão: telas principais compostas por estilos e componentes co
 - Adicionar regras de contribuição e checklist de revisão.
 - Monitorar tempo de build, warnings e estabilidade dos testes.
 
-Critério de conclusão: nenhuma alteração entra na `develop` sem validação automatizada da base.
+Esta fase foi concluída com checks obrigatórios de qualidade, build e testes antes do merge na `develop`.
 
-### 9. Release 2.0.0 — planejada
+### 9. Ambiente de demonstração — concluída
 
-- Executar regressão funcional e revisão de memória e performance.
-- Atualizar changelog e documentação de execução.
+- Disponibilizar dados representativos para revisão visual sem credenciais da API.
+- Ativar dados de demonstração por padrão em builds Debug.
+- Permitir integração real em Debug por argumento de lançamento explícito.
+- Garantir que serviços e dados de demonstração não sejam compilados em Release.
+
+Esta fase ficou pronta com catálogo, favoritos e detalhes navegáveis usando dados previsíveis. O código de demonstração não faz parte dos builds de Release.
+
+### 10. Estabilidade da suíte e persistência — concluída
+
+- Corrigir o warning de transição de aparência que ainda aparece durante os testes.
+- Separar as regras do `FavoritesStore` do acesso físico ao arquivo.
+- Manter poucos testes de integração com disco e executar os demais com uma implementação em memória.
+- Reduzir a dependência de timeouts longos sem diminuir a carga ou as verificações dos testes.
+- Preservar a escrita atômica e atualizar o cache somente depois que os dados forem persistidos.
+
+Esta fase ficou pronta com a navegação testável sem lifecycle artificial, regras de persistência executadas em memória e testes de integração dedicados ao arquivo real.
+
+### 11. Demonstração offline — planejada
+
+- Substituir as imagens remotas do modo demo por assets locais com origem documentada.
+- Manter as URLs reais apenas no fluxo de integração com a API.
+- Garantir que catálogo, favoritos e detalhes possam ser avaliados sem conexão com a internet.
+
+Esta fase estará pronta quando toda a navegação de demonstração funcionar em modo avião sem placeholders inesperados.
+
+### 12. Estados de erro e feedback — planejada
+
+- Apresentar falhas de catálogo no contexto da tela, com opção de tentar novamente.
+- Preservar o conteúdo existente quando refresh, paginação ou favoritos falharem.
+- Diferenciar loading inicial, atualização e carregamento da próxima página visualmente.
+- Dar retorno claro ao adicionar ou remover um favorito.
+
+Esta fase estará pronta quando cada operação assíncrona tiver estados de carregamento, sucesso e falha perceptíveis sem interromper a navegação desnecessariamente.
+
+### 13. Acessibilidade e adaptação de layout — planejada
+
+- Validar VoiceOver, ordem de leitura, traits e estado dos controles.
+- Revisar contraste, Bold Text, Reduce Motion e os maiores tamanhos de Dynamic Type.
+- Remover alturas fixas que causem truncamento nos tamanhos de acessibilidade.
+- Definir e validar as orientações realmente suportadas no iPhone e no iPad.
+
+Esta fase estará pronta depois de uma passagem manual documentada pelas configurações de acessibilidade e tamanhos de tela suportados.
+
+### 14. Testes dos fluxos principais — planejada
+
+- Criar um target enxuto de UI Tests.
+- Cobrir abertura em modo demo, troca de layout, detalhes e favoritos.
+- Validar a presença das localizações em inglês e português do Brasil.
+- Impedir que chaves de localização apareçam diretamente na interface.
+
+Esta fase estará pronta com os fluxos essenciais cobertos sem rede real e executando de forma estável na CI.
+
+### 15. Assets e acabamento visual — planejada
+
+- Revisar App Icon, logo, favoritos e ilustrações de estado vazio.
+- Preferir SF Symbols ou assets vetoriais quando fizer sentido.
+- Remover arquivos duplicados ou herdados que não sejam mais usados.
+- Conferir consistência visual entre a Launch Screen e a primeira tela.
+
+Esta fase estará pronta com um catálogo de assets pequeno, rastreável e adequado às escalas e aparências suportadas.
+
+### 16. Preparação da release — planejada
+
+- Gerar e validar um archive de Release.
+- Confirmar que mocks, argumentos de demonstração e credenciais não estão no binário final.
+- Executar regressão funcional, Memory Graph, Leaks, Allocations e revisão de performance durante scroll.
+- Revisar warnings, licenças, atribuições e limitações conhecidas.
+- Criar o changelog da versão 2.0.0.
+
+Esta fase estará pronta com um archive limpo, reproduzível e acompanhado das evidências da regressão final.
+
+### 17. Release 2.0.0 — planejada
+
 - Abrir Pull Request da `develop` para a `master`.
 - Criar a tag e a release 2.0.0.
+- Publicar o resumo da modernização e as limitações conhecidas.
 
-Critério de conclusão: release reproduzível, documentada e gerada a partir da `master` validada.
+A versão 2.0.0 estará pronta quando puder ser reproduzida a partir da `master`, com documentação, tag e regressão final concluídas.
 
-## Definition of Done
+## Quando uma fase está pronta
 
-Uma etapa é considerada concluída quando:
+Antes de marcar uma fase como concluída, conferimos se:
 
 - o código compila sem novos warnings relevantes;
 - testes proporcionais ao risco foram adicionados e estão passando;

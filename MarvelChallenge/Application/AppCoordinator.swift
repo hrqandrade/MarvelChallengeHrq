@@ -7,6 +7,21 @@ protocol ScreenBuilding {
     func makeDetails(for character: Character, onClose: @escaping () -> Void) -> HeroesDetailsViewController
 }
 
+protocol ModalPresenting {
+    func present(_ viewController: UIViewController, from presentingViewController: UIViewController?, animated: Bool)
+    func dismissPresented(from presentingViewController: UIViewController?, animated: Bool)
+}
+
+struct UIKitModalPresenter: ModalPresenting {
+    func present(_ viewController: UIViewController, from presentingViewController: UIViewController?, animated: Bool) {
+        presentingViewController?.present(viewController, animated: animated)
+    }
+
+    func dismissPresented(from presentingViewController: UIViewController?, animated: Bool) {
+        presentingViewController?.dismiss(animated: animated)
+    }
+}
+
 struct AppScreenFactory: ScreenBuilding {
     let dependencies: AppDependencies
     func makeCatalog(onSelect: @escaping (Character) -> Void) -> HeroesCatalogViewController {
@@ -31,9 +46,16 @@ struct AppScreenFactory: ScreenBuilding {
 final class AppCoordinator: Coordinator {
     private let window: UIWindow
     private let screenFactory: ScreenBuilding
-    init(window: UIWindow, screenFactory: ScreenBuilding = AppScreenFactory(dependencies: .live)) {
+    private let modalPresenter: ModalPresenting
+
+    init(
+        window: UIWindow,
+        screenFactory: ScreenBuilding = AppScreenFactory(dependencies: .resolve()),
+        modalPresenter: ModalPresenting = UIKitModalPresenter()
+    ) {
         self.window = window
         self.screenFactory = screenFactory
+        self.modalPresenter = modalPresenter
     }
 
     func start() {
@@ -43,9 +65,12 @@ final class AppCoordinator: Coordinator {
 
     private func showDetails(for character: Character) {
         let details = screenFactory
-            .makeDetails(for: character) { [weak self] in self?.window.rootViewController?.dismiss(animated: true) }
+            .makeDetails(for: character) { [weak self] in
+                guard let self else { return }
+                self.modalPresenter.dismissPresented(from: self.window.rootViewController, animated: true)
+            }
         details.modalPresentationStyle = .fullScreen
-        window.rootViewController?.present(details, animated: true)
+        modalPresenter.present(details, from: window.rootViewController, animated: true)
     }
 }
 
@@ -53,4 +78,13 @@ struct AppDependencies {
     let heroService: HeroServicing
     let favoritesStore: FavoritesStoring
     static let live = AppDependencies(heroService: HeroService(), favoritesStore: FavoritesStore())
+
+    static func resolve(arguments: [String] = ProcessInfo.processInfo.arguments) -> AppDependencies {
+        #if DEBUG
+            if !arguments.contains("-useLiveData") {
+                return AppDependencies(heroService: DebugHeroService(), favoritesStore: DebugFavoritesStore())
+            }
+        #endif
+        return .live
+    }
 }

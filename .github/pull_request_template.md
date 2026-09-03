@@ -1,19 +1,19 @@
-## Contexto
+## O que mudou
 
-Descreva o problema ou a oportunidade que motivou a alteração.
+Explique brevemente o problema e a solução adotada.
 
-## Alterações
+## Como validar
 
-- Liste as decisões e mudanças relevantes.
+Descreva os passos necessários para revisar a alteração.
 
-## Validação
+## Checklist
 
 - [ ] Build executado com sucesso
 - [ ] Testes automatizados aprovados
 - [ ] SwiftFormat e SwiftLint aprovados
 - [ ] Fluxos afetados validados manualmente
-- [ ] Memória, acessibilidade e concorrência avaliadas quando aplicável
+- [ ] Testes e documentação atualizados quando necessário
 
-## Evidências
+## Evidências visuais
 
-Inclua imagens ou informações que ajudem a revisar a mudança, quando aplicável.
+Inclua screenshots ou vídeos quando houver mudança de interface.

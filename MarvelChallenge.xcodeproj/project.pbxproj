@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		AA0000000000000000000001 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000011 /* AppCoordinator.swift */; };
+		FA0000000000000000000001 /* DebugAppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000000000000000000011 /* DebugAppDependencies.swift */; };
 		AA0000000000000000000002 /* HeroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000012 /* HeroService.swift */; };
 		AA0000000000000000000003 /* FavoritesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000013 /* FavoritesStore.swift */; };
+		AD0000000000000000000001 /* FavoritesPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0000000000000000000011 /* FavoritesPersistence.swift */; };
 		BB0000000000000000000001 /* MarvelImageLoader in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000000000000000000003 /* MarvelImageLoader */; };
 		CC0000000000000000000001 /* MarvelDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = CC0000000000000000000007 /* MarvelDesignSystem */; };
 		CC0000000000000000000002 /* Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000003 /* Localizable.swift */; };
@@ -30,6 +32,8 @@
 		50C7BD0625A785B6006A235D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50C7BD0525A785B6006A235D /* Assets.xcassets */; };
 		50C7BD0925A785B6006A235D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 50C7BD0725A785B6006A235D /* LaunchScreen.storyboard */; };
 		50C7BD1425A785B7006A235D /* MarvelChallengeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C7BD1325A785B7006A235D /* MarvelChallengeTests.swift */; };
+		AB0000000000000000000002 /* PresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000012 /* PresentationTests.swift */; };
+		AD0000000000000000000002 /* FavoritesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD0000000000000000000012 /* FavoritesStoreTests.swift */; };
 		50C7BD2425A79BD8006A235D /* HeroesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C7BD2225A79BD8006A235D /* HeroesCollectionViewCell.swift */; };
 		50C7BD2A25A7AECF006A235D /* GridFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C7BD2925A7AECF006A235D /* GridFlowLayout.swift */; };
 		EE0000000000000000000001 /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000000000000000000011 /* Character.swift */; };
@@ -64,8 +68,10 @@
 /* Begin PBXFileReference section */
 		5025353225A7C60A00B03C4D /* ListFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListFlowLayout.swift; sourceTree = "<group>"; };
 		AA0000000000000000000011 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
+		FA0000000000000000000011 /* DebugAppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugAppDependencies.swift; sourceTree = "<group>"; };
 		AA0000000000000000000012 /* HeroService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroService.swift; sourceTree = "<group>"; };
 		AA0000000000000000000013 /* FavoritesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStore.swift; sourceTree = "<group>"; };
+		AD0000000000000000000011 /* FavoritesPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesPersistence.swift; sourceTree = "<group>"; };
 		AA0000000000000000000015 /* HeroesCatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCatalogViewModel.swift; sourceTree = "<group>"; };
 		AA0000000000000000000016 /* HeroesDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesDetailsViewModel.swift; sourceTree = "<group>"; };
 		5025353425A7EA7300B03C4D /* UIViewController+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Alert.swift"; sourceTree = "<group>"; };
@@ -84,6 +90,8 @@
 		50C7BD0A25A785B6006A235D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50C7BD0F25A785B7006A235D /* MarvelChallengeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarvelChallengeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50C7BD1325A785B7006A235D /* MarvelChallengeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarvelChallengeTests.swift; sourceTree = "<group>"; };
+		AB0000000000000000000012 /* PresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationTests.swift; sourceTree = "<group>"; };
+		AD0000000000000000000012 /* FavoritesStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStoreTests.swift; sourceTree = "<group>"; };
 		50C7BD1525A785B7006A235D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50C7BD2225A79BD8006A235D /* HeroesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCollectionViewCell.swift; sourceTree = "<group>"; };
 		50C7BD2925A7AECF006A235D /* GridFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridFlowLayout.swift; sourceTree = "<group>"; };
@@ -119,6 +127,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0000000000000000000011 /* AppCoordinator.swift */,
+				FA0000000000000000000011 /* DebugAppDependencies.swift */,
 				50C7BCFC25A785B4006A235D /* AppDelegate.swift */,
 				50C7BCFE25A785B4006A235D /* SceneDelegate.swift */,
 			);
@@ -165,6 +174,7 @@
 		DD0000000000000000000005 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
+				AD0000000000000000000011 /* FavoritesPersistence.swift */,
 				AA0000000000000000000013 /* FavoritesStore.swift */,
 			);
 			path = Persistence;
@@ -330,7 +340,9 @@
 		50C7BD1225A785B7006A235D /* MarvelChallengeTests */ = {
 			isa = PBXGroup;
 			children = (
+				AD0000000000000000000012 /* FavoritesStoreTests.swift */,
 				50C7BD1325A785B7006A235D /* MarvelChallengeTests.swift */,
+				AB0000000000000000000012 /* PresentationTests.swift */,
 				50C7BD1525A785B7006A235D /* Info.plist */,
 			);
 			path = MarvelChallengeTests;
@@ -452,7 +464,9 @@
 				FF0000000000000000000002 /* HeroesDetailsView.swift in Sources */,
 				CC0000000000000000000002 /* Localizable.swift in Sources */,
 				AA0000000000000000000001 /* AppCoordinator.swift in Sources */,
+				FA0000000000000000000001 /* DebugAppDependencies.swift in Sources */,
 				AA0000000000000000000002 /* HeroService.swift in Sources */,
+				AD0000000000000000000001 /* FavoritesPersistence.swift in Sources */,
 				AA0000000000000000000003 /* FavoritesStore.swift in Sources */,
 				AA0000000000000000000005 /* HeroesCatalogViewModel.swift in Sources */,
 				AA0000000000000000000006 /* HeroesDetailsViewModel.swift in Sources */,
@@ -477,7 +491,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD0000000000000000000002 /* FavoritesStoreTests.swift in Sources */,
 				50C7BD1425A785B7006A235D /* MarvelChallengeTests.swift in Sources */,
+				AB0000000000000000000002 /* PresentationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

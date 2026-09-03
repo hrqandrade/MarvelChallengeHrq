@@ -2,8 +2,10 @@ import UIKit
 
 final class GridFlowLayout: UICollectionViewFlowLayout {
     private enum Metrics {
-        static let itemHeight: CGFloat = 190
-        static let spacing: CGFloat = 1
+        static let itemHeight: CGFloat = 220
+        static let spacing: CGFloat = 12
+        static let horizontalInset: CGFloat = 8
+        static let verticalInset: CGFloat = 12
         static let columns: CGFloat = 2
     }
 
@@ -29,6 +31,12 @@ final class GridFlowLayout: UICollectionViewFlowLayout {
     private func setupLayout() {
         minimumInteritemSpacing = Metrics.spacing
         minimumLineSpacing = Metrics.spacing
+        sectionInset = UIEdgeInsets(
+            top: Metrics.verticalInset,
+            left: Metrics.horizontalInset,
+            bottom: Metrics.verticalInset,
+            right: Metrics.horizontalInset
+        )
         scrollDirection = .vertical
     }
 }

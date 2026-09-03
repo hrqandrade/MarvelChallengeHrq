@@ -2,8 +2,10 @@ import UIKit
 
 final class ListFlowLayout: UICollectionViewFlowLayout {
     private enum Metrics {
-        static let itemHeight: CGFloat = 95
-        static let lineSpacing: CGFloat = 1
+        static let itemHeight: CGFloat = 104
+        static let lineSpacing: CGFloat = 8
+        static let horizontalInset: CGFloat = 8
+        static let verticalInset: CGFloat = 12
     }
 
     override init() {
@@ -26,6 +28,12 @@ final class ListFlowLayout: UICollectionViewFlowLayout {
     private func setupLayout() {
         minimumInteritemSpacing = 0
         minimumLineSpacing = Metrics.lineSpacing
+        sectionInset = UIEdgeInsets(
+            top: Metrics.verticalInset,
+            left: Metrics.horizontalInset,
+            bottom: Metrics.verticalInset,
+            right: Metrics.horizontalInset
+        )
         scrollDirection = .vertical
     }
 }
