@@ -5,7 +5,7 @@ import XCTest
 final class FavoritesStoreTests: XCTestCase {
     func testSavesAndRemovesCharacter() {
         let persistence = InMemoryFavoritesPersistence()
-        let store = FavoritesStore(persistence: persistence)
+        let store = makeSynchronousStore(persistence: persistence)
         let favorite = FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)
 
         assertSuccess { store.save(favorite, completion: $0) }
@@ -18,7 +18,7 @@ final class FavoritesStoreTests: XCTestCase {
 
     func testDifferentiatesMissingAndCorruptedData() {
         let persistence = InMemoryFavoritesPersistence()
-        let store = FavoritesStore(persistence: persistence)
+        let store = makeSynchronousStore(persistence: persistence)
 
         assertLoad(store, expectedError: .fileNotFound)
 
@@ -29,7 +29,7 @@ final class FavoritesStoreTests: XCTestCase {
     func testWritingFailureDoesNotChangeCache() {
         let persistence = InMemoryFavoritesPersistence()
         persistence.writeError = PersistenceError.expected
-        let store = FavoritesStore(persistence: persistence)
+        let store = makeSynchronousStore(persistence: persistence)
         let expectation = expectation(description: "writing failure")
 
         store.save(FavoriteCharacter(id: 1, name: "Spider-Man", imageURL: nil)) { result in
@@ -46,7 +46,7 @@ final class FavoritesStoreTests: XCTestCase {
 
     func testSerializesConcurrentMutationsAndWritesValidData() throws {
         let persistence = InMemoryFavoritesPersistence()
-        let store = FavoritesStore(persistence: persistence)
+        let store = makeSynchronousStore(persistence: persistence)
         let expectations = (0 ..< 20).map { expectation(description: "save \($0)") }
 
         for index in 0 ..< expectations.count {
@@ -74,7 +74,7 @@ final class FavoritesStoreTests: XCTestCase {
             FavoriteCharacter(id: 1, name: "Captain America", imageURL: nil),
         ]
         let persistence = try InMemoryFavoritesPersistence(data: JSONEncoder().encode(initialValues))
-        let store = FavoritesStore(persistence: persistence)
+        let store = makeSynchronousStore(persistence: persistence)
         let loadExpectation = expectation(description: "load sorted favorites")
 
         store.load { result in
@@ -153,6 +153,30 @@ final class FavoritesStoreTests: XCTestCase {
         FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
             .appendingPathComponent("favorites.json")
+    }
+
+    private func makeSynchronousStore(persistence: FavoritesPersistence) -> FavoritesStore {
+        FavoritesStore(
+            persistence: persistence,
+            ioScheduler: LockedImmediateScheduler(),
+            completionScheduler: ImmediateScheduler()
+        )
+    }
+}
+
+private struct ImmediateScheduler: FavoritesStoreScheduling {
+    func schedule(_ operation: @escaping () -> Void) {
+        operation()
+    }
+}
+
+private final class LockedImmediateScheduler: FavoritesStoreScheduling {
+    private let lock = NSLock()
+
+    func schedule(_ operation: @escaping () -> Void) {
+        lock.lock()
+        defer { lock.unlock() }
+        operation()
     }
 }
 

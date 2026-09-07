@@ -126,13 +126,13 @@ Esta fase ficou pronta com catálogo, favoritos e detalhes navegáveis usando da
 
 Esta fase ficou pronta com a navegação testável sem lifecycle artificial, regras de persistência executadas em memória e testes de integração dedicados ao arquivo real.
 
-### 11. Demonstração offline — planejada
+### 11. Demonstração offline — concluída
 
-- Substituir as imagens remotas do modo demo por assets locais com origem documentada.
+- Substituir as imagens remotas do modo demo por ilustrações locais geradas pelo próprio aplicativo.
 - Manter as URLs reais apenas no fluxo de integração com a API.
 - Garantir que catálogo, favoritos e detalhes possam ser avaliados sem conexão com a internet.
 
-Esta fase estará pronta quando toda a navegação de demonstração funcionar em modo avião sem placeholders inesperados.
+O modo demo agora usa monogramas visuais determinísticos, sem downloads ou arquivos de terceiros. A mesma solução funciona como fallback no fluxo real e mantém catálogo, favoritos e detalhes legíveis mesmo sem uma imagem disponível.
 
 ### 12. Estados de erro e feedback — planejada
 

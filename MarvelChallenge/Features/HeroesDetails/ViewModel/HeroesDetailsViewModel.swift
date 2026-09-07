@@ -14,6 +14,10 @@ final class HeroesDetailsViewModel {
         self.favorites = favorites
     }
 
+    var id: Int {
+        character.id
+    }
+
     var name: String {
         character.name
     }

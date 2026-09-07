@@ -26,14 +26,30 @@ enum FavoritesStoreError: Error, Equatable {
     case writing
 }
 
+protocol FavoritesStoreScheduling {
+    func schedule(_ operation: @escaping () -> Void)
+}
+
+private struct DispatchQueueFavoritesScheduler: FavoritesStoreScheduling {
+    let queue: DispatchQueue
+
+    func schedule(_ operation: @escaping () -> Void) {
+        queue.async(execute: operation)
+    }
+}
+
 final class FavoritesStore: FavoritesStoring {
     private let persistence: FavoritesPersistence
-    private let ioQueue: DispatchQueue
+    private let ioScheduler: FavoritesStoreScheduling
+    private let completionScheduler: FavoritesStoreScheduling
     private let cacheLock = NSLock()
     private var favoritesByID: [Int: FavoriteCharacter] = [:]
 
     init(fileManager: FileManager = .default) {
-        ioQueue = DispatchQueue(label: "com.marvelchallenge.favorites.io", qos: .utility)
+        ioScheduler = DispatchQueueFavoritesScheduler(
+            queue: DispatchQueue(label: "com.marvelchallenge.favorites.io", qos: .utility)
+        )
+        completionScheduler = DispatchQueueFavoritesScheduler(queue: .main)
         let directory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         persistence = FileFavoritesPersistence(
             fileURL: directory.appendingPathComponent("favorites.json"),
@@ -47,7 +63,8 @@ final class FavoritesStore: FavoritesStoring {
         ioQueue: DispatchQueue = DispatchQueue(label: "com.marvelchallenge.favorites.io", qos: .utility)
     ) {
         persistence = FileFavoritesPersistence(fileURL: fileURL, fileManager: fileManager)
-        self.ioQueue = ioQueue
+        ioScheduler = DispatchQueueFavoritesScheduler(queue: ioQueue)
+        completionScheduler = DispatchQueueFavoritesScheduler(queue: .main)
     }
 
     init(
@@ -55,7 +72,18 @@ final class FavoritesStore: FavoritesStoring {
         ioQueue: DispatchQueue = DispatchQueue(label: "com.marvelchallenge.favorites.io", qos: .utility)
     ) {
         self.persistence = persistence
-        self.ioQueue = ioQueue
+        ioScheduler = DispatchQueueFavoritesScheduler(queue: ioQueue)
+        completionScheduler = DispatchQueueFavoritesScheduler(queue: .main)
+    }
+
+    init(
+        persistence: FavoritesPersistence,
+        ioScheduler: FavoritesStoreScheduling,
+        completionScheduler: FavoritesStoreScheduling
+    ) {
+        self.persistence = persistence
+        self.ioScheduler = ioScheduler
+        self.completionScheduler = completionScheduler
     }
 
     func all() -> [FavoriteCharacter] {
@@ -71,7 +99,7 @@ final class FavoritesStore: FavoritesStoring {
     }
 
     func load(completion: @escaping (Result<[FavoriteCharacter], FavoritesStoreError>) -> Void) {
-        ioQueue.async { [self] in
+        ioScheduler.schedule { [self] in
             do {
                 guard let data = try persistence.read() else {
                     replaceCache(with: [])
@@ -89,7 +117,7 @@ final class FavoritesStore: FavoritesStoring {
     }
 
     func save(_ character: FavoriteCharacter, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void) {
-        ioQueue.async { [self] in
+        ioScheduler.schedule { [self] in
             var updated = cachedFavorites()
             updated[character.id] = character
             deliver(persist(updated), to: completion)
@@ -97,7 +125,7 @@ final class FavoritesStore: FavoritesStoring {
     }
 
     func remove(id: Int, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void) {
-        ioQueue.async { [self] in
+        ioScheduler.schedule { [self] in
             var updated = cachedFavorites()
             updated[id] = nil
             deliver(persist(updated), to: completion)
@@ -140,7 +168,7 @@ final class FavoritesStore: FavoritesStoring {
         _ result: Result<Success, FavoritesStoreError>,
         to completion: @escaping (Result<Success, FavoritesStoreError>) -> Void
     ) {
-        DispatchQueue.main.async { completion(result) }
+        completionScheduler.schedule { completion(result) }
     }
 }
 
