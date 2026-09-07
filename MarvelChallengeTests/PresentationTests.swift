@@ -18,6 +18,24 @@ final class PresentationTests: XCTestCase {
         )
     }
 
+    func testCatalogErrorStateKeepsFailureInTheScreen() {
+        let view = HeroesCatalogView()
+
+        view.renderError(message: Localizable.Error.transport)
+
+        XCTAssertTrue(view.collectionView.backgroundView is MarvelErrorStateView)
+        XCTAssertEqual(view.collectionView.backgroundView?.accessibilityLabel, Localizable.Error.transport)
+    }
+
+    func testFeedbackBannerExposesItsCurrentMessage() {
+        let banner = MarvelFeedbackBanner()
+
+        banner.show(message: Localizable.Catalog.favoriteAdded, isError: false)
+
+        XCTAssertFalse(banner.isHidden)
+        XCTAssertEqual(banner.accessibilityLabel, Localizable.Catalog.favoriteAdded)
+    }
+
     func testDemoDescriptionsUseLocalizedCopy() {
         XCTAssertEqual(DebugSampleData.characters.first?.description, Localizable.Demo.spiderManDescription)
     }

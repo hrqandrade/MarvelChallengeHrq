@@ -134,14 +134,14 @@ Esta fase ficou pronta com a navegação testável sem lifecycle artificial, reg
 
 O modo demo agora usa monogramas visuais determinísticos, sem downloads ou arquivos de terceiros. A mesma solução funciona como fallback no fluxo real e mantém catálogo, favoritos e detalhes legíveis mesmo sem uma imagem disponível.
 
-### 12. Estados de erro e feedback — planejada
+### 12. Estados de erro e feedback — concluída
 
 - Apresentar falhas de catálogo no contexto da tela, com opção de tentar novamente.
 - Preservar o conteúdo existente quando refresh, paginação ou favoritos falharem.
 - Diferenciar loading inicial, atualização e carregamento da próxima página visualmente.
 - Dar retorno claro ao adicionar ou remover um favorito.
 
-Esta fase estará pronta quando cada operação assíncrona tiver estados de carregamento, sucesso e falha perceptíveis sem interromper a navegação desnecessariamente.
+Falhas na primeira carga agora ficam na própria tela com uma ação de nova tentativa. Atualização, paginação e favoritos preservam o conteúdo existente e usam feedback transitório; os indicadores de carregamento deixam claro qual operação está em andamento sem bloquear a navegação.
 
 ### 13. Acessibilidade e adaptação de layout — planejada
 

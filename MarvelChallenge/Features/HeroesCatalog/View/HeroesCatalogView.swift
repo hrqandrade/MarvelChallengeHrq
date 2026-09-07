@@ -7,10 +7,13 @@ final class HeroesCatalogView: UIView {
     private let headerView = MarvelScreenHeaderView(title: Localizable.Catalog.characters)
     private let footerView = UIView()
     private let refreshControl = UIRefreshControl()
+    private let paginationIndicator = UIActivityIndicatorView(style: .medium)
+    private let feedbackBanner = MarvelFeedbackBanner()
 
     var onRefresh: (() -> Void)?
     var onLayoutChange: (() -> Void)?
     var onSectionChange: ((HeroesCatalogSection) -> Void)?
+    var onRetry: (() -> Void)?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -39,12 +42,26 @@ final class HeroesCatalogView: UIView {
 
     func renderLoaded() {
         refreshControl.endRefreshing()
+        paginationIndicator.stopAnimating()
         collectionView.backgroundView = nil
         collectionView.reloadData()
     }
 
+    func renderRefreshing() {
+        paginationIndicator.stopAnimating()
+        if !refreshControl.isRefreshing {
+            refreshControl.beginRefreshing()
+        }
+    }
+
+    func renderLoadingNextPage() {
+        refreshControl.endRefreshing()
+        paginationIndicator.startAnimating()
+    }
+
     func renderEmpty(section: HeroesCatalogSection) {
         refreshControl.endRefreshing()
+        paginationIndicator.stopAnimating()
         collectionView.reloadData()
         let imageName = section == .characters ? "emptyList" : "emptyFavorite"
         let title = section == .characters
@@ -61,11 +78,21 @@ final class HeroesCatalogView: UIView {
     }
 
     func renderLoading() {
+        paginationIndicator.stopAnimating()
         collectionView.backgroundView = MarvelLoadingView()
     }
 
-    func endRefreshing() {
+    func renderError(message: String) {
         refreshControl.endRefreshing()
+        paginationIndicator.stopAnimating()
+        collectionView.reloadData()
+        let errorView = MarvelErrorStateView(message: message)
+        errorView.onRetry = { [weak self] in self?.onRetry?() }
+        collectionView.backgroundView = errorView
+    }
+
+    func showFeedback(message: String, isError: Bool) {
+        feedbackBanner.show(message: message, isError: isError)
     }
 
     private func configureView() {
@@ -92,6 +119,7 @@ final class HeroesCatalogView: UIView {
         )
         refreshControl.addTarget(self, action: #selector(didRefresh), for: .valueChanged)
         collectionView.refreshControl = refreshControl
+        paginationIndicator.hidesWhenStopped = true
     }
 
     private func configureFooter() {
@@ -111,13 +139,15 @@ final class HeroesCatalogView: UIView {
     }
 
     private func configureHierarchy() {
-        for item in [headerView, collectionView, footerView, segmentedControl] {
+        for item in [headerView, collectionView, footerView, segmentedControl, paginationIndicator, feedbackBanner] {
             item.translatesAutoresizingMaskIntoConstraints = false
         }
         addSubview(headerView)
         addSubview(collectionView)
         addSubview(footerView)
         footerView.addSubview(segmentedControl)
+        addSubview(paginationIndicator)
+        addSubview(feedbackBanner)
     }
 
     private func configureConstraints() {
@@ -148,6 +178,14 @@ final class HeroesCatalogView: UIView {
                 lessThanOrEqualTo: footerView.trailingAnchor,
                 constant: -DesignSystem.Spacing.large
             ),
+            paginationIndicator.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
+            paginationIndicator.bottomAnchor.constraint(
+                equalTo: collectionView.bottomAnchor,
+                constant: -DesignSystem.Spacing.small
+            ),
+            feedbackBanner.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: DesignSystem.Spacing.small),
+            feedbackBanner.leadingAnchor.constraint(equalTo: leadingAnchor, constant: DesignSystem.Spacing.medium),
+            feedbackBanner.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
         ])
     }
 

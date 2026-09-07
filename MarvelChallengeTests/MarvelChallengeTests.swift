@@ -42,7 +42,7 @@ final class MarvelChallengeTests: XCTestCase {
 
         XCTAssertTrue(initialToken.isCancelled)
         XCTAssertEqual(service.requests.map(\.page), [0, 0])
-        XCTAssertEqual(states, [.initialLoading, .refreshing])
+        XCTAssertEqual(states, [.initialLoading, .initialLoading])
 
         try service.completeRequest(at: 0, with: .success(HeroesPage(
             characters: [makeCharacter(id: 1, name: "Old")],
@@ -139,7 +139,7 @@ final class MarvelChallengeTests: XCTestCase {
         service.completeRequest(at: 0, with: .failure(.transport))
         viewModel.reload()
 
-        XCTAssertEqual(states, [.initialLoading, .failed(Localizable.Error.transport), .refreshing])
+        XCTAssertEqual(states, [.initialLoading, .failed(Localizable.Error.transport), .initialLoading])
         XCTAssertEqual(service.requests.map(\.page), [0, 0])
     }
 
@@ -185,14 +185,64 @@ final class MarvelChallengeTests: XCTestCase {
             favorites: FailingFavoritesStoreStub()
         )
         let expectation = expectation(description: "favorite writing failure")
-        viewModel.onStateChange = { state in
-            guard state == .failed(Localizable.Error.favoritesWriting) else { return }
+        viewModel.onFeedback = { feedback in
+            guard feedback == .error(Localizable.Error.favoritesWriting) else { return }
             expectation.fulfill()
         }
 
         try viewModel.toggleFavorite(makeCharacter())
 
         wait(for: [expectation], timeout: 1)
+    }
+
+    func testPaginationFailurePreservesCharactersAndPublishesFeedback() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        var states: [HeroesCatalogState] = []
+        var feedback: [HeroesCatalogFeedback] = []
+        viewModel.onStateChange = { states.append($0) }
+        viewModel.onFeedback = { feedback.append($0) }
+
+        viewModel.loadInitial()
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
+            offset: 0,
+            total: 2
+        )))
+        viewModel.loadNextPageIfNeeded(index: 0)
+        try service.completeRequest(at: 1, with: .failure(.transport))
+
+        XCTAssertEqual(viewModel.characters.count, 1)
+        XCTAssertEqual(states.suffix(2), [.loadingNextPage, .loaded])
+        XCTAssertEqual(feedback, [.error(Localizable.Error.transport)])
+    }
+
+    func testRefreshFailurePreservesCharactersAndPublishesFeedback() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        var states: [HeroesCatalogState] = []
+        var feedback: [HeroesCatalogFeedback] = []
+        viewModel.onStateChange = { states.append($0) }
+        viewModel.onFeedback = { feedback.append($0) }
+
+        viewModel.loadInitial()
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
+            offset: 0,
+            total: 1
+        )))
+        viewModel.reload()
+        try service.completeRequest(at: 1, with: .failure(.transport))
+
+        XCTAssertEqual(viewModel.characters.count, 1)
+        XCTAssertEqual(states.suffix(2), [.refreshing, .loaded])
+        XCTAssertEqual(feedback, [.error(Localizable.Error.transport)])
     }
 
     func testGridLayoutCalculatesTwoColumnsWithoutRecursion() {

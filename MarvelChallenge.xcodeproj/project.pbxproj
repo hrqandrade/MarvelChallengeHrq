@@ -19,7 +19,6 @@
 		AA0000000000000000000005 /* HeroesCatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000015 /* HeroesCatalogViewModel.swift */; };
 		AA0000000000000000000006 /* HeroesDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000016 /* HeroesDetailsViewModel.swift */; };
 		5025353325A7C60A00B03C4D /* ListFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5025353225A7C60A00B03C4D /* ListFlowLayout.swift */; };
-		5025353525A7EA7300B03C4D /* UIViewController+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5025353425A7EA7300B03C4D /* UIViewController+Alert.swift */; };
 		50733D2325AA7A2A00EAC4FF /* HeroesCollectionListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50733D2225AA7A2A00EAC4FF /* HeroesCollectionListCell.swift */; };
 		509EEC5B25AC90470057441B /* HeroesCatalogViewControllerDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509EEC5A25AC90470057441B /* HeroesCatalogViewControllerDataSource.swift */; };
 		509EEC7A25AC92460057441B /* CharacterDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509EEC7925AC92460057441B /* CharacterDTO.swift */; };
@@ -75,7 +74,6 @@
 		AD0000000000000000000011 /* FavoritesPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesPersistence.swift; sourceTree = "<group>"; };
 		AA0000000000000000000015 /* HeroesCatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCatalogViewModel.swift; sourceTree = "<group>"; };
 		AA0000000000000000000016 /* HeroesDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesDetailsViewModel.swift; sourceTree = "<group>"; };
-		5025353425A7EA7300B03C4D /* UIViewController+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Alert.swift"; sourceTree = "<group>"; };
 		50733D2225AA7A2A00EAC4FF /* HeroesCollectionListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroesCollectionListCell.swift; sourceTree = "<group>"; };
 		509EEC5A25AC90470057441B /* HeroesCatalogViewControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeroesCatalogViewControllerDataSource.swift; sourceTree = "<group>"; };
 		509EEC7925AC92460057441B /* CharacterDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDTO.swift; sourceTree = "<group>"; };
@@ -194,7 +192,6 @@
 		DD0000000000000000000007 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				5025353425A7EA7300B03C4D /* UIViewController+Alert.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -480,7 +477,6 @@
 				5025353325A7C60A00B03C4D /* ListFlowLayout.swift in Sources */,
 				50C7BCFD25A785B4006A235D /* AppDelegate.swift in Sources */,
 				50733D2325AA7A2A00EAC4FF /* HeroesCollectionListCell.swift in Sources */,
-				5025353525A7EA7300B03C4D /* UIViewController+Alert.swift in Sources */,
 				50C7BD2A25A7AECF006A235D /* GridFlowLayout.swift in Sources */,
 				50C7BD2425A79BD8006A235D /* HeroesCollectionViewCell.swift in Sources */,
 				50BFB00E25ACA7BB009F34FA /* HeroesDetailsViewController.swift in Sources */,
