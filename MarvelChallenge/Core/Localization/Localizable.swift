@@ -21,6 +21,14 @@ enum Localizable {
         static let comics = text("details.comics")
         static let series = text("details.series")
         static let removeFavorite = text("details.removeFavorite")
+
+        static func addFavorite(characterName: String) -> String {
+            String(format: text("details.addFavorite.character"), characterName)
+        }
+
+        static func removeFavorite(characterName: String) -> String {
+            String(format: text("details.removeFavorite.character"), characterName)
+        }
     }
 
     enum Loading {

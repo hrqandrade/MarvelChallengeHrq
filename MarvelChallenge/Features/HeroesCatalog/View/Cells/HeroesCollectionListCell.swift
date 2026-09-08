@@ -75,6 +75,7 @@ final class HeroesCollectionListCell: UICollectionViewCell {
         heroImageView.backgroundColor = DesignSystem.Color.backgroundPrimary
         heroImageView.layer.cornerRadius = DesignSystem.Radius.small
         heroImageView.clipsToBounds = true
+        heroImageView.isAccessibilityElement = false
     }
 
     private func configureNameLabel() {
@@ -127,8 +128,9 @@ final class HeroesCollectionListCell: UICollectionViewCell {
         nameLabel.text = name
         heroImageView.setImage(from: imageURL, placeholder: HeroArtworkFactory.image(id: id, name: name))
         favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
-        favoriteButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable.Details
-            .addFavorite
+        favoriteButton.accessibilityLabel = isFavorite
+            ? Localizable.Details.removeFavorite(characterName: name)
+            : Localizable.Details.addFavorite(characterName: name)
         self.onFavorite = onFavorite
     }
 

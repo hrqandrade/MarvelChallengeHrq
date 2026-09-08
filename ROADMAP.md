@@ -143,7 +143,7 @@ O modo demo agora usa monogramas visuais determinísticos, sem downloads ou arqu
 
 Falhas na primeira carga agora ficam na própria tela com uma ação de nova tentativa. Atualização, paginação e favoritos preservam o conteúdo existente e usam feedback transitório; os indicadores de carregamento deixam claro qual operação está em andamento sem bloquear a navegação.
 
-### 13. Acessibilidade e adaptação de layout — planejada
+### 13. Acessibilidade e adaptação de layout — em validação
 
 - Validar VoiceOver, ordem de leitura, traits e estado dos controles.
 - Revisar contraste, Bold Text, Reduce Motion e os maiores tamanhos de Dynamic Type.
@@ -151,6 +151,8 @@ Falhas na primeira carga agora ficam na própria tela com uma ação de nova ten
 - Definir e validar as orientações realmente suportadas no iPhone e no iPad.
 
 Esta fase estará pronta depois de uma passagem manual documentada pelas configurações de acessibilidade e tamanhos de tela suportados.
+
+A base já reage aos tamanhos de texto de acessibilidade, mantém ações separadas na ordem do VoiceOver e respeita Reduce Motion nos feedbacks. Os controles de favorito agora incluem o nome do personagem, e o iPhone declara apenas a orientação retrato; o iPad continua adaptável nas quatro orientações. Falta concluir a passagem manual de VoiceOver, Bold Text e contraste antes de encerrar a fase.
 
 ### 14. Testes dos fluxos principais — planejada
 

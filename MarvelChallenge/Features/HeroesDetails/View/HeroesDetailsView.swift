@@ -23,6 +23,12 @@ final class HeroesDetailsView: UIView {
     private let comicLabel = UILabel()
     private let seriesLabel = UILabel()
     private let feedbackBanner = MarvelFeedbackBanner()
+    private lazy var comicHeightConstraint = comicCollectionView.heightAnchor.constraint(
+        equalToConstant: MarvelComponentSize.detailsCarouselHeight
+    )
+    private lazy var seriesHeightConstraint = seriesCollectionView.heightAnchor.constraint(
+        equalToConstant: MarvelComponentSize.detailsCarouselHeight
+    )
 
     var onClose: (() -> Void)?
     var onFavorite: (() -> Void)?
@@ -39,6 +45,16 @@ final class HeroesDetailsView: UIView {
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         nil
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory
+        else { return }
+        comicHeightConstraint.constant = MarvelComponentSize.detailsCarouselHeight
+        seriesHeightConstraint.constant = MarvelComponentSize.detailsCarouselHeight
+        comicCollectionView.collectionViewLayout.invalidateLayout()
+        seriesCollectionView.collectionViewLayout.invalidateLayout()
     }
 
     func render(_ state: State) {
@@ -116,7 +132,7 @@ final class HeroesDetailsView: UIView {
             headerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.navigationBarHeight),
+            headerView.heightAnchor.constraint(greaterThanOrEqualToConstant: MarvelComponentSize.navigationBarHeight),
             scrollView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -138,8 +154,8 @@ final class HeroesDetailsView: UIView {
                 constant: -DesignSystem.Spacing.large
             ),
             heroImageView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.heroImageHeight),
-            comicCollectionView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.detailsCarouselHeight),
-            seriesCollectionView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.detailsCarouselHeight),
+            comicHeightConstraint,
+            seriesHeightConstraint,
             feedbackBanner.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: DesignSystem.Spacing.small),
             feedbackBanner.leadingAnchor.constraint(equalTo: leadingAnchor, constant: DesignSystem.Spacing.medium),
             feedbackBanner.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),

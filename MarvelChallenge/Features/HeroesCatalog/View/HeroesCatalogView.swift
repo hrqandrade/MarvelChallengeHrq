@@ -9,6 +9,9 @@ final class HeroesCatalogView: UIView {
     private let refreshControl = UIRefreshControl()
     private let paginationIndicator = UIActivityIndicatorView(style: .medium)
     private let feedbackBanner = MarvelFeedbackBanner()
+    private lazy var segmentedHeightConstraint = segmentedControl.heightAnchor.constraint(
+        equalToConstant: MarvelComponentSize.segmentedControlHeight
+    )
 
     var onRefresh: (() -> Void)?
     var onLayoutChange: (() -> Void)?
@@ -30,6 +33,15 @@ final class HeroesCatalogView: UIView {
         nil
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory
+        else { return }
+        configureSegmentedControlTypography()
+        segmentedHeightConstraint.constant = MarvelComponentSize.segmentedControlHeight
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+
     func renderLayout(isGrid: Bool, animated: Bool) {
         let imageName = isGrid ? "list.bullet" : "square.grid.2x2"
         let image = UIImage(systemName: imageName)?.withConfiguration(
@@ -37,7 +49,14 @@ final class HeroesCatalogView: UIView {
         )
         headerView.leadingButton.setImage(image, for: .normal)
         let layout: UICollectionViewLayout = isGrid ? GridFlowLayout() : ListFlowLayout()
-        collectionView.setCollectionViewLayout(layout, animated: animated)
+        collectionView.setCollectionViewLayout(
+            layout,
+            animated: animated && !UIAccessibility.isReduceMotionEnabled
+        )
+    }
+
+    func renderLayoutControl(isHidden: Bool) {
+        headerView.leadingButton.isHidden = isHidden
     }
 
     func renderLoaded() {
@@ -126,15 +145,8 @@ final class HeroesCatalogView: UIView {
         footerView.backgroundColor = DesignSystem.Color.surface
         segmentedControl.selectedSegmentIndex = 0
         segmentedControl.backgroundColor = DesignSystem.Color.accent.withAlphaComponent(0.12)
-        segmentedControl.selectedSegmentTintColor = DesignSystem.Color.accent
-        segmentedControl.setTitleTextAttributes(
-            [.foregroundColor: DesignSystem.Color.textPrimary],
-            for: .normal
-        )
-        segmentedControl.setTitleTextAttributes(
-            [.foregroundColor: DesignSystem.Color.onAccent],
-            for: .selected
-        )
+        segmentedControl.selectedSegmentTintColor = DesignSystem.Color.surface
+        configureSegmentedControlTypography()
         segmentedControl.addTarget(self, action: #selector(didChangeSection), for: .valueChanged)
     }
 
@@ -155,7 +167,7 @@ final class HeroesCatalogView: UIView {
             headerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.navigationBarHeight),
+            headerView.heightAnchor.constraint(greaterThanOrEqualToConstant: MarvelComponentSize.navigationBarHeight),
             collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -169,7 +181,7 @@ final class HeroesCatalogView: UIView {
             footerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             segmentedControl.centerXAnchor.constraint(equalTo: footerView.centerXAnchor),
             segmentedControl.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -36),
-            segmentedControl.heightAnchor.constraint(equalToConstant: MarvelComponentSize.segmentedControlHeight),
+            segmentedHeightConstraint,
             segmentedControl.leadingAnchor.constraint(
                 greaterThanOrEqualTo: footerView.leadingAnchor,
                 constant: DesignSystem.Spacing.large
@@ -187,6 +199,15 @@ final class HeroesCatalogView: UIView {
             feedbackBanner.leadingAnchor.constraint(equalTo: leadingAnchor, constant: DesignSystem.Spacing.medium),
             feedbackBanner.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
         ])
+    }
+
+    private func configureSegmentedControlTypography() {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: MarvelTypography.segmentedControlTitle,
+            .foregroundColor: DesignSystem.Color.textPrimary,
+        ]
+        segmentedControl.setTitleTextAttributes(attributes, for: .normal)
+        segmentedControl.setTitleTextAttributes(attributes, for: .selected)
     }
 
     @objc private func didRefresh() {

@@ -23,8 +23,12 @@ final class PresentationTests: XCTestCase {
 
         view.renderError(message: Localizable.Error.transport)
 
-        XCTAssertTrue(view.collectionView.backgroundView is MarvelErrorStateView)
-        XCTAssertEqual(view.collectionView.backgroundView?.accessibilityLabel, Localizable.Error.transport)
+        let errorView = view.collectionView.backgroundView as? MarvelErrorStateView
+        let elements = errorView?.accessibilityElements as? [UIView]
+        XCTAssertNotNil(errorView)
+        XCTAssertFalse(errorView?.isAccessibilityElement ?? true)
+        XCTAssertEqual(elements?.first?.accessibilityLabel, Localizable.Error.transport)
+        XCTAssertEqual((elements?.last as? UIButton)?.currentTitle, Localizable.Catalog.retry)
     }
 
     func testFeedbackBannerExposesItsCurrentMessage() {
@@ -33,7 +37,40 @@ final class PresentationTests: XCTestCase {
         banner.show(message: Localizable.Catalog.favoriteAdded, isError: false)
 
         XCTAssertFalse(banner.isHidden)
+        XCTAssertTrue(banner.isAccessibilityElement)
         XCTAssertEqual(banner.accessibilityLabel, Localizable.Catalog.favoriteAdded)
+    }
+
+    func testLoadingViewIsExposedAsAStatusUpdate() {
+        let loadingView = MarvelLoadingView()
+
+        XCTAssertTrue(loadingView.isAccessibilityElement)
+        XCTAssertEqual(loadingView.accessibilityLabel, Localizable.Loading.title)
+        XCTAssertTrue(loadingView.accessibilityTraits.contains(.updatesFrequently))
+    }
+
+    func testAccessibilityContentSizeUsesListLayout() {
+        let viewModel = HeroesCatalogViewModel(
+            service: DebugHeroService(),
+            favorites: DebugFavoritesStore()
+        )
+        let controller = HeroesCatalogViewController(viewModel: viewModel)
+        let parent = UIViewController()
+        parent.addChild(controller)
+        parent.setOverrideTraitCollection(
+            UITraitCollection(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge),
+            forChild: controller
+        )
+
+        controller.loadViewIfNeeded()
+
+        XCTAssertFalse(controller.isGridLayout)
+        XCTAssertTrue(controller.heroesCollectionView.collectionViewLayout is ListFlowLayout)
+    }
+
+    func testFavoriteAccessibilityLabelsIncludeCharacterName() {
+        XCTAssertTrue(Localizable.Details.addFavorite(characterName: "Storm").contains("Storm"))
+        XCTAssertTrue(Localizable.Details.removeFavorite(characterName: "Storm").contains("Storm"))
     }
 
     func testDemoDescriptionsUseLocalizedCopy() {
