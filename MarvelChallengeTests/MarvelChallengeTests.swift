@@ -42,7 +42,7 @@ final class MarvelChallengeTests: XCTestCase {
 
         XCTAssertTrue(initialToken.isCancelled)
         XCTAssertEqual(service.requests.map(\.page), [0, 0])
-        XCTAssertEqual(states, [.initialLoading, .refreshing])
+        XCTAssertEqual(states, [.initialLoading, .initialLoading])
 
         try service.completeRequest(at: 0, with: .success(HeroesPage(
             characters: [makeCharacter(id: 1, name: "Old")],
@@ -139,7 +139,7 @@ final class MarvelChallengeTests: XCTestCase {
         service.completeRequest(at: 0, with: .failure(.transport))
         viewModel.reload()
 
-        XCTAssertEqual(states, [.initialLoading, .failed(Localizable.Error.transport), .refreshing])
+        XCTAssertEqual(states, [.initialLoading, .failed(Localizable.Error.transport), .initialLoading])
         XCTAssertEqual(service.requests.map(\.page), [0, 0])
     }
 
@@ -185,14 +185,64 @@ final class MarvelChallengeTests: XCTestCase {
             favorites: FailingFavoritesStoreStub()
         )
         let expectation = expectation(description: "favorite writing failure")
-        viewModel.onStateChange = { state in
-            guard state == .failed(Localizable.Error.favoritesWriting) else { return }
+        viewModel.onFeedback = { feedback in
+            guard feedback == .error(Localizable.Error.favoritesWriting) else { return }
             expectation.fulfill()
         }
 
         try viewModel.toggleFavorite(makeCharacter())
 
         wait(for: [expectation], timeout: 1)
+    }
+
+    func testPaginationFailurePreservesCharactersAndPublishesFeedback() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        var states: [HeroesCatalogState] = []
+        var feedback: [HeroesCatalogFeedback] = []
+        viewModel.onStateChange = { states.append($0) }
+        viewModel.onFeedback = { feedback.append($0) }
+
+        viewModel.loadInitial()
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
+            offset: 0,
+            total: 2
+        )))
+        viewModel.loadNextPageIfNeeded(index: 0)
+        try service.completeRequest(at: 1, with: .failure(.transport))
+
+        XCTAssertEqual(viewModel.characters.count, 1)
+        XCTAssertEqual(states.suffix(2), [.loadingNextPage, .loaded])
+        XCTAssertEqual(feedback, [.error(Localizable.Error.transport)])
+    }
+
+    func testRefreshFailurePreservesCharactersAndPublishesFeedback() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        var states: [HeroesCatalogState] = []
+        var feedback: [HeroesCatalogFeedback] = []
+        viewModel.onStateChange = { states.append($0) }
+        viewModel.onFeedback = { feedback.append($0) }
+
+        viewModel.loadInitial()
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
+            offset: 0,
+            total: 1
+        )))
+        viewModel.reload()
+        try service.completeRequest(at: 1, with: .failure(.transport))
+
+        XCTAssertEqual(viewModel.characters.count, 1)
+        XCTAssertEqual(states.suffix(2), [.refreshing, .loaded])
+        XCTAssertEqual(feedback, [.error(Localizable.Error.transport)])
     }
 
     func testGridLayoutCalculatesTwoColumnsWithoutRecursion() {
@@ -415,16 +465,20 @@ final class MarvelChallengeTests: XCTestCase {
         )
     }
 
-    func testHeroServiceMapsTransportFailure() {
-        let service = makeHeroService { _ in throw URLError(.notConnectedToInternet) }
-        let expectation = expectation(description: "transport failure")
+    func testHeroServiceMapsTransportFailure() throws {
+        let client = HTTPClientStub(error: URLError(.notConnectedToInternet))
+        let service = try HeroService(
+            httpClient: client,
+            baseURL: XCTUnwrap(URL(string: "https://example.com")),
+            publicKey: "public",
+            privateKey: "private"
+        )
+        var receivedResult: Result<HeroesPage, HeroServiceError>?
 
-        service.fetchHeroes(page: 0) { result in
-            XCTAssertEqual(result.failure, .transport)
-            expectation.fulfill()
-        }
+        service.fetchHeroes(page: 0) { receivedResult = $0 }
 
-        wait(for: [expectation], timeout: 1)
+        XCTAssertEqual(receivedResult?.failure, .transport)
+        XCTAssertEqual(client.requestCount, 1)
     }
 
     func testHeroServiceCancelsUnderlyingRequest() throws {
@@ -542,6 +596,28 @@ private final class URLProtocolStub: URLProtocol {
     override func stopLoading() {
         Self.onStopLoading?()
     }
+}
+
+private final class HTTPClientStub: HTTPClient {
+    private let error: Error
+    private(set) var requestCount = 0
+
+    init(error: Error) {
+        self.error = error
+    }
+
+    func dataTask(
+        with _: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> RequestCancellable {
+        requestCount += 1
+        completion(nil, nil, error)
+        return RequestCancellableStub()
+    }
+}
+
+private final class RequestCancellableStub: RequestCancellable {
+    func cancel() {}
 }
 
 private final class ClosureOwner {

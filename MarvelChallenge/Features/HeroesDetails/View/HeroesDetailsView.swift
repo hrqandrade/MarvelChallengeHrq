@@ -22,6 +22,7 @@ final class HeroesDetailsView: UIView {
     private let descriptionLabel = UILabel()
     private let comicLabel = UILabel()
     private let seriesLabel = UILabel()
+    private let feedbackBanner = MarvelFeedbackBanner()
 
     var onClose: (() -> Void)?
     var onFavorite: (() -> Void)?
@@ -64,6 +65,10 @@ final class HeroesDetailsView: UIView {
         headerView.trailingButton.isEnabled = isEnabled
     }
 
+    func showFeedback(message: String, isError: Bool) {
+        feedbackBanner.show(message: message, isError: isError)
+    }
+
     private func configureView() {
         backgroundColor = DesignSystem.Color.accent
         scrollView.backgroundColor = DesignSystem.Color.backgroundPrimary
@@ -98,10 +103,12 @@ final class HeroesDetailsView: UIView {
     }
 
     private func configureHierarchy() {
-        [headerView, scrollView, contentStack].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        [headerView, scrollView, contentStack, feedbackBanner]
+            .forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         addSubview(headerView)
         addSubview(scrollView)
         scrollView.addSubview(contentStack)
+        addSubview(feedbackBanner)
     }
 
     private func configureConstraints() {
@@ -133,6 +140,9 @@ final class HeroesDetailsView: UIView {
             heroImageView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.heroImageHeight),
             comicCollectionView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.detailsCarouselHeight),
             seriesCollectionView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.detailsCarouselHeight),
+            feedbackBanner.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: DesignSystem.Spacing.small),
+            feedbackBanner.leadingAnchor.constraint(equalTo: leadingAnchor, constant: DesignSystem.Spacing.medium),
+            feedbackBanner.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
         ])
     }
 

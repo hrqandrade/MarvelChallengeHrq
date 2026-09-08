@@ -169,3 +169,130 @@ final class MarvelLoadingView: UIView {
         return label
     }
 }
+
+final class MarvelErrorStateView: UIView {
+    private let retryButton = UIButton(type: .system)
+    var onRetry: (() -> Void)?
+
+    init(message: String) {
+        super.init(frame: .zero)
+
+        let iconView = UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill"))
+        iconView.contentMode = .scaleAspectFit
+        iconView.tintColor = DesignSystem.Color.accent
+
+        let messageLabel = UILabel()
+        messageLabel.font = DesignSystem.Typography.body
+        messageLabel.adjustsFontForContentSizeCategory = true
+        messageLabel.textColor = DesignSystem.Color.textSecondary
+        messageLabel.textAlignment = .center
+        messageLabel.numberOfLines = 0
+        messageLabel.text = message
+
+        retryButton.setTitle(Localizable.Catalog.retry, for: .normal)
+        retryButton.titleLabel?.font = DesignSystem.Typography.headline
+        retryButton.tintColor = DesignSystem.Color.accent
+        retryButton.addTarget(self, action: #selector(didTapRetry), for: .touchUpInside)
+
+        let stack = UIStackView(arrangedSubviews: [iconView, messageLabel, retryButton])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.alignment = .center
+        stack.spacing = DesignSystem.Spacing.medium
+        addSubview(stack)
+
+        NSLayoutConstraint.activate([
+            iconView.widthAnchor.constraint(equalToConstant: MarvelComponentSize.minimumTouchTarget),
+            iconView.heightAnchor.constraint(equalTo: iconView.widthAnchor),
+            retryButton.heightAnchor.constraint(greaterThanOrEqualToConstant: MarvelComponentSize.minimumTouchTarget),
+            stack.centerXAnchor.constraint(equalTo: centerXAnchor),
+            stack.centerYAnchor.constraint(equalTo: centerYAnchor),
+            stack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: DesignSystem.Spacing.large),
+            stack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -DesignSystem.Spacing.large),
+        ])
+
+        isAccessibilityElement = true
+        accessibilityLabel = message
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        nil
+    }
+
+    @objc private func didTapRetry() {
+        onRetry?()
+    }
+}
+
+final class MarvelFeedbackBanner: UIView {
+    private enum Metrics {
+        static let displayDuration: TimeInterval = 3
+        static let animationDuration: TimeInterval = 0.2
+    }
+
+    private let iconView = UIImageView()
+    private let messageLabel = UILabel()
+    private var dismissal: DispatchWorkItem?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = DesignSystem.Color.surface
+        layer.cornerRadius = DesignSystem.Radius.medium
+        layer.apply(.card)
+        isHidden = true
+
+        iconView.contentMode = .scaleAspectFit
+        messageLabel.font = DesignSystem.Typography.body
+        messageLabel.adjustsFontForContentSizeCategory = true
+        messageLabel.textColor = DesignSystem.Color.textPrimary
+        messageLabel.numberOfLines = 2
+
+        let stack = UIStackView(arrangedSubviews: [iconView, messageLabel])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.alignment = .center
+        stack.spacing = DesignSystem.Spacing.small
+        addSubview(stack)
+        NSLayoutConstraint.activate([
+            iconView.widthAnchor.constraint(equalToConstant: MarvelComponentSize.minimumTouchTarget / 2),
+            iconView.heightAnchor.constraint(equalTo: iconView.widthAnchor),
+            stack.topAnchor.constraint(equalTo: topAnchor, constant: DesignSystem.Spacing.small),
+            stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: DesignSystem.Spacing.medium),
+            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
+            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -DesignSystem.Spacing.small),
+        ])
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        nil
+    }
+
+    func show(message: String, isError: Bool) {
+        dismissal?.cancel()
+        messageLabel.text = message
+        iconView.image = UIImage(systemName: isError ? "exclamationmark.circle.fill" : "checkmark.circle.fill")
+        iconView.tintColor = isError ? DesignSystem.Color.accent : DesignSystem.Color.textPrimary
+        accessibilityLabel = message
+        isHidden = false
+        alpha = 0
+        UIView.animate(withDuration: Metrics.animationDuration) {
+            self.alpha = 1
+        }
+
+        let dismissal = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            UIView.animate(
+                withDuration: Metrics.animationDuration,
+                animations: {
+                    self.alpha = 0
+                },
+                completion: { _ in
+                    self.isHidden = true
+                }
+            )
+        }
+        self.dismissal = dismissal
+        DispatchQueue.main.asyncAfter(deadline: .now() + Metrics.displayDuration, execute: dismissal)
+    }
+}

@@ -70,8 +70,12 @@ final class HeroesDetailsViewController: UIViewController {
             switch result {
             case let .success(isFavorite):
                 self.contentView.renderFavorite(isFavorite: isFavorite)
+                self.contentView.showFeedback(
+                    message: isFavorite ? Localizable.Catalog.favoriteAdded : Localizable.Catalog.favoriteRemoved,
+                    isError: false
+                )
             case let .failure(message):
-                self.presentAlert(withTitle: Localizable.Common.error, message: message)
+                self.contentView.showFeedback(message: message, isError: true)
             }
         }
     }

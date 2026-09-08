@@ -1,11 +1,6 @@
 import Foundation
 
 enum Localizable {
-    enum Common {
-        static let ok = text("common.ok")
-        static let error = text("common.error")
-    }
-
     enum Catalog {
         static let characters = text("catalog.characters")
         static let changeLayout = text("catalog.changeLayout")
@@ -14,6 +9,9 @@ enum Localizable {
         static let emptyCharactersDescription = text("catalog.emptyCharacters.description")
         static let emptyFavoritesTitle = text("catalog.emptyFavorites.title")
         static let emptyFavoritesDescription = text("catalog.emptyFavorites.description")
+        static let favoriteAdded = text("catalog.favoriteAdded")
+        static let favoriteRemoved = text("catalog.favoriteRemoved")
+        static let retry = text("catalog.retry")
     }
 
     enum Details {

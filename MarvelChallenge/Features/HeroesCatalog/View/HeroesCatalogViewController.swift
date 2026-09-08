@@ -53,6 +53,14 @@ final class HeroesCatalogViewController: UIViewController {
 
     private func bindViewActions() {
         contentView.onRefresh = { [weak self] in self?.viewModel.reload() }
+        contentView.onRetry = { [weak self] in
+            guard let self else { return }
+            if self.selectedSection == .favorites {
+                self.viewModel.reloadFavorites()
+            } else {
+                self.viewModel.reload()
+            }
+        }
         contentView.onLayoutChange = { [weak self] in
             guard let self else { return }
             self.isGridLayout.toggle()
@@ -70,15 +78,26 @@ final class HeroesCatalogViewController: UIViewController {
             switch state {
             case .initialLoading:
                 self.contentView.renderLoading()
-            case .refreshing, .loadingNextPage, .idle:
+            case .refreshing:
+                self.contentView.renderRefreshing()
+            case .loadingNextPage:
+                self.contentView.renderLoadingNextPage()
+            case .idle:
                 break
             case .loaded:
                 self.contentView.renderLoaded()
             case .empty:
                 self.contentView.renderEmpty(section: self.selectedSection)
             case let .failed(message):
-                self.contentView.endRefreshing()
-                self.presentAlert(withTitle: Localizable.Common.error, message: message)
+                self.contentView.renderError(message: message)
+            }
+        }
+        viewModel.onFeedback = { [weak self] feedback in
+            switch feedback {
+            case let .success(message):
+                self?.contentView.showFeedback(message: message, isError: false)
+            case let .error(message):
+                self?.contentView.showFeedback(message: message, isError: true)
             }
         }
     }

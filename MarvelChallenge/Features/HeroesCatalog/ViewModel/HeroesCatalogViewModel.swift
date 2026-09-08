@@ -15,6 +15,11 @@ enum HeroesCatalogState: Equatable {
     case failed(String)
 }
 
+enum HeroesCatalogFeedback: Equatable {
+    case success(String)
+    case error(String)
+}
+
 final class HeroesCatalogViewModel {
     private let service: HeroServicing
     private let favorites: FavoritesStoring
@@ -27,6 +32,7 @@ final class HeroesCatalogViewModel {
     private var currentRequestID: UUID?
 
     var onStateChange: ((HeroesCatalogState) -> Void)?
+    var onFeedback: ((HeroesCatalogFeedback) -> Void)?
 
     init(service: HeroServicing, favorites: FavoritesStoring) {
         self.service = service
@@ -54,7 +60,7 @@ final class HeroesCatalogViewModel {
         cancelCurrentRequest()
         page = 0
         hasMorePages = true
-        load(page: page, mode: .refresh)
+        load(page: page, mode: characters.isEmpty ? .initial : .refresh)
     }
 
     func loadNextPageIfNeeded(index: Int) {
@@ -91,7 +97,11 @@ final class HeroesCatalogViewModel {
                         self.publishCurrentState()
                     }
                 case .failure:
-                    self.onStateChange?(.failed(Localizable.Error.favoritesReading))
+                    if self.section == .favorites, self.favoriteCharacters.isEmpty {
+                        self.onStateChange?(.failed(Localizable.Error.favoritesReading))
+                    } else {
+                        self.onFeedback?(.error(Localizable.Error.favoritesReading))
+                    }
                 }
             }
         }
@@ -113,10 +123,16 @@ final class HeroesCatalogViewModel {
 
     func toggleFavorite(_ character: Character) {
         let id = character.id
+        let isRemoving = favorites.contains(id: id)
         let completion: (Result<Void, FavoritesStoreError>) -> Void = { [weak self] result in
-            self?.handleFavoriteMutation(result)
+            self?.handleFavoriteMutation(
+                result,
+                successMessage: isRemoving
+                    ? Localizable.Catalog.favoriteRemoved
+                    : Localizable.Catalog.favoriteAdded
+            )
         }
-        if favorites.contains(id: id) {
+        if isRemoving {
             favorites.remove(id: id, completion: completion)
         } else {
             favorites.save(
@@ -129,7 +145,7 @@ final class HeroesCatalogViewModel {
     func removeFavorite(at index: Int) {
         guard let favorite = favorite(at: index) else { return }
         favorites.remove(id: favorite.id) { [weak self] result in
-            self?.handleFavoriteMutation(result)
+            self?.handleFavoriteMutation(result, successMessage: Localizable.Catalog.favoriteRemoved)
         }
     }
 
@@ -172,7 +188,13 @@ final class HeroesCatalogViewModel {
             }
             publishCurrentState()
         case let .failure(error):
-            onStateChange?(.failed(message(for: error)))
+            let message = message(for: error)
+            if characters.isEmpty {
+                onStateChange?(.failed(message))
+            } else {
+                publishCurrentState()
+                onFeedback?(.error(message))
+            }
         }
     }
 
@@ -190,15 +212,19 @@ final class HeroesCatalogViewModel {
         }
     }
 
-    private func handleFavoriteMutation(_ result: Result<Void, FavoritesStoreError>) {
+    private func handleFavoriteMutation(
+        _ result: Result<Void, FavoritesStoreError>,
+        successMessage: String
+    ) {
         performOnMain { [weak self] in
             guard let self else { return }
             switch result {
             case .success:
                 self.favoriteCharacters = self.favorites.all()
                 self.publishCurrentState()
+                self.onFeedback?(.success(successMessage))
             case .failure:
-                self.onStateChange?(.failed(Localizable.Error.favoritesWriting))
+                self.onFeedback?(.error(Localizable.Error.favoritesWriting))
             }
         }
     }
