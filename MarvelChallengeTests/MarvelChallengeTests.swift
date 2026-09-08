@@ -465,16 +465,20 @@ final class MarvelChallengeTests: XCTestCase {
         )
     }
 
-    func testHeroServiceMapsTransportFailure() {
-        let service = makeHeroService { _ in throw URLError(.notConnectedToInternet) }
-        let expectation = expectation(description: "transport failure")
+    func testHeroServiceMapsTransportFailure() throws {
+        let client = HTTPClientStub(error: URLError(.notConnectedToInternet))
+        let service = try HeroService(
+            httpClient: client,
+            baseURL: XCTUnwrap(URL(string: "https://example.com")),
+            publicKey: "public",
+            privateKey: "private"
+        )
+        var receivedResult: Result<HeroesPage, HeroServiceError>?
 
-        service.fetchHeroes(page: 0) { result in
-            XCTAssertEqual(result.failure, .transport)
-            expectation.fulfill()
-        }
+        service.fetchHeroes(page: 0) { receivedResult = $0 }
 
-        wait(for: [expectation], timeout: 1)
+        XCTAssertEqual(receivedResult?.failure, .transport)
+        XCTAssertEqual(client.requestCount, 1)
     }
 
     func testHeroServiceCancelsUnderlyingRequest() throws {
@@ -592,6 +596,28 @@ private final class URLProtocolStub: URLProtocol {
     override func stopLoading() {
         Self.onStopLoading?()
     }
+}
+
+private final class HTTPClientStub: HTTPClient {
+    private let error: Error
+    private(set) var requestCount = 0
+
+    init(error: Error) {
+        self.error = error
+    }
+
+    func dataTask(
+        with _: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> RequestCancellable {
+        requestCount += 1
+        completion(nil, nil, error)
+        return RequestCancellableStub()
+    }
+}
+
+private final class RequestCancellableStub: RequestCancellable {
+    func cancel() {}
 }
 
 private final class ClosureOwner {

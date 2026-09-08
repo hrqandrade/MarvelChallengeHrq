@@ -14,6 +14,32 @@ protocol RequestCancellable: AnyObject {
 
 extension URLSessionDataTask: RequestCancellable {}
 
+protocol HTTPClient {
+    @discardableResult
+    func dataTask(
+        with request: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> RequestCancellable
+}
+
+final class URLSessionHTTPClient: HTTPClient {
+    private let session: URLSession
+
+    init(session: URLSession) {
+        self.session = session
+    }
+
+    @discardableResult
+    func dataTask(
+        with request: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> RequestCancellable {
+        let task = session.dataTask(with: request, completionHandler: completion)
+        task.resume()
+        return task
+    }
+}
+
 struct HeroesPage {
     let characters: [Character]
     let offset: Int
@@ -39,7 +65,7 @@ final class HeroService: HeroServicing {
         static let pageSize = 20
     }
 
-    private let session: URLSession
+    private let httpClient: HTTPClient
     private let baseURL: URL
     private let publicKey: String
     private let privateKey: String
@@ -50,7 +76,19 @@ final class HeroService: HeroServicing {
         publicKey: String = ProcessInfo.processInfo.environment["MARVEL_PUBLIC_KEY"] ?? "",
         privateKey: String = ProcessInfo.processInfo.environment["MARVEL_PRIVATE_KEY"] ?? ""
     ) {
-        self.session = session
+        httpClient = URLSessionHTTPClient(session: session)
+        self.baseURL = baseURL
+        self.publicKey = publicKey
+        self.privateKey = privateKey
+    }
+
+    init(
+        httpClient: HTTPClient,
+        baseURL: URL,
+        publicKey: String,
+        privateKey: String
+    ) {
+        self.httpClient = httpClient
         self.baseURL = baseURL
         self.publicKey = publicKey
         self.privateKey = privateKey
@@ -70,7 +108,7 @@ final class HeroService: HeroServicing {
             return nil
         }
 
-        let task = session.dataTask(with: url) { data, response, error in
+        return httpClient.dataTask(with: URLRequest(url: url)) { data, response, error in
             if error != nil {
                 completion(.failure(.transport))
                 return
@@ -96,8 +134,6 @@ final class HeroService: HeroServicing {
                 completion(.failure(.decoding))
             }
         }
-        task.resume()
-        return task
     }
 
     private func makeURL(page: Int) -> URL? {
