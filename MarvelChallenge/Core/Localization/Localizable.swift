@@ -11,7 +11,10 @@ enum Localizable {
         static let emptyFavoritesDescription = text("catalog.emptyFavorites.description")
         static let favoriteAdded = text("catalog.favoriteAdded")
         static let favoriteRemoved = text("catalog.favoriteRemoved")
+        static let favoriteStatus = text("catalog.favoriteStatus")
+        static let notFavoriteStatus = text("catalog.notFavoriteStatus")
         static let retry = text("catalog.retry")
+        static let toggleFavorite = text("catalog.toggleFavorite")
     }
 
     enum Details {

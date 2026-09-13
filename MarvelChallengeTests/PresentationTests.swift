@@ -99,6 +99,56 @@ final class PresentationTests: XCTestCase {
         )
     }
 
+    func testCharacterCellsExposeSelectionAndFavoriteActions() {
+        let character = Character(
+            id: 1,
+            name: "Spider-Man",
+            description: "",
+            imageURL: nil,
+            comics: [],
+            series: []
+        )
+        var selectionCount = 0
+        let cell = HeroesCollectionViewCell()
+
+        cell.configure(
+            character: character,
+            isFavorite: false,
+            onFavorite: {},
+            onSelect: { selectionCount += 1 }
+        )
+
+        XCTAssertTrue(cell.isAccessibilityElement)
+        XCTAssertEqual(cell.accessibilityLabel, character.name)
+        XCTAssertEqual(cell.accessibilityValue, Localizable.Catalog.notFavoriteStatus)
+        XCTAssertTrue(cell.accessibilityTraits.contains(.button))
+        XCTAssertTrue(cell.accessibilityActivate())
+        XCTAssertEqual(selectionCount, 1)
+        XCTAssertEqual(
+            cell.accessibilityCustomActions?.first?.name,
+            Localizable.Catalog.toggleFavorite
+        )
+    }
+
+    func testDetailsIsModalAndFavoriteActionIdentifiesCharacter() {
+        let view = HeroesDetailsView()
+
+        view.render(.init(
+            id: 1,
+            name: "Spider-Man",
+            description: "Description",
+            imageURL: nil,
+            isFavorite: true,
+            hasComics: false,
+            hasSeries: false
+        ))
+
+        XCTAssertTrue(view.accessibilityViewIsModal)
+        XCTAssertTrue(view.descendantButtons.contains {
+            $0.accessibilityLabel == Localizable.Details.removeFavorite(characterName: "Spider-Man")
+        })
+    }
+
     func testSemanticColorsMeetTheirMinimumContrast() {
         for style in [UIUserInterfaceStyle.light, .dark] {
             let traits = UITraitCollection(userInterfaceStyle: style)
@@ -131,11 +181,19 @@ final class PresentationTests: XCTestCase {
     }
 
     func testSupportedOrientationsMatchTheLayoutPolicy() throws {
+        let testBundle = Bundle(for: PresentationTests.self)
+        let appBundleURL = testBundle.bundleURL
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let infoData = try Data(contentsOf: appBundleURL.appendingPathComponent("Info.plist"))
+        let infoDictionary = try XCTUnwrap(
+            PropertyListSerialization.propertyList(from: infoData, format: nil) as? [String: Any]
+        )
         let phoneOrientations = try XCTUnwrap(
-            Bundle.main.object(forInfoDictionaryKey: "UISupportedInterfaceOrientations") as? [String]
+            infoDictionary["UISupportedInterfaceOrientations"] as? [String]
         )
         let padOrientations = try XCTUnwrap(
-            Bundle.main.object(forInfoDictionaryKey: "UISupportedInterfaceOrientations~ipad") as? [String]
+            infoDictionary["UISupportedInterfaceOrientations~ipad"] as? [String]
         )
 
         XCTAssertEqual(phoneOrientations, ["UIInterfaceOrientationPortrait"])

@@ -3,6 +3,11 @@ import MarvelImageLoader
 import UIKit
 
 final class HeroesCollectionListCell: UICollectionViewCell {
+    private struct Actions {
+        let favorite: () -> Void
+        let select: (() -> Void)?
+    }
+
     private enum Metrics {
         static let imageSize: CGFloat = 63
         static let minimumTouchTarget: CGFloat = 44
@@ -16,6 +21,7 @@ final class HeroesCollectionListCell: UICollectionViewCell {
     private let cardView = MarvelCardView()
     private let favoriteButton = UIButton(type: .system)
     private var onFavorite: (() -> Void)?
+    private var onSelect: (() -> Void)?
 
     // MARK: - Initialization
 
@@ -42,25 +48,38 @@ final class HeroesCollectionListCell: UICollectionViewCell {
         nameLabel.text = nil
         favoriteButton.setImage(nil, for: .normal)
         onFavorite = nil
+        onSelect = nil
+        accessibilityLabel = nil
+        accessibilityValue = nil
+        accessibilityCustomActions = nil
     }
 
-    func configure(character: Character, isFavorite: Bool, onFavorite: @escaping () -> Void) {
+    func configure(
+        character: Character,
+        isFavorite: Bool,
+        onFavorite: @escaping () -> Void,
+        onSelect: (() -> Void)? = nil
+    ) {
         configure(
             id: character.id,
             name: character.name,
             imageURL: character.imageURL,
             isFavorite: isFavorite,
-            onFavorite: onFavorite
+            actions: Actions(favorite: onFavorite, select: onSelect)
         )
     }
 
-    func configure(favorite: FavoriteCharacter, onFavorite: @escaping () -> Void) {
+    func configure(
+        favorite: FavoriteCharacter,
+        onFavorite: @escaping () -> Void,
+        onSelect: (() -> Void)? = nil
+    ) {
         configure(
             id: favorite.id,
             name: favorite.name,
             imageURL: favorite.imageURL,
             isFavorite: true,
-            onFavorite: onFavorite
+            actions: Actions(favorite: onFavorite, select: onSelect)
         )
     }
 
@@ -123,7 +142,7 @@ final class HeroesCollectionListCell: UICollectionViewCell {
         name: String,
         imageURL: URL?,
         isFavorite: Bool,
-        onFavorite: @escaping () -> Void
+        actions: Actions
     ) {
         nameLabel.text = name
         heroImageView.setImage(from: imageURL, placeholder: HeroArtworkFactory.image(id: id, name: name))
@@ -131,12 +150,35 @@ final class HeroesCollectionListCell: UICollectionViewCell {
         favoriteButton.accessibilityLabel = isFavorite
             ? Localizable.Details.removeFavorite(characterName: name)
             : Localizable.Details.addFavorite(characterName: name)
-        self.onFavorite = onFavorite
+        onFavorite = actions.favorite
+        onSelect = actions.select
+        isAccessibilityElement = true
+        accessibilityLabel = name
+        accessibilityValue = isFavorite ? Localizable.Catalog.favoriteStatus : Localizable.Catalog.notFavoriteStatus
+        accessibilityTraits = .button
+        accessibilityCustomActions = [
+            UIAccessibilityCustomAction(
+                name: Localizable.Catalog.toggleFavorite,
+                target: self,
+                selector: #selector(didActivateFavoriteAccessibilityAction)
+            ),
+        ]
     }
 
     // MARK: - Actions
 
     @objc private func didTapFavorite() {
         onFavorite?()
+    }
+
+    override func accessibilityActivate() -> Bool {
+        guard let onSelect else { return false }
+        onSelect()
+        return true
+    }
+
+    @objc private func didActivateFavoriteAccessibilityAction() -> Bool {
+        onFavorite?()
+        return true
     }
 }

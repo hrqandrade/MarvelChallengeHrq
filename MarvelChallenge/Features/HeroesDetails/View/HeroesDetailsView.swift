@@ -23,6 +23,7 @@ final class HeroesDetailsView: UIView {
     private let comicLabel = UILabel()
     private let seriesLabel = UILabel()
     private let feedbackBanner = MarvelFeedbackBanner()
+    private var characterName = ""
     private lazy var comicHeightConstraint = comicCollectionView.heightAnchor.constraint(
         equalToConstant: MarvelComponentSize.detailsCarouselHeight
     )
@@ -58,6 +59,7 @@ final class HeroesDetailsView: UIView {
     }
 
     func render(_ state: State) {
+        characterName = state.name
         headerView.setTitle(state.name)
         descriptionLabel.text = state.description
         heroImageView.setImage(
@@ -73,8 +75,9 @@ final class HeroesDetailsView: UIView {
 
     func renderFavorite(isFavorite: Bool) {
         headerView.trailingButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
-        headerView.trailingButton.accessibilityLabel = isFavorite ? Localizable.Details.removeFavorite : Localizable
-            .Details.addFavorite
+        headerView.trailingButton.accessibilityLabel = isFavorite
+            ? Localizable.Details.removeFavorite(characterName: characterName)
+            : Localizable.Details.addFavorite(characterName: characterName)
     }
 
     func setFavoriteEnabled(_ isEnabled: Bool) {
@@ -87,6 +90,7 @@ final class HeroesDetailsView: UIView {
 
     private func configureView() {
         backgroundColor = DesignSystem.Color.accent
+        accessibilityViewIsModal = true
         scrollView.backgroundColor = DesignSystem.Color.backgroundPrimary
     }
 
