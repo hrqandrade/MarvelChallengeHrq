@@ -95,9 +95,11 @@ final class HeroesDetailsView: UIView {
     }
 
     private func configureHeader() {
+        headerView.leadingButton.accessibilityIdentifier = AccessibilityIdentifier.Details.backButton
         headerView.leadingButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
         headerView.leadingButton.accessibilityLabel = Localizable.Details.back
         headerView.leadingButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
+        headerView.trailingButton.accessibilityIdentifier = AccessibilityIdentifier.Details.favoriteButton
         headerView.trailingButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
     }
 

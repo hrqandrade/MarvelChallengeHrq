@@ -154,14 +154,14 @@ A base reage aos tamanhos de texto de acessibilidade, respeita Reduce Motion e m
 
 O Simulator não disponibiliza o VoiceOver completo nos Ajustes. Por isso, a navegação foi conferida pela árvore de acessibilidade do sistema, cobrindo catálogo, favoritos e detalhes. A passagem falada em aparelho físico fica registrada na regressão da release.
 
-### 14. Testes dos fluxos principais — planejada
+### 14. Testes dos fluxos principais — concluída
 
 - Criar um target enxuto de UI Tests.
 - Cobrir abertura em modo demo, troca de layout, detalhes e favoritos.
 - Validar a presença das localizações em inglês e português do Brasil.
 - Impedir que chaves de localização apareçam diretamente na interface.
 
-Esta fase estará pronta com os fluxos essenciais cobertos sem rede real e executando de forma estável na CI.
+O novo target de UI Tests percorre os caminhos essenciais com os dados locais do modo Debug: abre o catálogo, troca o layout, navega para detalhes e confirma a inclusão de um personagem nos favoritos. A suíte também inicia o aplicativo em português do Brasil e em inglês, verifica os principais textos e falha se uma chave de localização for exposta nessas telas. Esses testes fazem parte do scheme compartilhado e, portanto, entram no mesmo comando executado pela CI.
 
 ### 15. Assets e acabamento visual — planejada
 
