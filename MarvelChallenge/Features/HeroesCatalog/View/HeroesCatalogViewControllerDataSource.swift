@@ -12,6 +12,10 @@ extension HeroesCatalogViewController: UICollectionViewDataSource {
         let identifier = isGridLayout ? HeroesCollectionViewCell.reuseIdentifier : HeroesCollectionListCell
             .reuseIdentifier
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
+        let selectionAction: () -> Void = { [weak self] in
+            guard let self, let character = self.viewModel.characterForSelection(at: indexPath.item) else { return }
+            self.onSelectCharacter?(character)
+        }
         if let character = viewModel.character(at: indexPath.item) {
             let action: () -> Void = { [weak self] in
                 self?.viewModel.toggleFavorite(character)
@@ -19,12 +23,14 @@ extension HeroesCatalogViewController: UICollectionViewDataSource {
             (cell as? HeroesCollectionViewCell)?.configure(
                 character: character,
                 isFavorite: viewModel.isFavorite(character),
-                onFavorite: action
+                onFavorite: action,
+                onSelect: selectionAction
             )
             (cell as? HeroesCollectionListCell)?.configure(
                 character: character,
                 isFavorite: viewModel.isFavorite(character),
-                onFavorite: action
+                onFavorite: action,
+                onSelect: selectionAction
             )
         } else if let favorite = viewModel.favorite(at: indexPath.item) {
             let action = { [weak self] in
@@ -32,8 +38,16 @@ extension HeroesCatalogViewController: UICollectionViewDataSource {
                       let index = self.viewModel.favoriteCharacters.firstIndex(of: favorite) else { return }
                 self.viewModel.removeFavorite(at: index)
             }
-            (cell as? HeroesCollectionViewCell)?.configure(favorite: favorite, onFavorite: action)
-            (cell as? HeroesCollectionListCell)?.configure(favorite: favorite, onFavorite: action)
+            (cell as? HeroesCollectionViewCell)?.configure(
+                favorite: favorite,
+                onFavorite: action,
+                onSelect: selectionAction
+            )
+            (cell as? HeroesCollectionListCell)?.configure(
+                favorite: favorite,
+                onFavorite: action,
+                onSelect: selectionAction
+            )
         }
         return cell
     }
@@ -41,7 +55,7 @@ extension HeroesCatalogViewController: UICollectionViewDataSource {
 
 extension HeroesCatalogViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let character = viewModel.character(at: indexPath.item) else { return }
+        guard let character = viewModel.characterForSelection(at: indexPath.item) else { return }
         onSelectCharacter?(character)
     }
 

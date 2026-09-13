@@ -5,10 +5,27 @@ enum MarvelComponentSize {
     static let minimumTouchTarget: CGFloat = 44
     static let navigationBarHeight: CGFloat = 64
     static let tabBarHeight: CGFloat = 72
-    static let segmentedControlHeight: CGFloat = 40
+    static var segmentedControlHeight: CGFloat {
+        max(40, ceil(MarvelTypography.segmentedControlTitle.lineHeight + 16))
+    }
+
     static let emptyStateImageSize: CGFloat = 144
     static let heroImageHeight: CGFloat = 200
-    static let detailsCarouselHeight: CGFloat = 120
+    static var detailsCarouselHeight: CGFloat {
+        max(120, ceil(DesignSystem.Typography.caption.lineHeight * 3 + DesignSystem.Spacing.large * 2))
+    }
+}
+
+enum MarvelTypography {
+    static var screenTitle: UIFont {
+        let baseFont = UIFont.systemFont(ofSize: 28, weight: .bold)
+        return UIFontMetrics(forTextStyle: .title1).scaledFont(for: baseFont, maximumPointSize: 36)
+    }
+
+    static var segmentedControlTitle: UIFont {
+        let baseFont = UIFont.systemFont(ofSize: 17, weight: .semibold)
+        return UIFontMetrics(forTextStyle: .body).scaledFont(for: baseFont, maximumPointSize: 24)
+    }
 }
 
 final class MarvelScreenHeaderView: UIView {
@@ -19,10 +36,11 @@ final class MarvelScreenHeaderView: UIView {
     init(title: String) {
         super.init(frame: .zero)
         backgroundColor = DesignSystem.Color.accent
-        titleLabel.font = DesignSystem.Typography.title
-        titleLabel.adjustsFontForContentSizeCategory = true
+        titleLabel.font = MarvelTypography.screenTitle
+        titleLabel.adjustsFontForContentSizeCategory = false
         titleLabel.textColor = DesignSystem.Color.onAccent
         titleLabel.textAlignment = .center
+        titleLabel.numberOfLines = 2
         titleLabel.text = title
         for item in [leadingButton, trailingButton] {
             item.tintColor = DesignSystem.Color.onAccent
@@ -35,6 +53,22 @@ final class MarvelScreenHeaderView: UIView {
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         nil
+    }
+
+    override var intrinsicContentSize: CGSize {
+        let contentHeight = ceil(titleLabel.font.lineHeight * 2 + DesignSystem.Spacing.medium * 2)
+        return CGSize(
+            width: UIView.noIntrinsicMetric,
+            height: max(MarvelComponentSize.navigationBarHeight, contentHeight)
+        )
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory
+        else { return }
+        titleLabel.font = MarvelTypography.screenTitle
+        invalidateIntrinsicContentSize()
     }
 
     func setTitle(_ title: String) {
@@ -149,6 +183,7 @@ final class MarvelLoadingView: UIView {
             stack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
         ])
         activityIndicator.startAnimating()
+        isAccessibilityElement = true
         accessibilityLabel = Localizable.Loading.title
         accessibilityTraits = .updatesFrequently
     }
@@ -171,6 +206,7 @@ final class MarvelLoadingView: UIView {
 }
 
 final class MarvelErrorStateView: UIView {
+    private let messageLabel = UILabel()
     private let retryButton = UIButton(type: .system)
     var onRetry: (() -> Void)?
 
@@ -180,14 +216,15 @@ final class MarvelErrorStateView: UIView {
         let iconView = UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill"))
         iconView.contentMode = .scaleAspectFit
         iconView.tintColor = DesignSystem.Color.accent
+        iconView.isAccessibilityElement = false
 
-        let messageLabel = UILabel()
         messageLabel.font = DesignSystem.Typography.body
         messageLabel.adjustsFontForContentSizeCategory = true
         messageLabel.textColor = DesignSystem.Color.textSecondary
         messageLabel.textAlignment = .center
         messageLabel.numberOfLines = 0
         messageLabel.text = message
+        messageLabel.accessibilityLabel = message
 
         retryButton.setTitle(Localizable.Catalog.retry, for: .normal)
         retryButton.titleLabel?.font = DesignSystem.Typography.headline
@@ -211,8 +248,8 @@ final class MarvelErrorStateView: UIView {
             stack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -DesignSystem.Spacing.large),
         ])
 
-        isAccessibilityElement = true
-        accessibilityLabel = message
+        isAccessibilityElement = false
+        accessibilityElements = [messageLabel, retryButton]
     }
 
     @available(*, unavailable)
@@ -246,7 +283,7 @@ final class MarvelFeedbackBanner: UIView {
         messageLabel.font = DesignSystem.Typography.body
         messageLabel.adjustsFontForContentSizeCategory = true
         messageLabel.textColor = DesignSystem.Color.textPrimary
-        messageLabel.numberOfLines = 2
+        messageLabel.numberOfLines = 0
 
         let stack = UIStackView(arrangedSubviews: [iconView, messageLabel])
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -261,6 +298,8 @@ final class MarvelFeedbackBanner: UIView {
             stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
             stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -DesignSystem.Spacing.small),
         ])
+        isAccessibilityElement = true
+        accessibilityTraits = .staticText
     }
 
     @available(*, unavailable)
@@ -276,12 +315,21 @@ final class MarvelFeedbackBanner: UIView {
         accessibilityLabel = message
         isHidden = false
         alpha = 0
-        UIView.animate(withDuration: Metrics.animationDuration) {
-            self.alpha = 1
+        if UIAccessibility.isReduceMotionEnabled {
+            alpha = 1
+        } else {
+            UIView.animate(withDuration: Metrics.animationDuration) {
+                self.alpha = 1
+            }
         }
+        UIAccessibility.post(notification: .announcement, argument: message)
 
         let dismissal = DispatchWorkItem { [weak self] in
             guard let self else { return }
+            guard !UIAccessibility.isReduceMotionEnabled else {
+                self.isHidden = true
+                return
+            }
             UIView.animate(
                 withDuration: Metrics.animationDuration,
                 animations: {

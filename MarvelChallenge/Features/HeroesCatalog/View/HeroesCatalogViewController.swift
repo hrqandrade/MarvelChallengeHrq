@@ -5,6 +5,7 @@ final class HeroesCatalogViewController: UIViewController {
     let viewModel: HeroesCatalogViewModel
     var onSelectCharacter: ((Character) -> Void)?
     var isGridLayout = true
+    private var prefersGridLayout = true
     private var selectedSection: HeroesCatalogSection = .characters
     private var hasRequestedInitialLoad = false
 
@@ -36,7 +37,7 @@ final class HeroesCatalogViewController: UIViewController {
         heroesCollectionView.delegate = self
         bindViewActions()
         bindViewModel()
-        contentView.renderLayout(isGrid: isGridLayout, animated: false)
+        applyPreferredLayout(animated: false)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -51,6 +52,13 @@ final class HeroesCatalogViewController: UIViewController {
         viewModel.reloadFavorites()
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard previousTraitCollection?.preferredContentSizeCategory.isAccessibilityCategory
+            != traitCollection.preferredContentSizeCategory.isAccessibilityCategory else { return }
+        applyPreferredLayout(animated: false)
+    }
+
     private func bindViewActions() {
         contentView.onRefresh = { [weak self] in self?.viewModel.reload() }
         contentView.onRetry = { [weak self] in
@@ -63,13 +71,20 @@ final class HeroesCatalogViewController: UIViewController {
         }
         contentView.onLayoutChange = { [weak self] in
             guard let self else { return }
-            self.isGridLayout.toggle()
-            self.contentView.renderLayout(isGrid: self.isGridLayout, animated: true)
+            self.prefersGridLayout.toggle()
+            self.applyPreferredLayout(animated: true)
         }
         contentView.onSectionChange = { [weak self] section in
             self?.selectedSection = section
             self?.viewModel.selectSection(section)
         }
+    }
+
+    private func applyPreferredLayout(animated: Bool) {
+        let usesAccessibilityLayout = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+        isGridLayout = prefersGridLayout && !usesAccessibilityLayout
+        contentView.renderLayoutControl(isHidden: usesAccessibilityLayout)
+        contentView.renderLayout(isGrid: isGridLayout, animated: animated)
     }
 
     private func bindViewModel() {

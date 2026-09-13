@@ -143,14 +143,16 @@ O modo demo agora usa monogramas visuais determinísticos, sem downloads ou arqu
 
 Falhas na primeira carga agora ficam na própria tela com uma ação de nova tentativa. Atualização, paginação e favoritos preservam o conteúdo existente e usam feedback transitório; os indicadores de carregamento deixam claro qual operação está em andamento sem bloquear a navegação.
 
-### 13. Acessibilidade e adaptação de layout — planejada
+### 13. Acessibilidade e adaptação de layout — concluída
 
 - Validar VoiceOver, ordem de leitura, traits e estado dos controles.
 - Revisar contraste, Bold Text, Reduce Motion e os maiores tamanhos de Dynamic Type.
 - Remover alturas fixas que causem truncamento nos tamanhos de acessibilidade.
 - Definir e validar as orientações realmente suportadas no iPhone e no iPad.
 
-Esta fase estará pronta depois de uma passagem manual documentada pelas configurações de acessibilidade e tamanhos de tela suportados.
+A base reage aos tamanhos de texto de acessibilidade, respeita Reduce Motion e mantém os cards acionáveis sem perder a ação de favorito. A tela de detalhes isola a leitura do conteúdo apresentado, e os controles anunciam personagem e estado sem depender apenas da cor. Também validamos Bold Text, contraste e as orientações declaradas: retrato no iPhone e as quatro orientações no iPad.
+
+O Simulator não disponibiliza o VoiceOver completo nos Ajustes. Por isso, a navegação foi conferida pela árvore de acessibilidade do sistema, cobrindo catálogo, favoritos e detalhes. A passagem falada em aparelho físico fica registrada na regressão da release.
 
 ### 14. Testes dos fluxos principais — planejada
 

@@ -117,6 +117,21 @@ final class HeroesCatalogViewModel {
         return favoriteCharacters[index]
     }
 
+    func characterForSelection(at index: Int) -> Character? {
+        if let character = character(at: index) {
+            return character
+        }
+        guard let favorite = favorite(at: index) else { return nil }
+        return characters.first { $0.id == favorite.id } ?? Character(
+            id: favorite.id,
+            name: favorite.name,
+            description: "",
+            imageURL: favorite.imageURL,
+            comics: [],
+            series: []
+        )
+    }
+
     func isFavorite(_ character: Character) -> Bool {
         favorites.contains(id: character.id)
     }
