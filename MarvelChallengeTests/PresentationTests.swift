@@ -1,4 +1,5 @@
 @testable import MarvelChallenge
+import MarvelDesignSystem
 import XCTest
 
 final class PresentationTests: XCTestCase {
@@ -73,6 +74,79 @@ final class PresentationTests: XCTestCase {
         XCTAssertTrue(Localizable.Details.removeFavorite(characterName: "Storm").contains("Storm"))
     }
 
+    func testFavoriteButtonsIdentifyTheirCharacter() {
+        let character = Character(
+            id: 1,
+            name: "Spider-Man",
+            description: "",
+            imageURL: nil,
+            comics: [],
+            series: []
+        )
+        let gridCell = HeroesCollectionViewCell()
+        let listCell = HeroesCollectionListCell()
+
+        gridCell.configure(character: character, isFavorite: false, onFavorite: {})
+        listCell.configure(character: character, isFavorite: true, onFavorite: {})
+
+        XCTAssertEqual(
+            gridCell.descendantButtons.first?.accessibilityLabel,
+            Localizable.Details.addFavorite(characterName: character.name)
+        )
+        XCTAssertEqual(
+            listCell.descendantButtons.first?.accessibilityLabel,
+            Localizable.Details.removeFavorite(characterName: character.name)
+        )
+    }
+
+    func testSemanticColorsMeetTheirMinimumContrast() {
+        for style in [UIUserInterfaceStyle.light, .dark] {
+            let traits = UITraitCollection(userInterfaceStyle: style)
+            XCTAssertGreaterThanOrEqual(
+                contrastRatio(
+                    foreground: DesignSystem.Color.textPrimary,
+                    background: DesignSystem.Color.backgroundPrimary,
+                    traits: traits
+                ),
+                4.5
+            )
+            XCTAssertGreaterThanOrEqual(
+                contrastRatio(
+                    foreground: DesignSystem.Color.textSecondary,
+                    background: DesignSystem.Color.backgroundPrimary,
+                    traits: traits
+                ),
+                4.5
+            )
+        }
+
+        XCTAssertGreaterThanOrEqual(
+            contrastRatio(
+                foreground: DesignSystem.Color.onAccent,
+                background: DesignSystem.Color.accent,
+                traits: UITraitCollection(userInterfaceStyle: .light)
+            ),
+            3
+        )
+    }
+
+    func testSupportedOrientationsMatchTheLayoutPolicy() throws {
+        let phoneOrientations = try XCTUnwrap(
+            Bundle.main.object(forInfoDictionaryKey: "UISupportedInterfaceOrientations") as? [String]
+        )
+        let padOrientations = try XCTUnwrap(
+            Bundle.main.object(forInfoDictionaryKey: "UISupportedInterfaceOrientations~ipad") as? [String]
+        )
+
+        XCTAssertEqual(phoneOrientations, ["UIInterfaceOrientationPortrait"])
+        XCTAssertEqual(Set(padOrientations), Set([
+            "UIInterfaceOrientationPortrait",
+            "UIInterfaceOrientationPortraitUpsideDown",
+            "UIInterfaceOrientationLandscapeLeft",
+            "UIInterfaceOrientationLandscapeRight",
+        ]))
+    }
+
     func testDemoDescriptionsUseLocalizedCopy() {
         XCTAssertEqual(DebugSampleData.characters.first?.description, Localizable.Demo.spiderManDescription)
     }
@@ -88,5 +162,40 @@ final class PresentationTests: XCTestCase {
 
         XCTAssertTrue(firstImage === secondImage)
         XCTAssertEqual(firstImage.size, CGSize(width: 600, height: 600))
+    }
+
+    private func contrastRatio(
+        foreground: UIColor,
+        background: UIColor,
+        traits: UITraitCollection
+    ) -> CGFloat {
+        let foregroundLuminance = relativeLuminance(of: foreground.resolvedColor(with: traits))
+        let backgroundLuminance = relativeLuminance(of: background.resolvedColor(with: traits))
+        let lighter = max(foregroundLuminance, backgroundLuminance)
+        let darker = min(foregroundLuminance, backgroundLuminance)
+        return (lighter + 0.05) / (darker + 0.05)
+    }
+
+    private func relativeLuminance(of color: UIColor) -> CGFloat {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        XCTAssertTrue(color.getRed(&red, green: &green, blue: &blue, alpha: &alpha))
+        let components = [red, green, blue].map { component in
+            component <= 0.04045
+                ? component / 12.92
+                : pow((component + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * components[0] + 0.7152 * components[1] + 0.0722 * components[2]
+    }
+}
+
+private extension UIView {
+    var descendantButtons: [UIButton] {
+        subviews.flatMap { view -> [UIButton] in
+            let button = view as? UIButton
+            return [button].compactMap { $0 } + view.descendantButtons
+        }
     }
 }
