@@ -182,6 +182,16 @@ O catálogo ficou restrito ao que realmente precisa ser próprio do aplicativo: 
 
 Esta fase estará pronta com um archive limpo, reproduzível e acompanhado das evidências da regressão final.
 
+#### Evidências da homologação
+
+- [x] Archive Release 2.0.0 gerado para iOS e validado pelo Xcode.
+- [x] Produto compilado sem implementações, catálogo mockado ou argumento de demonstração.
+- [x] Produto compilado sem valores de credenciais; somente os nomes das variáveis de ambiente fazem parte do cliente live.
+- [x] Changelog da 2.0.0 e limitações conhecidas documentados.
+- [x] Regressão automatizada repetida a partir do estado final da fase: 47 testes de unidade e integração, além de 4 testes de interface.
+- [ ] Memory Graph, Leaks, Allocations e fluidez do scroll conferidos na configuração Release.
+- [ ] Fluxos de catálogo, favoritos e detalhes percorridos com VoiceOver em aparelho físico.
+
 ### 17. Release 2.0.0 — planejada
 
 - Abrir Pull Request da `develop` para a `master`.

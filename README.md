@@ -162,9 +162,13 @@ make bootstrap
 make quality
 make build
 make test
+make archive
+make validate-release
 ```
 
 Pull Requests para `develop` e `master` executam formatação, análise estática, build e os testes automatizados. O processo de contribuição e os critérios de revisão estão documentados em [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+As mudanças da versão em preparação estão reunidas em [`CHANGELOG.md`](CHANGELOG.md). A homologação final combina as verificações reproduzíveis acima com a passagem manual registrada no roadmap.
 
 ## Modo de demonstração
 
