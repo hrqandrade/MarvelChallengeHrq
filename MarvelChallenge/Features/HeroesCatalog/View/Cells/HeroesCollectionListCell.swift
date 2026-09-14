@@ -147,7 +147,7 @@ final class HeroesCollectionListCell: UICollectionViewCell {
         accessibilityIdentifier = AccessibilityIdentifier.Catalog.character(id: id)
         nameLabel.text = name
         heroImageView.setImage(from: imageURL, placeholder: HeroArtworkFactory.image(id: id, name: name))
-        favoriteButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
+        favoriteButton.setImage(UIImage(systemName: isFavorite ? "star.fill" : "star"), for: .normal)
         favoriteButton.accessibilityLabel = isFavorite
             ? Localizable.Details.removeFavorite(characterName: name)
             : Localizable.Details.addFavorite(characterName: name)

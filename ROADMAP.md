@@ -163,14 +163,14 @@ O Simulator não disponibiliza o VoiceOver completo nos Ajustes. Por isso, a nav
 
 O novo target de UI Tests percorre os caminhos essenciais com os dados locais do modo Debug: abre o catálogo, troca o layout, navega para detalhes e confirma a inclusão de um personagem nos favoritos. A suíte também inicia o aplicativo em português do Brasil e em inglês, verifica os principais textos e falha se uma chave de localização for exposta nessas telas. Esses testes fazem parte do scheme compartilhado e, portanto, entram no mesmo comando executado pela CI.
 
-### 15. Assets e acabamento visual — planejada
+### 15. Assets e acabamento visual — concluída
 
 - Revisar App Icon, logo, favoritos e ilustrações de estado vazio.
 - Preferir SF Symbols ou assets vetoriais quando fizer sentido.
 - Remover arquivos duplicados ou herdados que não sejam mais usados.
 - Conferir consistência visual entre a Launch Screen e a primeira tela.
 
-Esta fase estará pronta com um catálogo de assets pequeno, rastreável e adequado às escalas e aparências suportadas.
+O catálogo ficou restrito ao que realmente precisa ser próprio do aplicativo: um App Icon opaco em alta resolução, o logo da Launch Screen e sua cor de fundo. Favoritos, alternância de layout e estados vazios usam SF Symbols, mantendo escala e renderização consistentes sem carregar cópias rasterizadas. A Launch Screen preserva o vermelho e o logo que introduzem a primeira tela do catálogo.
 
 ### 16. Preparação da release — planejada
 

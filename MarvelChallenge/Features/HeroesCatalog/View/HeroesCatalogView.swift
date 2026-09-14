@@ -82,7 +82,7 @@ final class HeroesCatalogView: UIView {
         refreshControl.endRefreshing()
         paginationIndicator.stopAnimating()
         collectionView.reloadData()
-        let imageName = section == .characters ? "emptyList" : "emptyFavorite"
+        let imageName = section == .characters ? "person.3.fill" : "star"
         let title = section == .characters
             ? Localizable.Catalog.emptyCharactersTitle
             : Localizable.Catalog.emptyFavoritesTitle
@@ -90,7 +90,7 @@ final class HeroesCatalogView: UIView {
             ? Localizable.Catalog.emptyCharactersDescription
             : Localizable.Catalog.emptyFavoritesDescription
         collectionView.backgroundView = MarvelEmptyStateView(
-            image: UIImage(named: imageName),
+            image: UIImage(systemName: imageName),
             title: title,
             description: description
         )

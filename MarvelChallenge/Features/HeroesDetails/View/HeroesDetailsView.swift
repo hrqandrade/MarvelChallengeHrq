@@ -74,7 +74,7 @@ final class HeroesDetailsView: UIView {
     }
 
     func renderFavorite(isFavorite: Bool) {
-        headerView.trailingButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
+        headerView.trailingButton.setImage(UIImage(systemName: isFavorite ? "star.fill" : "star"), for: .normal)
         headerView.trailingButton.accessibilityLabel = isFavorite
             ? Localizable.Details.removeFavorite(characterName: characterName)
             : Localizable.Details.addFavorite(characterName: characterName)
