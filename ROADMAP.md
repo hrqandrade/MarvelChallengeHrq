@@ -172,7 +172,7 @@ O novo target de UI Tests percorre os caminhos essenciais com os dados locais do
 
 O catálogo ficou restrito ao que realmente precisa ser próprio do aplicativo: um App Icon opaco em alta resolução, o logo da Launch Screen e sua cor de fundo. Favoritos, alternância de layout e estados vazios usam SF Symbols, mantendo escala e renderização consistentes sem carregar cópias rasterizadas. A Launch Screen preserva o vermelho e o logo que introduzem a primeira tela do catálogo.
 
-### 16. Preparação da release — planejada
+### 16. Preparação da release — em homologação
 
 - Gerar e validar um archive de Release.
 - Confirmar que mocks, argumentos de demonstração e credenciais não estão no binário final.
@@ -189,8 +189,11 @@ Esta fase estará pronta com um archive limpo, reproduzível e acompanhado das e
 - [x] Produto compilado sem valores de credenciais; somente os nomes das variáveis de ambiente fazem parte do cliente live.
 - [x] Changelog da 2.0.0 e limitações conhecidas documentados.
 - [x] Regressão automatizada repetida a partir do estado final da fase: 47 testes de unidade e integração, além de 4 testes de interface.
-- [ ] Memory Graph, Leaks, Allocations e fluidez do scroll conferidos na configuração Release.
+- [x] Leaks e Allocations conferidos no início e no estado de erro da configuração Release, sem vazamentos detectados.
+- [x] Fluxos de catálogo, mudança de layout, detalhes e favoritos exercitados em Debug durante a coleta de Animation Hitches, sem hitches ou hangs detectados.
+- [ ] Memory Graph conferido em aparelho físico após percorrer e encerrar os fluxos principais.
 - [ ] Fluxos de catálogo, favoritos e detalhes percorridos com VoiceOver em aparelho físico.
+- [ ] Licença de distribuição do repositório definida pelo responsável pelo projeto.
 
 ### 17. Release 2.0.0 — planejada
 
