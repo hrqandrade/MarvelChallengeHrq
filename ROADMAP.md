@@ -170,7 +170,7 @@ O novo target de UI Tests percorre os caminhos essenciais com os dados locais do
 - Remover arquivos duplicados ou herdados que não sejam mais usados.
 - Conferir consistência visual entre a Launch Screen e a primeira tela.
 
-O catálogo ficou restrito ao que realmente precisa ser próprio do aplicativo: um App Icon opaco em alta resolução, o logo da Launch Screen e sua cor de fundo. Favoritos, alternância de layout e estados vazios usam SF Symbols, mantendo escala e renderização consistentes sem carregar cópias rasterizadas. A Launch Screen preserva o vermelho e o logo que introduzem a primeira tela do catálogo.
+O catálogo ficou restrito a um App Icon opaco em alta resolução e à cor de fundo da Launch Screen. A revisão de licenciamento substituiu o ícone com logo oficial por uma composição geométrica própria e removeu o logo da tela de abertura. Favoritos, alternância de layout e estados vazios usam SF Symbols, mantendo escala e renderização consistentes sem carregar cópias rasterizadas. A Launch Screen preserva a cor de fundo que introduz a primeira tela do catálogo, sem usar o logo oficial.
 
 ### 16. Preparação da release — em homologação
 
@@ -193,7 +193,8 @@ Esta fase estará pronta com um archive limpo, reproduzível e acompanhado das e
 - [x] Fluxos de catálogo, mudança de layout, detalhes e favoritos exercitados em Debug durante a coleta de Animation Hitches, sem hitches ou hangs detectados.
 - [ ] Memory Graph conferido em aparelho físico após percorrer e encerrar os fluxos principais.
 - [ ] Fluxos de catálogo, favoritos e detalhes percorridos com VoiceOver em aparelho físico.
-- [ ] Licença de distribuição do repositório definida pelo responsável pelo projeto.
+- [x] Licença MIT definida para o código próprio, com direitos de terceiros separados em `THIRD_PARTY_NOTICES.md`.
+- [ ] Termos e atribuição da API confirmados antes de distribuir o modo live; consulta aos endpoints oficiais retornou HTTP 403 em 23/09/2026.
 
 ### 17. Release 2.0.0 — planejada
 

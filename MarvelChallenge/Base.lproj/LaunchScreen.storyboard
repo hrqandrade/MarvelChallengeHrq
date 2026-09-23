@@ -14,20 +14,7 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="MarvelLogo" translatesAutoresizingMaskIntoConstraints="NO" id="8mB-8H-Qya">
-                                <rect key="frame" x="56" y="239.5" width="208" height="83.5"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="8mB-8H-Qya" secondAttribute="height" multiplier="400:161" id="blz-E1-mAa"/>
-                                </constraints>
-                            </imageView>
-                        </subviews>
                         <color key="backgroundColor" name="LaunchBackground"/>
-                        <constraints>
-                            <constraint firstItem="8mB-8H-Qya" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="QLk-45-jHB"/>
-                            <constraint firstItem="8mB-8H-Qya" firstAttribute="width" secondItem="6Tk-OE-BBY" secondAttribute="width" multiplier="0.65" id="XmO-1A-gSr"/>
-                            <constraint firstItem="8mB-8H-Qya" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="f9f-k5-fgd"/>
-                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                 </viewController>
@@ -37,7 +24,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="MarvelLogo" width="266.66665649414062" height="107.33333587646484"/>
         <namedColor name="LaunchBackground">
             <color red="0.927" green="0.116" blue="0.141" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
