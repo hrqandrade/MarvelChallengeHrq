@@ -181,3 +181,13 @@ Para validar a integração real durante o desenvolvimento, edite o Scheme no Xc
 A evolução técnica até a release 2.0.0 está organizada no [`ROADMAP.md`](ROADMAP.md). O planejamento inclui segurança de runtime, ciclo de vida e memória, cancelamento, paginação, persistência, limites arquiteturais, testes, componentes do Design System e integração contínua.
 
 O roadmap é tratado como um documento vivo: descobertas técnicas são priorizadas pelo risco e incorporadas às próximas entregas com critérios claros de conclusão.
+
+## Licença e direitos de terceiros
+
+O código próprio é disponibilizado sob a [licença MIT](LICENSE), para estudo,
+modificação e reutilização, inclusive comercial, respeitadas suas condições.
+Essa permissão não abrange marcas ou materiais de terceiros.
+
+Projeto independente, sem afiliação ou endosso da Marvel ou da Disney.
+Consulte [Direitos de terceiros](THIRD_PARTY_NOTICES.md) para o escopo da licença,
+os avisos e as condições que devem ser verificadas antes de distribuir conteúdo.

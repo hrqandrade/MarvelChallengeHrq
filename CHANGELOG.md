@@ -30,8 +30,15 @@ Este arquivo registra as mudanças relevantes de cada versão publicada.
 - Verificações de formatação, análise estática, build e testes na integração contínua.
 - Archive Release reproduzível e verificação do produto compilado.
 
+### Licenciamento
+
+- Licença MIT para o código próprio e avisos separados sobre direitos de terceiros.
+- Substituição do ícone com logo oficial por uma composição geométrica própria e remoção do logo da tela de abertura.
+
 ### Limitações conhecidas
 
 - O modo live exige credenciais próprias da API da Marvel configuradas localmente.
 - Sem um serviço intermediário, a chave privada não deve ser usada em uma distribuição pública.
 - A validação final de VoiceOver e o profiling da release dependem de execução em aparelho físico.
+
+- A distribuição do modo live depende de conferir os termos e a atribuição da API; a consulta oficial retornou HTTP 403 nesta revisão.
