@@ -144,7 +144,7 @@ git switch -c feat/image-loader-spm
 
 ## Testes
 
-Os testes cobrem estados e concorrência do ViewModel, contratos HTTP do `HeroService` com `URLProtocol`, cancelamento e paginação, política de payload inválido, cache e persistência de favoritos, reuso de células, composição programática, navegação e desalocação dos principais fluxos. As regras do `FavoritesStore` usam uma persistência em memória nos testes; um conjunto menor valida o adaptador de arquivo real. Para executá-los:
+Os testes cobrem estados e concorrência do ViewModel, contratos HTTP do `HeroService` com `URLProtocol`, cancelamento e paginação, política de payload inválido, cache e persistência de favoritos, reuso de células, composição programática, navegação e desalocação dos principais fluxos. Um target enxuto de UI Tests percorre catálogo, troca de layout, detalhes, favoritos e as localizações em português do Brasil e inglês usando apenas os dados locais do modo Debug. As regras do `FavoritesStore` usam uma persistência em memória nos testes; um conjunto menor valida o adaptador de arquivo real. Para executá-los:
 
 ```bash
 xcodebuild test \
@@ -162,9 +162,13 @@ make bootstrap
 make quality
 make build
 make test
+make archive
+make validate-release
 ```
 
 Pull Requests para `develop` e `master` executam formatação, análise estática, build e os testes automatizados. O processo de contribuição e os critérios de revisão estão documentados em [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+As mudanças da versão em preparação estão reunidas em [`CHANGELOG.md`](CHANGELOG.md). A homologação final combina as verificações reproduzíveis acima com a passagem manual registrada no roadmap.
 
 ## Modo de demonstração
 

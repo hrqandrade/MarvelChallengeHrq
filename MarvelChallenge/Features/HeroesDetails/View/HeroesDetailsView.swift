@@ -74,7 +74,7 @@ final class HeroesDetailsView: UIView {
     }
 
     func renderFavorite(isFavorite: Bool) {
-        headerView.trailingButton.setImage(UIImage(named: isFavorite ? "likedStar" : "dislikedStar"), for: .normal)
+        headerView.trailingButton.setImage(UIImage(systemName: isFavorite ? "star.fill" : "star"), for: .normal)
         headerView.trailingButton.accessibilityLabel = isFavorite
             ? Localizable.Details.removeFavorite(characterName: characterName)
             : Localizable.Details.addFavorite(characterName: characterName)
@@ -95,9 +95,11 @@ final class HeroesDetailsView: UIView {
     }
 
     private func configureHeader() {
+        headerView.leadingButton.accessibilityIdentifier = AccessibilityIdentifier.Details.backButton
         headerView.leadingButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
         headerView.leadingButton.accessibilityLabel = Localizable.Details.back
         headerView.leadingButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
+        headerView.trailingButton.accessibilityIdentifier = AccessibilityIdentifier.Details.favoriteButton
         headerView.trailingButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
     }
 

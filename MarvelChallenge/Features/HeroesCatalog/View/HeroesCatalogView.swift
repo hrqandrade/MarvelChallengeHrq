@@ -82,7 +82,7 @@ final class HeroesCatalogView: UIView {
         refreshControl.endRefreshing()
         paginationIndicator.stopAnimating()
         collectionView.reloadData()
-        let imageName = section == .characters ? "emptyList" : "emptyFavorite"
+        let imageName = section == .characters ? "person.3.fill" : "star"
         let title = section == .characters
             ? Localizable.Catalog.emptyCharactersTitle
             : Localizable.Catalog.emptyFavoritesTitle
@@ -90,7 +90,7 @@ final class HeroesCatalogView: UIView {
             ? Localizable.Catalog.emptyCharactersDescription
             : Localizable.Catalog.emptyFavoritesDescription
         collectionView.backgroundView = MarvelEmptyStateView(
-            image: UIImage(named: imageName),
+            image: UIImage(systemName: imageName),
             title: title,
             description: description
         )
@@ -119,12 +119,14 @@ final class HeroesCatalogView: UIView {
     }
 
     private func configureHeader() {
+        headerView.leadingButton.accessibilityIdentifier = AccessibilityIdentifier.Catalog.layoutButton
         headerView.leadingButton.accessibilityLabel = Localizable.Catalog.changeLayout
         headerView.leadingButton.addTarget(self, action: #selector(didTapLayout), for: .touchUpInside)
         headerView.trailingButton.isHidden = true
     }
 
     private func configureCollection() {
+        collectionView.accessibilityIdentifier = AccessibilityIdentifier.Catalog.collection
         collectionView.backgroundColor = DesignSystem.Color.backgroundPrimary
         collectionView.alwaysBounceVertical = true
         collectionView.showsVerticalScrollIndicator = false
@@ -142,6 +144,7 @@ final class HeroesCatalogView: UIView {
     }
 
     private func configureFooter() {
+        segmentedControl.accessibilityIdentifier = AccessibilityIdentifier.Catalog.sectionControl
         footerView.backgroundColor = DesignSystem.Color.surface
         segmentedControl.selectedSegmentIndex = 0
         segmentedControl.backgroundColor = DesignSystem.Color.accent.withAlphaComponent(0.12)
