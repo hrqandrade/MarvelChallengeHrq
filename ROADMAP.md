@@ -1,0 +1,220 @@
+# Roadmap técnico
+
+Este arquivo acompanha a modernização do Marvel Challenge até a versão 2.0.0. Ele nasceu para registrar o que já mudou, o que aprendemos no caminho e o que ainda falta antes da release.
+
+## Como estamos trabalhando
+
+- Problemas de crash, perda de dados, concorrência e memória vêm antes de ajustes cosméticos.
+- Cada entrega leva seus próprios testes. Não deixamos toda a validação para o final.
+- Refatorações preservam o comportamento existente, salvo quando a mudança é intencional e documentada.
+- O trabalho parte da `develop` e volta para ela por Pull Request.
+
+## Fases
+
+### 0. Fundação da modernização — concluída
+
+- Migrar a arquitetura principal de MVC para MVVM-C.
+- Remover CocoaPods e adotar APIs nativas quando suficientes.
+- Extrair o carregamento de imagens para o `MarvelImageLoader` via SPM.
+- Criar o `MarvelDesignSystem` com tokens semânticos.
+- Centralizar textos no String Catalog `Localizable`.
+- Retirar credenciais do código versionado.
+- Definir a versão 2.0.0 e o fluxo de branches.
+
+### 1. Organização por feature e camada — concluída
+
+- Alinhar pastas físicas e grupos do Xcode.
+- Aproximar View e ViewModel dentro de cada feature.
+- Separar `Application`, `Core`, `Features` e `Shared`.
+- Remover arquivos e referências antigas sem uso.
+
+Consideramos esta fase pronta com o projeto compilando, os testes aprovados e as referências do Xcode organizadas.
+
+### 2. Segurança de runtime e ciclo de vida — concluída
+
+- Corrigir o cálculo recursivo de `itemSize` nos layouts.
+- Remover force casts, force unwraps e dependências implicitamente desembrulhadas evitáveis.
+- Limpar closures e cancelar imagens em `prepareForReuse`.
+- Integrar o loading ao fluxo de estado ou remover o componente enquanto não tiver uso.
+- Validar desalocação de Coordinator, ViewControllers, ViewModels e células.
+
+Esta fase foi encerrada sem caminhos conhecidos de crash por cast ou unwrap e com testes básicos de desalocação. A passagem manual pelo Memory Graph em aparelho físico foi adiada para uma validação posterior à publicação do código-fonte da 2.0.0.
+
+### 3. Concorrência, cancelamento e paginação — concluída
+
+- Fazer o serviço de rede devolver uma operação cancelável.
+- Cancelar requisições substituídas, recarregadas ou sem consumidor.
+- Isolar atualizações de apresentação na main thread com contrato explícito.
+- Modelar loading inicial, refresh e paginação como estados diferentes.
+- Impedir respostas antigas de sobrescrever estados recentes.
+- Controlar última página e impedir requisições infinitas.
+
+Esta fase ficou pronta com paginação previsível, operações canceláveis e testes para reload, falhas, concorrência e fim da lista.
+
+### 4. Persistência robusta — concluída
+
+- Manter um índice de favoritos em memória para evitar leitura de disco durante a renderização.
+- Retirar I/O síncrono do caminho crítico da interface.
+- Diferenciar arquivo inexistente, conteúdo corrompido e falha de escrita.
+- Propagar erros de salvar e remover até o estado de apresentação.
+- Validar acesso concorrente e escrita atômica.
+
+Esta fase ficou pronta quando as consultas deixaram de acessar disco na main thread e os erros passaram a chegar até a camada de apresentação.
+
+### 5. Limites arquiteturais e navegação — concluída
+
+- Separar DTOs da API, modelos de domínio e modelos de apresentação.
+- Mapear respostas opcionais na fronteira da camada de rede.
+- Retirar localização e mensagens de interface dos erros de infraestrutura.
+- Introduzir uma fábrica de telas para tornar a injeção obrigatória e testável.
+- Fazer o Coordinator controlar apresentação e encerramento de todos os fluxos.
+- Remover Storyboards das telas e construí-las programaticamente com Auto Layout.
+- Eliminar outlets, actions e identifiers, tornando dependências obrigatórias por inicializador.
+
+Ao final desta fase, a UI deixou de depender dos DTOs da API, a infraestrutura deixou de conhecer textos de interface e a navegação passou a ser testável fora das ViewControllers.
+
+### 6. Estratégia de testes — concluída
+
+- Cobrir estados e transições dos ViewModels.
+- Testar o `HeroService` com `URLProtocol`, sem rede real.
+- Cobrir paginação, cancelamento, respostas inválidas e códigos HTTP.
+- Centralizar a configuração de page size e validar offset e limite nos testes do serviço.
+- Definir e testar a política para respostas parcialmente inválidas, sem descarte silencioso de DTOs.
+- Cobrir persistência, atualização, ordenação, corrupção e falha de escrita.
+- Adicionar testes de navegação, reuso de células e desalocação.
+- Cobrir a composição programática e os fluxos principais das telas sem depender de rede real.
+
+Esta fase foi concluída com os principais riscos cobertos e a suíte executável localmente por um único comando. Testes end-to-end de interface continuam como uma evolução futura.
+
+### 7. Componentes do Design System — concluída
+
+- Evoluir tokens para componentes reutilizáveis.
+- Padronizar loading, empty state, cards, botões e mensagens de erro.
+- Extrair `HeroesCatalogView` e `HeroesDetailsView`, mantendo as ViewControllers focadas em lifecycle e binding.
+- Criar tokens semânticos para área mínima de toque, ícones, barras, cards e bordas.
+- Adotar Dynamic Type, rótulos de VoiceOver e áreas mínimas de toque nos componentes principais.
+
+Esta fase ficou pronta com as telas principais usando estilos e componentes compartilhados. A revisão completa de contraste e tamanhos extremos de Dynamic Type será repetida na regressão da release.
+
+### 8. Integração contínua e qualidade — concluída
+
+- Executar build e testes em Pull Requests.
+- Aplicar SwiftFormat e SwiftLint de forma reproduzível.
+- Tornar explícitos os contratos de fila dos serviços e remover dispatches defensivos redundantes.
+- Remover métodos vazios e comentários residuais dos templates do Xcode.
+- Adicionar regras de contribuição e checklist de revisão.
+- Monitorar tempo de build, warnings e estabilidade dos testes.
+
+Esta fase foi concluída com checks obrigatórios de qualidade, build e testes antes do merge na `develop`.
+
+### 9. Ambiente de demonstração — concluída
+
+- Disponibilizar dados representativos para revisão visual sem credenciais da API.
+- Ativar dados de demonstração por padrão em builds Debug.
+- Permitir integração real em Debug por argumento de lançamento explícito.
+- Garantir que serviços e dados de demonstração não sejam compilados em Release.
+
+Esta fase ficou pronta com catálogo, favoritos e detalhes navegáveis usando dados previsíveis. O código de demonstração não faz parte dos builds de Release.
+
+### 10. Estabilidade da suíte e persistência — concluída
+
+- Corrigir o warning de transição de aparência que ainda aparece durante os testes.
+- Separar as regras do `FavoritesStore` do acesso físico ao arquivo.
+- Manter poucos testes de integração com disco e executar os demais com uma implementação em memória.
+- Reduzir a dependência de timeouts longos sem diminuir a carga ou as verificações dos testes.
+- Preservar a escrita atômica e atualizar o cache somente depois que os dados forem persistidos.
+
+Esta fase ficou pronta com a navegação testável sem lifecycle artificial, regras de persistência executadas em memória e testes de integração dedicados ao arquivo real.
+
+### 11. Demonstração offline — concluída
+
+- Substituir as imagens remotas do modo demo por ilustrações locais geradas pelo próprio aplicativo.
+- Manter as URLs reais apenas no fluxo de integração com a API.
+- Garantir que catálogo, favoritos e detalhes possam ser avaliados sem conexão com a internet.
+
+O modo demo agora usa monogramas visuais determinísticos, sem downloads ou arquivos de terceiros. A mesma solução funciona como fallback no fluxo real e mantém catálogo, favoritos e detalhes legíveis mesmo sem uma imagem disponível.
+
+### 12. Estados de erro e feedback — concluída
+
+- Apresentar falhas de catálogo no contexto da tela, com opção de tentar novamente.
+- Preservar o conteúdo existente quando refresh, paginação ou favoritos falharem.
+- Diferenciar loading inicial, atualização e carregamento da próxima página visualmente.
+- Dar retorno claro ao adicionar ou remover um favorito.
+
+Falhas na primeira carga agora ficam na própria tela com uma ação de nova tentativa. Atualização, paginação e favoritos preservam o conteúdo existente e usam feedback transitório; os indicadores de carregamento deixam claro qual operação está em andamento sem bloquear a navegação.
+
+### 13. Acessibilidade e adaptação de layout — concluída
+
+- Validar VoiceOver, ordem de leitura, traits e estado dos controles.
+- Revisar contraste, Bold Text, Reduce Motion e os maiores tamanhos de Dynamic Type.
+- Remover alturas fixas que causem truncamento nos tamanhos de acessibilidade.
+- Definir e validar as orientações realmente suportadas no iPhone e no iPad.
+
+A base reage aos tamanhos de texto de acessibilidade, respeita Reduce Motion e mantém os cards acionáveis sem perder a ação de favorito. A tela de detalhes isola a leitura do conteúdo apresentado, e os controles anunciam personagem e estado sem depender apenas da cor. Também validamos Bold Text, contraste e as orientações declaradas: retrato no iPhone e as quatro orientações no iPad.
+
+O Simulator não disponibiliza o VoiceOver completo nos Ajustes. Por isso, a navegação foi conferida pela árvore de acessibilidade do sistema, cobrindo catálogo, favoritos e detalhes. A passagem falada em aparelho físico foi adiada para uma validação posterior à publicação do código-fonte da 2.0.0.
+
+### 14. Testes dos fluxos principais — concluída
+
+- Criar um target enxuto de UI Tests.
+- Cobrir abertura em modo demo, troca de layout, detalhes e favoritos.
+- Validar a presença das localizações em inglês e português do Brasil.
+- Impedir que chaves de localização apareçam diretamente na interface.
+
+O novo target de UI Tests percorre os caminhos essenciais com os dados locais do modo Debug: abre o catálogo, troca o layout, navega para detalhes e confirma a inclusão de um personagem nos favoritos. A suíte também inicia o aplicativo em português do Brasil e em inglês, verifica os principais textos e falha se uma chave de localização for exposta nessas telas. Esses testes fazem parte do scheme compartilhado e, portanto, entram no mesmo comando executado pela CI.
+
+### 15. Assets e acabamento visual — concluída
+
+- Revisar App Icon, logo, favoritos e ilustrações de estado vazio.
+- Preferir SF Symbols ou assets vetoriais quando fizer sentido.
+- Remover arquivos duplicados ou herdados que não sejam mais usados.
+- Conferir consistência visual entre a Launch Screen e a primeira tela.
+
+O catálogo ficou restrito a um App Icon opaco em alta resolução e à cor de fundo da Launch Screen. A revisão de licenciamento substituiu o ícone com logo oficial por uma composição geométrica própria e removeu o logo da tela de abertura. Favoritos, alternância de layout e estados vazios usam SF Symbols, mantendo escala e renderização consistentes sem carregar cópias rasterizadas. A Launch Screen preserva a cor de fundo que introduz a primeira tela do catálogo, sem usar o logo oficial.
+
+### 16. Preparação da release — escopo de código-fonte
+
+- Gerar e validar um archive de Release.
+- Confirmar que mocks, argumentos de demonstração e credenciais não estão no binário final.
+- Executar regressão funcional, Memory Graph, Leaks, Allocations e revisão de performance durante scroll.
+- Revisar warnings, licenças, atribuições e limitações conhecidas.
+- Criar o changelog da versão 2.0.0.
+
+A publicação da 2.0.0 abrange o código-fonte para estudo e a demonstração local em Debug. O archive é uma evidência de compilação e não será distribuído como aplicativo homologado. Em 23/09/2026, o responsável decidiu adiar a validação em aparelho físico. Essa decisão não equivale à aprovação dos testes físicos nem da integração live.
+
+#### Evidências da homologação
+
+- [x] Archive Release 2.0.0 gerado para iOS e validado pelo Xcode.
+- [x] Produto compilado sem implementações, catálogo mockado ou argumento de demonstração.
+- [x] Produto compilado sem valores de credenciais; somente os nomes das variáveis de ambiente fazem parte do cliente live.
+- [x] Changelog da 2.0.0 e limitações conhecidas documentados.
+- [x] Regressão automatizada repetida a partir do estado final da fase: 47 testes de unidade e integração, além de 4 testes de interface.
+- [x] Leaks e Allocations conferidos no início e no estado de erro da configuração Release, sem vazamentos detectados.
+- [x] Fluxos de catálogo, mudança de layout, detalhes e favoritos exercitados em Debug durante a coleta de Animation Hitches, sem hitches ou hangs detectados.
+- **Adiado:** Memory Graph em aparelho físico após percorrer e encerrar os fluxos principais; não executado nesta release.
+- **Adiado:** catálogo, favoritos e detalhes com VoiceOver em aparelho físico; não executado nesta release.
+- [x] Licença MIT definida para o código próprio, com direitos de terceiros separados em `THIRD_PARTY_NOTICES.md`.
+- [ ] Termos e atribuição da API confirmados antes de distribuir o modo live; consulta aos endpoints oficiais retornou HTTP 403 em 23/09/2026.
+
+### 17. Release 2.0.0 — publicação de código-fonte
+
+- Abrir Pull Request da `develop` para a `master`.
+- Criar a tag e a release 2.0.0.
+- Publicar o resumo da modernização e as limitações conhecidas.
+
+A publicação reúne o código-fonte na `master`, tag 2.0.0 e notas com os resultados automatizados e as limitações. Não inclui IPA, distribuição na App Store ou homologação do modo live. A validação física fica adiada; os termos e a atribuição da API continuam pendentes antes de distribuir conteúdo remoto.
+
+## Quando uma fase está pronta
+
+Antes de marcar uma fase como concluída, conferimos se:
+
+- o código compila sem novos warnings relevantes;
+- testes proporcionais ao risco foram adicionados e estão passando;
+- memória, concorrência e estados de erro foram considerados na revisão;
+- documentação e roadmap refletem a decisão final;
+- o Pull Request foi revisado e integrado à `develop`.
+
+## Acompanhamento posterior à 2.0.0
+
+- [ ] Executar Memory Graph e VoiceOver em aparelho físico.
+- [ ] Confirmar disponibilidade, termos e atribuição da API antes de distribuir o modo live.

@@ -1,64 +1,784 @@
-//
-//  MarvelChallengeTests.swift
-//  MarvelChallengeTests
-//
-//  Created by Henrique Silva on 07/01/21.
-//  Copyright © 2021 Henrique Silva. All rights reserved.
-//
-
-import XCTest
 @testable import MarvelChallenge
+import UIKit
+import XCTest
 
-class MarvelChallengeTests: XCTestCase {
-    let delegate = RequestDelegateCopy()
-    var manager: RequestManager?
-
-    override func setUp() {
-    }
-
+final class MarvelChallengeTests: XCTestCase {
     override func tearDown() {
-        manager = nil
+        URLProtocolStub.handler = nil
+        URLProtocolStub.shouldFinishLoading = true
+        URLProtocolStub.onStopLoading = nil
+        super.tearDown()
     }
 
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testCatalogPublishesEmptyStateWhenServiceReturnsNoCharacters() {
+        let service = HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0)))
+        let store = makeTransientFavoritesStore()
+        let viewModel = HeroesCatalogViewModel(service: service, favorites: store)
+        let expectation = expectation(description: "empty state")
+
+        viewModel.onStateChange = { state in
+            if state == .empty {
+                expectation.fulfill()
+            }
+        }
+        viewModel.loadInitial()
+
+        wait(for: [expectation], timeout: 1)
+        XCTAssertEqual(viewModel.itemCount, 0)
     }
 
-    func testeParseCharactersValue(){
-        let expectation = self.expectation(description: "RequestCharacter")
-        manager = RequestManager(delegate: delegate)
-        manager?.getHeroes(page: 0)
-        
-        var isEqual = false
-        if case .success(results: _) = delegate.handledSuccess {
-            isEqual = true
-            expectation.fulfill()
-        }
-        
-        waitForExpectations(timeout: 5, handler: nil)
-        XCTAssertEqual(isEqual, true)
-    }
-    
-    func testeErrorDelegateValue() {
-        let expectation = self.expectation(description: "RequestCharacter")
-        let manager = RequestManager(delegate: delegate)
-        manager.fileName = ""
-        manager.getHeroes(page: 0)
-        
-        var isEqual = false
-        if case .success(results: _) = delegate.handledSuccess {
-            isEqual = false
-            expectation.fulfill()
-        }
-        
-        if case .errorGetHeroes = delegate.handledError {
-            isEqual = true
-            expectation.fulfill()
-        }
-        
-        waitForExpectations(timeout: 5, handler: nil)
-        XCTAssertEqual(isEqual, true)
+    func testReloadCancelsPreviousRequestAndIgnoresItsResponse() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        var states: [HeroesCatalogState] = []
+        viewModel.onStateChange = { states.append($0) }
+
+        viewModel.loadInitial()
+        let initialToken = try XCTUnwrap(service.requests.first?.token)
+        viewModel.reload()
+
+        XCTAssertTrue(initialToken.isCancelled)
+        XCTAssertEqual(service.requests.map(\.page), [0, 0])
+        XCTAssertEqual(states, [.initialLoading, .initialLoading])
+
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter(id: 1, name: "Old")],
+            offset: 0,
+            total: 1
+        )))
+        XCTAssertTrue(viewModel.characters.isEmpty)
+
+        try service.completeRequest(at: 1, with: .success(HeroesPage(
+            characters: [makeCharacter(id: 2, name: "Current")],
+            offset: 0,
+            total: 1
+        )))
+        XCTAssertEqual(viewModel.characters.first?.id, 2)
+        XCTAssertEqual(states.last, .loaded)
     }
 
+    func testCatalogDoesNotRequestAnotherPageAfterReachingTotal() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+
+        viewModel.loadInitial()
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
+            offset: 0,
+            total: 1
+        )))
+        viewModel.loadNextPageIfNeeded(index: 0)
+
+        XCTAssertEqual(service.requests.count, 1)
+    }
+
+    func testCatalogAppendsNextPageAndPublishesPaginationState() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        var states: [HeroesCatalogState] = []
+        viewModel.onStateChange = { states.append($0) }
+
+        viewModel.loadInitial()
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter(id: 1, name: "First")],
+            offset: 0,
+            total: 2
+        )))
+        viewModel.loadNextPageIfNeeded(index: 0)
+
+        XCTAssertEqual(service.requests.map(\.page), [0, 1])
+        XCTAssertEqual(states.last, .loadingNextPage)
+
+        try service.completeRequest(at: 1, with: .success(HeroesPage(
+            characters: [makeCharacter(id: 2, name: "Second")],
+            offset: 1,
+            total: 2
+        )))
+        XCTAssertEqual(viewModel.characters.compactMap(\.id), [1, 2])
+        XCTAssertEqual(states.last, .loaded)
+    }
+
+    func testCatalogDoesNotDuplicatePaginationRequestWhileOneIsRunning() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+
+        viewModel.loadInitial()
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
+            offset: 0,
+            total: 2
+        )))
+        viewModel.loadNextPageIfNeeded(index: 0)
+        viewModel.loadNextPageIfNeeded(index: 0)
+
+        XCTAssertEqual(service.requests.map(\.page), [0, 1])
+    }
+
+    func testCatalogPublishesFailureAndAllowsRetry() {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        var states: [HeroesCatalogState] = []
+        viewModel.onStateChange = { states.append($0) }
+
+        viewModel.loadInitial()
+        service.completeRequest(at: 0, with: .failure(.transport))
+        viewModel.reload()
+
+        XCTAssertEqual(states, [.initialLoading, .failed(Localizable.Error.transport), .initialLoading])
+        XCTAssertEqual(service.requests.map(\.page), [0, 0])
+    }
+
+    func testCatalogPublishesBackgroundCompletionOnMainThread() throws {
+        let expectation = expectation(description: "main thread state")
+        let service = try BackgroundHeroServiceStub(page: HeroesPage(
+            characters: [makeCharacter()],
+            offset: 0,
+            total: 1
+        ))
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        viewModel.onStateChange = { state in
+            guard state == .loaded else { return }
+            XCTAssertTrue(Thread.isMainThread)
+            expectation.fulfill()
+        }
+
+        viewModel.loadInitial()
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testViewModelCancelsRequestWhenReleased() throws {
+        let service = HeroServiceSpy()
+        var viewModel: HeroesCatalogViewModel? = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+
+        viewModel?.loadInitial()
+        let token = try XCTUnwrap(service.requests.first?.token)
+        viewModel = nil
+
+        XCTAssertTrue(token.isCancelled)
+    }
+
+    func testCatalogPublishesFavoriteWritingFailure() throws {
+        let viewModel = HeroesCatalogViewModel(
+            service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
+            favorites: FailingFavoritesStoreStub()
+        )
+        let expectation = expectation(description: "favorite writing failure")
+        viewModel.onFeedback = { feedback in
+            guard feedback == .error(Localizable.Error.favoritesWriting) else { return }
+            expectation.fulfill()
+        }
+
+        try viewModel.toggleFavorite(makeCharacter())
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testPaginationFailurePreservesCharactersAndPublishesFeedback() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        var states: [HeroesCatalogState] = []
+        var feedback: [HeroesCatalogFeedback] = []
+        viewModel.onStateChange = { states.append($0) }
+        viewModel.onFeedback = { feedback.append($0) }
+
+        viewModel.loadInitial()
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
+            offset: 0,
+            total: 2
+        )))
+        viewModel.loadNextPageIfNeeded(index: 0)
+        try service.completeRequest(at: 1, with: .failure(.transport))
+
+        XCTAssertEqual(viewModel.characters.count, 1)
+        XCTAssertEqual(states.suffix(2), [.loadingNextPage, .loaded])
+        XCTAssertEqual(feedback, [.error(Localizable.Error.transport)])
+    }
+
+    func testRefreshFailurePreservesCharactersAndPublishesFeedback() throws {
+        let service = HeroServiceSpy()
+        let viewModel = HeroesCatalogViewModel(
+            service: service,
+            favorites: makeTransientFavoritesStore()
+        )
+        var states: [HeroesCatalogState] = []
+        var feedback: [HeroesCatalogFeedback] = []
+        viewModel.onStateChange = { states.append($0) }
+        viewModel.onFeedback = { feedback.append($0) }
+
+        viewModel.loadInitial()
+        try service.completeRequest(at: 0, with: .success(HeroesPage(
+            characters: [makeCharacter()],
+            offset: 0,
+            total: 1
+        )))
+        viewModel.reload()
+        try service.completeRequest(at: 1, with: .failure(.transport))
+
+        XCTAssertEqual(viewModel.characters.count, 1)
+        XCTAssertEqual(states.suffix(2), [.refreshing, .loaded])
+        XCTAssertEqual(feedback, [.error(Localizable.Error.transport)])
+    }
+
+    func testGridLayoutCalculatesTwoColumnsWithoutRecursion() {
+        let layout = GridFlowLayout()
+        let collectionView = UICollectionView(
+            frame: CGRect(x: 0, y: 0, width: 320, height: 640),
+            collectionViewLayout: layout
+        )
+
+        layout.prepare()
+
+        XCTAssertEqual(layout.itemSize, CGSize(width: 146, height: 220))
+        XCTAssertTrue(collectionView.collectionViewLayout === layout)
+    }
+
+    func testListLayoutUsesAvailableCollectionWidth() {
+        let layout = ListFlowLayout()
+        let collectionView = UICollectionView(
+            frame: CGRect(x: 0, y: 0, width: 320, height: 640),
+            collectionViewLayout: layout
+        )
+
+        layout.prepare()
+
+        XCTAssertEqual(layout.itemSize, CGSize(width: 304, height: 104))
+        XCTAssertTrue(collectionView.collectionViewLayout === layout)
+    }
+
+    func testCoordinatorAndCatalogAreReleasedAfterFlowTeardown() {
+        weak var weakCoordinator: AppCoordinator?
+        weak var weakCatalog: HeroesCatalogViewController?
+
+        autoreleasepool {
+            let window = UIWindow()
+            var coordinator: AppCoordinator? = AppCoordinator(
+                window: window,
+                screenFactory: AppScreenFactory(dependencies: AppDependencies(
+                    heroService: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
+                    favoritesStore: makeTransientFavoritesStore()
+                ))
+            )
+
+            coordinator?.start()
+            let catalog = window.rootViewController as? HeroesCatalogViewController
+            catalog?.loadViewIfNeeded()
+            weakCoordinator = coordinator
+            weakCatalog = catalog
+            window.isHidden = true
+            window.rootViewController = nil
+            coordinator = nil
+        }
+
+        XCTAssertNil(weakCoordinator)
+        XCTAssertNil(weakCatalog)
+    }
+
+    func testCoordinatorBuildsDetailsWhenCatalogSelectsCharacter() throws {
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        let factory = ScreenFactorySpy()
+        let modalPresenter = ModalPresenterSpy()
+        let coordinator = AppCoordinator(
+            window: window,
+            screenFactory: factory,
+            modalPresenter: modalPresenter
+        )
+        let character = try makeCharacter()
+
+        coordinator.start()
+        factory.onSelect?(character)
+
+        XCTAssertTrue(window.rootViewController === factory.catalog)
+        XCTAssertEqual(factory.detailsCharacter, character)
+        XCTAssertTrue(modalPresenter.presentingViewController === factory.catalog)
+        XCTAssertTrue(modalPresenter.presentedViewController is HeroesDetailsViewController)
+        XCTAssertTrue(modalPresenter.presentedAnimated)
+
+        factory.onClose?()
+
+        XCTAssertTrue(modalPresenter.dismissedViewController === factory.catalog)
+        XCTAssertTrue(modalPresenter.dismissedAnimated)
+    }
+
+    func testDetailsControllerAndViewModelAreReleasedAfterDismissal() throws {
+        weak var weakController: HeroesDetailsViewController?
+        weak var weakViewModel: HeroesDetailsViewModel?
+
+        try autoreleasepool {
+            var viewModel: HeroesDetailsViewModel? = try HeroesDetailsViewModel(
+                character: makeCharacter(),
+                favorites: makeTransientFavoritesStore()
+            )
+            var controller: HeroesDetailsViewController? =
+                try HeroesDetailsViewController(viewModel: XCTUnwrap(viewModel))
+            controller?.loadViewIfNeeded()
+
+            weakController = controller
+            weakViewModel = viewModel
+            controller = nil
+            viewModel = nil
+        }
+
+        XCTAssertNil(weakController)
+        XCTAssertNil(weakViewModel)
+    }
+
+    func testProgrammaticScreensLoadTheirCriticalViews() throws {
+        let catalog = HeroesCatalogViewController(viewModel: HeroesCatalogViewModel(
+            service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
+            favorites: makeTransientFavoritesStore()
+        ))
+        let details = try HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
+            character: makeCharacter(),
+            favorites: makeTransientFavoritesStore()
+        ))
+
+        catalog.loadViewIfNeeded()
+        details.loadViewIfNeeded()
+
+        XCTAssertTrue(catalog.view is HeroesCatalogView)
+        XCTAssertTrue(details.view is HeroesDetailsView)
+        XCTAssertTrue(catalog.heroesCollectionView.isDescendant(of: catalog.view))
+        XCTAssertTrue(details.comicCollectionView.isDescendant(of: details.view))
+        XCTAssertEqual(catalog.preferredStatusBarStyle, .darkContent)
+        XCTAssertEqual(details.preferredStatusBarStyle, .darkContent)
+    }
+
+    func testDebugUsesDemoDependenciesByDefaultAndAllowsLiveOptIn() {
+        let demo = AppDependencies.resolve(arguments: ["MarvelChallenge"])
+        let standard = AppDependencies.resolve(arguments: ["MarvelChallenge", "-useLiveData"])
+
+        XCTAssertTrue(demo.heroService is DebugHeroService)
+        XCTAssertTrue(demo.favoritesStore is DebugFavoritesStore)
+        XCTAssertTrue(standard.heroService is HeroService)
+        XCTAssertTrue(standard.favoritesStore is FavoritesStore)
+        XCTAssertFalse(demo.favoritesStore.all().isEmpty)
+
+        var receivedPage: HeroesPage?
+        demo.heroService.fetchHeroes(page: 0) { result in
+            receivedPage = try? result.get()
+        }
+
+        XCTAssertEqual(receivedPage?.characters.count, DebugSampleData.characters.count)
+        XCTAssertEqual(receivedPage?.hasNextPage, false)
+    }
+
+    func testSharedHeaderProvidesAccessibleMinimumTouchTargets() {
+        let header = MarvelScreenHeaderView(title: "Title")
+        header.frame = CGRect(x: 0, y: 0, width: 320, height: MarvelComponentSize.navigationBarHeight)
+        header.layoutIfNeeded()
+
+        XCTAssertGreaterThanOrEqual(header.leadingButton.bounds.height, MarvelComponentSize.minimumTouchTarget)
+        XCTAssertGreaterThanOrEqual(header.trailingButton.bounds.height, MarvelComponentSize.minimumTouchTarget)
+    }
+
+    func testGridAndListCellsReleaseFavoriteActionsOnReuse() throws {
+        weak var gridOwner: ClosureOwner?
+        weak var listOwner: ClosureOwner?
+        let character = try makeCharacter()
+
+        autoreleasepool {
+            var owner: ClosureOwner? = ClosureOwner()
+            let gridCell = HeroesCollectionViewCell(frame: .zero)
+            gridCell.configure(character: character, isFavorite: false) { [owner] in owner?.run() }
+            gridOwner = owner
+            gridCell.prepareForReuse()
+            owner = nil
+        }
+        autoreleasepool {
+            var owner: ClosureOwner? = ClosureOwner()
+            let listCell = HeroesCollectionListCell(frame: .zero)
+            listCell.configure(character: character, isFavorite: false) { [owner] in owner?.run() }
+            listOwner = owner
+            listCell.prepareForReuse()
+            owner = nil
+        }
+
+        XCTAssertNil(gridOwner)
+        XCTAssertNil(listOwner)
+    }
+
+    func testHeroServiceBuildsPaginatedRequestAndMapsResponse() {
+        let service = makeHeroService { request in
+            let components = try XCTUnwrap(try URLComponents(
+                url: XCTUnwrap(request.url),
+                resolvingAgainstBaseURL: false
+            ))
+            let query = Dictionary(uniqueKeysWithValues: (components.queryItems ?? []).compactMap { item in
+                item.value.map { (item.name, $0) }
+            })
+            XCTAssertEqual(components.path, "/v1/public/characters")
+            XCTAssertEqual(query["offset"], "40")
+            XCTAssertEqual(query["limit"], "20")
+            XCTAssertEqual(query["orderBy"], "name")
+            XCTAssertEqual(query["apikey"], "public")
+            return (200, Data(Self.validHeroesJSON.utf8))
+        }
+        let expectation = expectation(description: "service success")
+
+        service.fetchHeroes(page: 2) { result in
+            guard case let .success(page) = result else {
+                return XCTFail("Expected a successful page")
+            }
+            XCTAssertEqual(page.characters.map(\.name), ["Spider-Man"])
+            XCTAssertEqual(page.offset, 40)
+            XCTAssertEqual(page.total, 41)
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testHeroServiceRejectsHTTPErrorAndInvalidPayload() {
+        assertHeroService(statusCode: 500, data: Data(), expectedError: .invalidResponse)
+        assertHeroService(statusCode: 200, data: Data("not-json".utf8), expectedError: .decoding)
+        assertHeroService(statusCode: 200, data: Data(#"{}"#.utf8), expectedError: .invalidResponse)
+        assertHeroService(
+            statusCode: 200,
+            data: Data(#"{"data":{"results":[{"name":"Missing id"}]}}"#.utf8),
+            expectedError: .decoding
+        )
+    }
+
+    func testHeroServiceMapsTransportFailure() throws {
+        let client = HTTPClientStub(error: URLError(.notConnectedToInternet))
+        let service = try HeroService(
+            httpClient: client,
+            baseURL: XCTUnwrap(URL(string: "https://example.com")),
+            publicKey: "public",
+            privateKey: "private"
+        )
+        var receivedResult: Result<HeroesPage, HeroServiceError>?
+
+        service.fetchHeroes(page: 0) { receivedResult = $0 }
+
+        XCTAssertEqual(receivedResult?.failure, .transport)
+        XCTAssertEqual(client.requestCount, 1)
+    }
+
+    func testHeroServiceCancelsUnderlyingRequest() throws {
+        let requestStarted = expectation(description: "request started")
+        let requestCancelled = expectation(description: "request cancelled")
+        URLProtocolStub.shouldFinishLoading = false
+        URLProtocolStub.onStopLoading = { requestCancelled.fulfill() }
+        let service = makeHeroService { _ in
+            requestStarted.fulfill()
+            return (200, Data(Self.validHeroesJSON.utf8))
+        }
+
+        let request = try XCTUnwrap(service.fetchHeroes(page: 0) { _ in })
+        wait(for: [requestStarted], timeout: 1)
+        request.cancel()
+
+        wait(for: [requestCancelled], timeout: 1)
+    }
+
+    func testHeroServiceFailsWithoutCredentialsBeforeStartingRequest() throws {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [URLProtocolStub.self]
+        let service = try HeroService(
+            session: URLSession(configuration: configuration),
+            baseURL: XCTUnwrap(URL(string: "https://example.com")),
+            publicKey: "",
+            privateKey: ""
+        )
+        var receivedResult: Result<HeroesPage, HeroServiceError>?
+
+        let request = service.fetchHeroes(page: 0) { receivedResult = $0 }
+
+        XCTAssertNil(request)
+        XCTAssertEqual(receivedResult?.failure, .missingCredentials)
+    }
+
+    private static let validHeroesJSON = #"""
+    {
+        "data": {
+            "offset": 40,
+            "total": 41,
+            "results": [{
+                "id": 1,
+                "name": "Spider-Man",
+                "description": "Hero",
+                "thumbnail": { "path": "https://example.com/hero", "extension": "jpg" },
+                "comics": { "items": [] },
+                "series": { "items": [] }
+            }]
+        }
+    }
+    """#
+
+    private func makeHeroService(
+        handler: @escaping (URLRequest) throws -> (Int, Data)
+    ) -> HeroService {
+        URLProtocolStub.handler = handler
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [URLProtocolStub.self]
+        return HeroService(
+            session: URLSession(configuration: configuration),
+            baseURL: URL(string: "https://example.com")!,
+            publicKey: "public",
+            privateKey: "private"
+        )
+    }
+
+    private func assertHeroService(statusCode: Int, data: Data, expectedError: HeroServiceError) {
+        let service = makeHeroService { _ in (statusCode, data) }
+        let expectation = expectation(description: "service failure \(expectedError)")
+        service.fetchHeroes(page: 0) { result in
+            XCTAssertEqual(result.failure, expectedError)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+    }
+
+    private func makeCharacter(id: Int = 1, name: String = "Spider-Man") throws -> Character {
+        Character(id: id, name: name, description: "", imageURL: nil, comics: [], series: [])
+    }
+}
+
+private final class URLProtocolStub: URLProtocol {
+    static var handler: ((URLRequest) throws -> (Int, Data))?
+    static var shouldFinishLoading = true
+    static var onStopLoading: (() -> Void)?
+
+    override class func canInit(with _: URLRequest) -> Bool {
+        true
+    }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {
+        do {
+            let handler = try XCTUnwrap(Self.handler)
+            let (statusCode, data) = try handler(request)
+            guard Self.shouldFinishLoading else { return }
+            let response = try XCTUnwrap(try HTTPURLResponse(
+                url: XCTUnwrap(request.url),
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: nil
+            ))
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() {
+        Self.onStopLoading?()
+    }
+}
+
+private final class HTTPClientStub: HTTPClient {
+    private let error: Error
+    private(set) var requestCount = 0
+
+    init(error: Error) {
+        self.error = error
+    }
+
+    func dataTask(
+        with _: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> RequestCancellable {
+        requestCount += 1
+        completion(nil, nil, error)
+        return RequestCancellableStub()
+    }
+}
+
+private final class RequestCancellableStub: RequestCancellable {
+    func cancel() {}
+}
+
+private final class ClosureOwner {
+    func run() {}
+}
+
+private extension Result {
+    var failure: Failure? {
+        if case let .failure(error) = self {
+            return error
+        }
+        return nil
+    }
+}
+
+private final class HeroServiceStub: HeroServicing {
+    let result: Result<HeroesPage, HeroServiceError>
+
+    init(result: Result<HeroesPage, HeroServiceError>) {
+        self.result = result
+    }
+
+    func fetchHeroes(
+        page: Int,
+        completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void
+    ) -> RequestCancellable? {
+        completion(result)
+        return nil
+    }
+}
+
+private final class HeroServiceSpy: HeroServicing {
+    struct Request {
+        let page: Int
+        let token: RequestTokenSpy
+        let completion: (Result<HeroesPage, HeroServiceError>) -> Void
+    }
+
+    private(set) var requests: [Request] = []
+
+    func fetchHeroes(
+        page: Int,
+        completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void
+    ) -> RequestCancellable? {
+        let token = RequestTokenSpy()
+        requests.append(Request(page: page, token: token, completion: completion))
+        return token
+    }
+
+    func completeRequest(at index: Int, with result: Result<HeroesPage, HeroServiceError>) {
+        requests[index].completion(result)
+    }
+}
+
+private final class RequestTokenSpy: RequestCancellable {
+    private(set) var isCancelled = false
+
+    func cancel() {
+        isCancelled = true
+    }
+}
+
+private final class BackgroundHeroServiceStub: HeroServicing {
+    let page: HeroesPage
+
+    init(page: HeroesPage) {
+        self.page = page
+    }
+
+    func fetchHeroes(
+        page: Int,
+        completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void
+    ) -> RequestCancellable? {
+        DispatchQueue.global().async { [self] in
+            completion(.success(self.page))
+        }
+        return nil
+    }
+}
+
+private final class FailingFavoritesStoreStub: FavoritesStoring {
+    func all() -> [FavoriteCharacter] {
+        []
+    }
+
+    func contains(id: Int) -> Bool {
+        false
+    }
+
+    func load(completion: @escaping (Result<[FavoriteCharacter], FavoritesStoreError>) -> Void) {
+        completion(.success([]))
+    }
+
+    func save(_ character: FavoriteCharacter, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void) {
+        completion(.failure(.writing))
+    }
+
+    func remove(id: Int, completion: @escaping (Result<Void, FavoritesStoreError>) -> Void) {
+        completion(.failure(.writing))
+    }
+}
+
+private final class ScreenFactorySpy: ScreenBuilding {
+    let catalog = HeroesCatalogViewController(viewModel: HeroesCatalogViewModel(
+        service: HeroServiceStub(result: .success(HeroesPage(characters: [], offset: 0, total: 0))),
+        favorites: makeTransientFavoritesStore()
+    ))
+    private(set) var onSelect: ((Character) -> Void)?
+    private(set) var onClose: (() -> Void)?
+    private(set) var detailsCharacter: Character?
+
+    func makeCatalog(onSelect: @escaping (Character) -> Void) -> HeroesCatalogViewController {
+        self.onSelect = onSelect
+        return catalog
+    }
+
+    func makeDetails(for character: Character, onClose: @escaping () -> Void) -> HeroesDetailsViewController {
+        detailsCharacter = character
+        self.onClose = onClose
+        return HeroesDetailsViewController(viewModel: HeroesDetailsViewModel(
+            character: character,
+            favorites: makeTransientFavoritesStore()
+        ))
+    }
+}
+
+private final class ModalPresenterSpy: ModalPresenting {
+    private(set) weak var presentingViewController: UIViewController?
+    private(set) var presentedViewController: UIViewController?
+    private(set) var presentedAnimated = false
+    private(set) weak var dismissedViewController: UIViewController?
+    private(set) var dismissedAnimated = false
+
+    func present(
+        _ viewController: UIViewController,
+        from presentingViewController: UIViewController?,
+        animated: Bool
+    ) {
+        self.presentingViewController = presentingViewController
+        presentedViewController = viewController
+        presentedAnimated = animated
+    }
+
+    func dismissPresented(from presentingViewController: UIViewController?, animated: Bool) {
+        dismissedViewController = presentingViewController
+        dismissedAnimated = animated
+    }
+}
+
+private func makeTransientFavoritesStore() -> FavoritesStore {
+    FavoritesStore(persistence: TransientFavoritesPersistence())
+}
+
+private final class TransientFavoritesPersistence: FavoritesPersistence {
+    private var data: Data?
+
+    func read() throws -> Data? {
+        data
+    }
+
+    func write(_ data: Data) throws {
+        self.data = data
+    }
 }

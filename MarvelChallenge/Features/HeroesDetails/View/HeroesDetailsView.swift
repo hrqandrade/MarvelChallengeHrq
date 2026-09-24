@@ -1,0 +1,191 @@
+import MarvelDesignSystem
+import MarvelImageLoader
+import UIKit
+
+final class HeroesDetailsView: UIView {
+    struct State {
+        let id: Int
+        let name: String
+        let description: String
+        let imageURL: URL?
+        let isFavorite: Bool
+        let hasComics: Bool
+        let hasSeries: Bool
+    }
+
+    let comicCollectionView = HeroesDetailsView.makeCollectionView()
+    let seriesCollectionView = HeroesDetailsView.makeCollectionView()
+    private let headerView = MarvelScreenHeaderView(title: "")
+    private let scrollView = UIScrollView()
+    private let contentStack = UIStackView()
+    private let heroImageView = UIImageView()
+    private let descriptionLabel = UILabel()
+    private let comicLabel = UILabel()
+    private let seriesLabel = UILabel()
+    private let feedbackBanner = MarvelFeedbackBanner()
+    private var characterName = ""
+    private lazy var comicHeightConstraint = comicCollectionView.heightAnchor.constraint(
+        equalToConstant: MarvelComponentSize.detailsCarouselHeight
+    )
+    private lazy var seriesHeightConstraint = seriesCollectionView.heightAnchor.constraint(
+        equalToConstant: MarvelComponentSize.detailsCarouselHeight
+    )
+
+    var onClose: (() -> Void)?
+    var onFavorite: (() -> Void)?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configureView()
+        configureHeader()
+        configureContent()
+        configureHierarchy()
+        configureConstraints()
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        nil
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory
+        else { return }
+        comicHeightConstraint.constant = MarvelComponentSize.detailsCarouselHeight
+        seriesHeightConstraint.constant = MarvelComponentSize.detailsCarouselHeight
+        comicCollectionView.collectionViewLayout.invalidateLayout()
+        seriesCollectionView.collectionViewLayout.invalidateLayout()
+    }
+
+    func render(_ state: State) {
+        characterName = state.name
+        headerView.setTitle(state.name)
+        descriptionLabel.text = state.description
+        heroImageView.setImage(
+            from: state.imageURL,
+            placeholder: HeroArtworkFactory.image(id: state.id, name: state.name)
+        )
+        comicLabel.isHidden = !state.hasComics
+        comicCollectionView.isHidden = !state.hasComics
+        seriesLabel.isHidden = !state.hasSeries
+        seriesCollectionView.isHidden = !state.hasSeries
+        renderFavorite(isFavorite: state.isFavorite)
+    }
+
+    func renderFavorite(isFavorite: Bool) {
+        headerView.trailingButton.setImage(UIImage(systemName: isFavorite ? "star.fill" : "star"), for: .normal)
+        headerView.trailingButton.accessibilityLabel = isFavorite
+            ? Localizable.Details.removeFavorite(characterName: characterName)
+            : Localizable.Details.addFavorite(characterName: characterName)
+    }
+
+    func setFavoriteEnabled(_ isEnabled: Bool) {
+        headerView.trailingButton.isEnabled = isEnabled
+    }
+
+    func showFeedback(message: String, isError: Bool) {
+        feedbackBanner.show(message: message, isError: isError)
+    }
+
+    private func configureView() {
+        backgroundColor = DesignSystem.Color.accent
+        accessibilityViewIsModal = true
+        scrollView.backgroundColor = DesignSystem.Color.backgroundPrimary
+    }
+
+    private func configureHeader() {
+        headerView.leadingButton.accessibilityIdentifier = AccessibilityIdentifier.Details.backButton
+        headerView.leadingButton.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
+        headerView.leadingButton.accessibilityLabel = Localizable.Details.back
+        headerView.leadingButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
+        headerView.trailingButton.accessibilityIdentifier = AccessibilityIdentifier.Details.favoriteButton
+        headerView.trailingButton.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
+    }
+
+    private func configureContent() {
+        heroImageView.contentMode = .scaleAspectFit
+        heroImageView.clipsToBounds = true
+        descriptionLabel.font = DesignSystem.Typography.body
+        descriptionLabel.adjustsFontForContentSizeCategory = true
+        descriptionLabel.textColor = DesignSystem.Color.textSecondary
+        descriptionLabel.numberOfLines = 0
+        comicLabel.font = DesignSystem.Typography.titleSecondary
+        comicLabel.adjustsFontForContentSizeCategory = true
+        comicLabel.textColor = DesignSystem.Color.textPrimary
+        comicLabel.text = Localizable.Details.comics
+        seriesLabel.font = DesignSystem.Typography.titleSecondary
+        seriesLabel.adjustsFontForContentSizeCategory = true
+        seriesLabel.textColor = DesignSystem.Color.textPrimary
+        seriesLabel.text = Localizable.Details.series
+        contentStack.axis = .vertical
+        contentStack.spacing = DesignSystem.Spacing.small
+        [heroImageView, descriptionLabel, comicLabel, comicCollectionView, seriesLabel, seriesCollectionView]
+            .forEach(contentStack.addArrangedSubview)
+    }
+
+    private func configureHierarchy() {
+        [headerView, scrollView, contentStack, feedbackBanner]
+            .forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        addSubview(headerView)
+        addSubview(scrollView)
+        scrollView.addSubview(contentStack)
+        addSubview(feedbackBanner)
+    }
+
+    private func configureConstraints() {
+        NSLayoutConstraint.activate([
+            headerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            headerView.heightAnchor.constraint(greaterThanOrEqualToConstant: MarvelComponentSize.navigationBarHeight),
+            scrollView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            contentStack.topAnchor.constraint(
+                equalTo: scrollView.contentLayoutGuide.topAnchor,
+                constant: DesignSystem.Spacing.medium
+            ),
+            contentStack.leadingAnchor.constraint(
+                equalTo: scrollView.frameLayoutGuide.leadingAnchor,
+                constant: DesignSystem.Spacing.medium
+            ),
+            contentStack.trailingAnchor.constraint(
+                equalTo: scrollView.frameLayoutGuide.trailingAnchor,
+                constant: -DesignSystem.Spacing.medium
+            ),
+            contentStack.bottomAnchor.constraint(
+                equalTo: scrollView.contentLayoutGuide.bottomAnchor,
+                constant: -DesignSystem.Spacing.large
+            ),
+            heroImageView.heightAnchor.constraint(equalToConstant: MarvelComponentSize.heroImageHeight),
+            comicHeightConstraint,
+            seriesHeightConstraint,
+            feedbackBanner.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: DesignSystem.Spacing.small),
+            feedbackBanner.leadingAnchor.constraint(equalTo: leadingAnchor, constant: DesignSystem.Spacing.medium),
+            feedbackBanner.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -DesignSystem.Spacing.medium),
+        ])
+    }
+
+    @objc private func didTapClose() {
+        onClose?()
+    }
+
+    @objc private func didTapFavorite() {
+        onFavorite?()
+    }
+
+    private static func makeCollectionView() -> UICollectionView {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = DesignSystem.Spacing.small
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.register(
+            DetailsCollectionViewCell.self,
+            forCellWithReuseIdentifier: DetailsCollectionViewCell.reuseIdentifier
+        )
+        return collectionView
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "originHash" : "4d5b3ee335e324cfbc4c4471a92684b0ec348271ca7a31219ffeec465a21e1a4",
+  "pins" : [
+    {
+      "identity" : "marveldesignsystem",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hrqandrade/MarvelDesignSystem.git",
+      "state" : {
+        "revision" : "5c58e0884b65cbf9783d7390e0ee62422b2eca06",
+        "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "marvelimageloader",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hrqandrade/MarvelImageLoader.git",
+      "state" : {
+        "revision" : "8def6c7c022b8e4d4772ba7d5bed72948fee8715",
+        "version" : "1.0.1"
+      }
+    }
+  ],
+  "version" : 3
+}

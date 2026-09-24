@@ -1,0 +1,70 @@
+included:
+  - MarvelChallenge
+  - MarvelChallengeTests
+
+excluded:
+  - .build
+  - DerivedData
+
+analyzer_rules:
+  - unused_declaration
+  - unused_import
+
+opt_in_rules:
+  - closure_spacing
+  - empty_count
+  - empty_string
+  - explicit_init
+  - fatal_error_message
+  - first_where
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - last_where
+  - legacy_multiple
+  - modifier_order
+  - multiline_arguments
+  - multiline_parameters
+  - overridden_super_call
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_parameter_alignment_on_call
+
+disabled_rules:
+  - static_over_final_class
+  - todo
+
+line_length:
+  warning: 120
+  error: 160
+  ignores_comments: true
+  ignores_urls: true
+
+file_length:
+  warning: 800
+  error: 900
+
+function_body_length:
+  warning: 60
+  error: 100
+
+type_body_length:
+  warning: 550
+  error: 650
+
+trailing_comma:
+  mandatory_comma: true
+
+identifier_name:
+  min_length:
+    warning: 2
+  excluded:
+    - id
+
+custom_rules:
+  no_objc_members:
+    name: "@objcMembers"
+    regex: "@objcMembers"
+    message: "Expose only the members that require Objective-C interoperability."
+    severity: error

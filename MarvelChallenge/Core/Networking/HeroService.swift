@@ -1,0 +1,160 @@
+import CryptoKit
+import Foundation
+
+protocol HeroServicing {
+    /// Delivers completion on the URL session callback queue. Presentation consumers must hop to the main thread.
+    @discardableResult
+    func fetchHeroes(page: Int, completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void)
+        -> RequestCancellable?
+}
+
+protocol RequestCancellable: AnyObject {
+    func cancel()
+}
+
+extension URLSessionDataTask: RequestCancellable {}
+
+protocol HTTPClient {
+    @discardableResult
+    func dataTask(
+        with request: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> RequestCancellable
+}
+
+final class URLSessionHTTPClient: HTTPClient {
+    private let session: URLSession
+
+    init(session: URLSession) {
+        self.session = session
+    }
+
+    @discardableResult
+    func dataTask(
+        with request: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> RequestCancellable {
+        let task = session.dataTask(with: request, completionHandler: completion)
+        task.resume()
+        return task
+    }
+}
+
+struct HeroesPage {
+    let characters: [Character]
+    let offset: Int
+    let total: Int?
+
+    var hasNextPage: Bool {
+        guard !characters.isEmpty else { return false }
+        guard let total else { return true }
+        return offset + characters.count < total
+    }
+}
+
+enum HeroServiceError: Error, Equatable {
+    case missingCredentials
+    case invalidURL
+    case transport
+    case invalidResponse
+    case decoding
+}
+
+final class HeroService: HeroServicing {
+    private enum Configuration {
+        static let pageSize = 20
+    }
+
+    private let httpClient: HTTPClient
+    private let baseURL: URL
+    private let publicKey: String
+    private let privateKey: String
+
+    init(
+        session: URLSession = .shared,
+        baseURL: URL = URL(string: "https://gateway.marvel.com:443")!,
+        publicKey: String = ProcessInfo.processInfo.environment["MARVEL_PUBLIC_KEY"] ?? "",
+        privateKey: String = ProcessInfo.processInfo.environment["MARVEL_PRIVATE_KEY"] ?? ""
+    ) {
+        httpClient = URLSessionHTTPClient(session: session)
+        self.baseURL = baseURL
+        self.publicKey = publicKey
+        self.privateKey = privateKey
+    }
+
+    init(
+        httpClient: HTTPClient,
+        baseURL: URL,
+        publicKey: String,
+        privateKey: String
+    ) {
+        self.httpClient = httpClient
+        self.baseURL = baseURL
+        self.publicKey = publicKey
+        self.privateKey = privateKey
+    }
+
+    @discardableResult
+    func fetchHeroes(
+        page: Int,
+        completion: @escaping (Result<HeroesPage, HeroServiceError>) -> Void
+    ) -> RequestCancellable? {
+        guard !publicKey.isEmpty, !privateKey.isEmpty else {
+            completion(.failure(.missingCredentials))
+            return nil
+        }
+        guard let url = makeURL(page: page) else {
+            completion(.failure(.invalidURL))
+            return nil
+        }
+
+        return httpClient.dataTask(with: URLRequest(url: url)) { data, response, error in
+            if error != nil {
+                completion(.failure(.transport))
+                return
+            }
+            guard let response = response as? HTTPURLResponse, (200 ..< 300).contains(response.statusCode),
+                  let data = data
+            else {
+                completion(.failure(.invalidResponse))
+                return
+            }
+            do {
+                let response = try JSONDecoder().decode(CharacterDataDTO.self, from: data)
+                guard let result = response.data else {
+                    completion(.failure(.invalidResponse))
+                    return
+                }
+                try completion(.success(HeroesPage(
+                    characters: result.results?.map { try $0.domainModel() } ?? [],
+                    offset: result.offset ?? page * Configuration.pageSize,
+                    total: result.total
+                )))
+            } catch {
+                completion(.failure(.decoding))
+            }
+        }
+    }
+
+    private func makeURL(page: Int) -> URL? {
+        let timestamp = String(Date().timeIntervalSince1970)
+        let hash = md5(timestamp + privateKey + publicKey)
+        var components = URLComponents(
+            url: baseURL.appendingPathComponent("v1/public/characters"),
+            resolvingAgainstBaseURL: true
+        )
+        components?.queryItems = [
+            URLQueryItem(name: "offset", value: String(page * Configuration.pageSize)),
+            URLQueryItem(name: "limit", value: String(Configuration.pageSize)),
+            URLQueryItem(name: "orderBy", value: "name"),
+            URLQueryItem(name: "ts", value: timestamp),
+            URLQueryItem(name: "hash", value: hash),
+            URLQueryItem(name: "apikey", value: publicKey),
+        ]
+        return components?.url
+    }
+
+    private func md5(_ value: String) -> String {
+        Insecure.MD5.hash(data: Data(value.utf8)).map { String(format: "%02x", $0) }.joined()
+    }
+}
