@@ -28,6 +28,7 @@ Este arquivo registra as mudanças relevantes de cada versão publicada.
 
 - Cobertura automatizada para regras de apresentação, rede, persistência, memória e fluxos principais.
 - Verificações de formatação, análise estática, build e testes na integração contínua.
+- Simulator iOS 18.5 criado e inicializado explicitamente na CI, com destino selecionado por identificador.
 - Archive Release reproduzível e verificação do produto compilado.
 
 ### Licenciamento
