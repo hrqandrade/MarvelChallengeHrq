@@ -2,7 +2,9 @@
 
 Aplicativo iOS para consultar personagens da Marvel, ver detalhes e manter uma lista local de favoritos. Mais do que uma demonstração de interface, este repositório registra a evolução de um projeto legado para uma base moderna, modular e testável.
 
-Versão em desenvolvimento: **2.0.0**
+Versão: **2.0.0** — código-fonte para estudo.
+
+A validação física de VoiceOver e Memory Graph foi adiada. A integração live não está homologada; consulte as [limitações da versão](CHANGELOG.md) e os [direitos de terceiros](THIRD_PARTY_NOTICES.md).
 
 ## A história do projeto
 
@@ -168,7 +170,7 @@ make validate-release
 
 Pull Requests para `develop` e `master` executam formatação, análise estática, build e os testes automatizados. O processo de contribuição e os critérios de revisão estão documentados em [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-As mudanças da versão em preparação estão reunidas em [`CHANGELOG.md`](CHANGELOG.md). A homologação final combina as verificações reproduzíveis acima com a passagem manual registrada no roadmap.
+As mudanças e limitações da versão estão reunidas em [`CHANGELOG.md`](CHANGELOG.md). Os resultados automatizados e as verificações físicas adiadas estão registrados no roadmap.
 
 ## Modo de demonstração
 

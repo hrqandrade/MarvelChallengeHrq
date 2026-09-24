@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hrqandrade/MarvelDesignSystem.git",
       "state" : {
-        "revision" : "312f0d142032696371344b2df9dd4315531cd8a4",
-        "version" : "1.0.0"
+        "revision" : "5c58e0884b65cbf9783d7390e0ee62422b2eca06",
+        "version" : "1.0.1"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hrqandrade/MarvelImageLoader.git",
       "state" : {
-        "revision" : "38cdadf6ad3c52b6521fe2b2950214636b4571b3",
-        "version" : "1.0.0"
+        "revision" : "8def6c7c022b8e4d4772ba7d5bed72948fee8715",
+        "version" : "1.0.1"
       }
     }
   ],

@@ -38,7 +38,7 @@ Consideramos esta fase pronta com o projeto compilando, os testes aprovados e as
 - Integrar o loading ao fluxo de estado ou remover o componente enquanto não tiver uso.
 - Validar desalocação de Coordinator, ViewControllers, ViewModels e células.
 
-Esta fase foi encerrada sem caminhos conhecidos de crash por cast ou unwrap e com testes básicos de desalocação. A regressão da release ainda inclui uma passagem manual pelo Memory Graph.
+Esta fase foi encerrada sem caminhos conhecidos de crash por cast ou unwrap e com testes básicos de desalocação. A passagem manual pelo Memory Graph em aparelho físico foi adiada para uma validação posterior à publicação do código-fonte da 2.0.0.
 
 ### 3. Concorrência, cancelamento e paginação — concluída
 
@@ -152,7 +152,7 @@ Falhas na primeira carga agora ficam na própria tela com uma ação de nova ten
 
 A base reage aos tamanhos de texto de acessibilidade, respeita Reduce Motion e mantém os cards acionáveis sem perder a ação de favorito. A tela de detalhes isola a leitura do conteúdo apresentado, e os controles anunciam personagem e estado sem depender apenas da cor. Também validamos Bold Text, contraste e as orientações declaradas: retrato no iPhone e as quatro orientações no iPad.
 
-O Simulator não disponibiliza o VoiceOver completo nos Ajustes. Por isso, a navegação foi conferida pela árvore de acessibilidade do sistema, cobrindo catálogo, favoritos e detalhes. A passagem falada em aparelho físico fica registrada na regressão da release.
+O Simulator não disponibiliza o VoiceOver completo nos Ajustes. Por isso, a navegação foi conferida pela árvore de acessibilidade do sistema, cobrindo catálogo, favoritos e detalhes. A passagem falada em aparelho físico foi adiada para uma validação posterior à publicação do código-fonte da 2.0.0.
 
 ### 14. Testes dos fluxos principais — concluída
 
@@ -172,7 +172,7 @@ O novo target de UI Tests percorre os caminhos essenciais com os dados locais do
 
 O catálogo ficou restrito a um App Icon opaco em alta resolução e à cor de fundo da Launch Screen. A revisão de licenciamento substituiu o ícone com logo oficial por uma composição geométrica própria e removeu o logo da tela de abertura. Favoritos, alternância de layout e estados vazios usam SF Symbols, mantendo escala e renderização consistentes sem carregar cópias rasterizadas. A Launch Screen preserva a cor de fundo que introduz a primeira tela do catálogo, sem usar o logo oficial.
 
-### 16. Preparação da release — em homologação
+### 16. Preparação da release — escopo de código-fonte
 
 - Gerar e validar um archive de Release.
 - Confirmar que mocks, argumentos de demonstração e credenciais não estão no binário final.
@@ -180,7 +180,7 @@ O catálogo ficou restrito a um App Icon opaco em alta resolução e à cor de f
 - Revisar warnings, licenças, atribuições e limitações conhecidas.
 - Criar o changelog da versão 2.0.0.
 
-Esta fase estará pronta com um archive limpo, reproduzível e acompanhado das evidências da regressão final.
+A publicação da 2.0.0 abrange o código-fonte para estudo e a demonstração local em Debug. O archive é uma evidência de compilação e não será distribuído como aplicativo homologado. Em 23/09/2026, o responsável decidiu adiar a validação em aparelho físico. Essa decisão não equivale à aprovação dos testes físicos nem da integração live.
 
 #### Evidências da homologação
 
@@ -191,18 +191,18 @@ Esta fase estará pronta com um archive limpo, reproduzível e acompanhado das e
 - [x] Regressão automatizada repetida a partir do estado final da fase: 47 testes de unidade e integração, além de 4 testes de interface.
 - [x] Leaks e Allocations conferidos no início e no estado de erro da configuração Release, sem vazamentos detectados.
 - [x] Fluxos de catálogo, mudança de layout, detalhes e favoritos exercitados em Debug durante a coleta de Animation Hitches, sem hitches ou hangs detectados.
-- [ ] Memory Graph conferido em aparelho físico após percorrer e encerrar os fluxos principais.
-- [ ] Fluxos de catálogo, favoritos e detalhes percorridos com VoiceOver em aparelho físico.
+- **Adiado:** Memory Graph em aparelho físico após percorrer e encerrar os fluxos principais; não executado nesta release.
+- **Adiado:** catálogo, favoritos e detalhes com VoiceOver em aparelho físico; não executado nesta release.
 - [x] Licença MIT definida para o código próprio, com direitos de terceiros separados em `THIRD_PARTY_NOTICES.md`.
 - [ ] Termos e atribuição da API confirmados antes de distribuir o modo live; consulta aos endpoints oficiais retornou HTTP 403 em 23/09/2026.
 
-### 17. Release 2.0.0 — planejada
+### 17. Release 2.0.0 — publicação de código-fonte
 
 - Abrir Pull Request da `develop` para a `master`.
 - Criar a tag e a release 2.0.0.
 - Publicar o resumo da modernização e as limitações conhecidas.
 
-A versão 2.0.0 estará pronta quando puder ser reproduzida a partir da `master`, com documentação, tag e regressão final concluídas.
+A publicação reúne o código-fonte na `master`, tag 2.0.0 e notas com os resultados automatizados e as limitações. Não inclui IPA, distribuição na App Store ou homologação do modo live. A validação física fica adiada; os termos e a atribuição da API continuam pendentes antes de distribuir conteúdo remoto.
 
 ## Quando uma fase está pronta
 
@@ -213,3 +213,8 @@ Antes de marcar uma fase como concluída, conferimos se:
 - memória, concorrência e estados de erro foram considerados na revisão;
 - documentação e roadmap refletem a decisão final;
 - o Pull Request foi revisado e integrado à `develop`.
+
+## Acompanhamento posterior à 2.0.0
+
+- [ ] Executar Memory Graph e VoiceOver em aparelho físico.
+- [ ] Confirmar disponibilidade, termos e atribuição da API antes de distribuir o modo live.
