@@ -51,8 +51,22 @@ jobs:
         with:
           xcode-version: "16.4"
 
+      - name: Prepare iOS Simulator
+        id: simulator
+        run: |
+          simulator_id=$(xcrun simctl create "MarvelChallenge CI" \
+            com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro \
+            com.apple.CoreSimulator.SimRuntime.iOS-18-5)
+          xcrun simctl boot "$simulator_id"
+          xcrun simctl bootstatus "$simulator_id" -b
+          echo "destination=platform=iOS Simulator,id=$simulator_id" >> "$GITHUB_OUTPUT"
+
       - name: Build
-        run: make build
+        env:
+          TEST_DESTINATION: ${{ steps.simulator.outputs.destination }}
+        run: make build DESTINATION="$TEST_DESTINATION"
 
       - name: Run tests
-        run: make test
+        env:
+          TEST_DESTINATION: ${{ steps.simulator.outputs.destination }}
+        run: make test DESTINATION="$TEST_DESTINATION"
